@@ -12,25 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            // 基本カラム
             $table->id();
-            $table->string('username')->unique();
-            $table->string('password');
             $table->string('name');
-            $table->string('email')->nullable()->unique();
-            
-            // 業務関連カラム
-            $table->enum('role', ['admin', 'care_worker', 'nurse', 'manager', 'staff', 'care_manager', 'nutritionist']);
-            $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('set null');
-            
-            // Laravel標準カラム
+            $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
             $table->rememberToken();
             $table->timestamps();
-            
-            // インデックス
-            $table->index('role');
-            $table->index('department_id');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
