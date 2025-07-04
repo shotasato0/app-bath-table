@@ -13,7 +13,16 @@ return new class extends Migration
     {
         Schema::create('calendar_dates', function (Blueprint $table) {
             $table->id();
+            $table->date('calendar_date')->unique();
+            $table->tinyInteger('day_of_week');
+            $table->boolean('is_holiday')->default(false);
+            $table->string('holiday_name')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
+            
+            $table->index('calendar_date');
+            $table->index('is_holiday');
+            $table->index('day_of_week');
         });
     }
 
