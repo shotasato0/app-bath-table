@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::create('residents', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->enum('gender', ['male', 'female', 'other'])->nullable();
+            $table->date('birth_date')->nullable();
+            $table->text('medical_notes')->nullable();
             $table->timestamps();
+            
+            $table->index('name');
+            $table->index('birth_date');
         });
     }
 
