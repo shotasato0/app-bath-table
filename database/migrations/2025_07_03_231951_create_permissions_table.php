@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('staff_id')->constrained('users')->onDelete('cascade');
+            $table->boolean('can_edit_schedule')->default(false);
             $table->timestamps();
+            
+            $table->index('staff_id');
+            $table->index('can_edit_schedule');
         });
     }
 
