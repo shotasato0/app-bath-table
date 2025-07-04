@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('schedule_types', function (Blueprint $table) {
             $table->id();
+            $table->string('type_name');
+            $table->string('color_code', 7)->default('#FF5733');
             $table->timestamps();
+            
+            $table->index('type_name');
         });
     }
 
