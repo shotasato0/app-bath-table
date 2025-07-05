@@ -29,7 +29,13 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropForeign(['department_id']);
+            $table->dropIndex(['username']);
+            $table->dropIndex(['role']);
+            $table->dropIndex(['department_id']);
+            
+            $table->dropColumn(['username', 'role', 'department_id']);
+            $table->string('email')->nullable(false)->change();
         });
     }
 };
