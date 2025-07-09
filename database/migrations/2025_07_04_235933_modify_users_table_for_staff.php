@@ -16,8 +16,6 @@ return new class extends Migration
             $table->enum('role', ['admin', 'care_worker', 'nurse', 'manager', 'staff', 'care_manager', 'nutritionist'])->after('name');
             $table->foreignId('department_id')->nullable()->after('role')->constrained('departments')->onDelete('set null');
             $table->string('email')->nullable()->change();
-            
-            $table->index('username');
             $table->index('role');
             $table->index('department_id');
         });
@@ -30,7 +28,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropForeign(['department_id']);
-            $table->dropIndex(['username']);
+            $table->dropUnique(['username']);
             $table->dropIndex(['role']);
             $table->dropIndex(['department_id']);
             
