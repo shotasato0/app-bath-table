@@ -20,7 +20,6 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->timestamps();
             
-            $table->index('calendar_date');
             $table->index('is_holiday');
             $table->index('day_of_week');
         });
