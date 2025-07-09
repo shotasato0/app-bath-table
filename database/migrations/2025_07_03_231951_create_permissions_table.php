@@ -18,7 +18,6 @@ return new class extends Migration
             $table->timestamps();
             
             $table->index('staff_id');
-            $table->index('can_edit_schedule');
         });
     }
 
