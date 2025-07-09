@@ -12,14 +12,11 @@ class ScheduleType extends Model
     protected $fillable = [
         'type_name',
         'color_code',
-        'is_active',
     ];
 
     protected function casts(): array
     {
-        return [
-            'is_active' => 'boolean',
-        ];
+        return [];
     }
 
     public function schedules()
