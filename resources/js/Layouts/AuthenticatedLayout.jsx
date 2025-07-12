@@ -2,14 +2,45 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
+    const { props } = usePage();
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+
+    const handleLogout = (e) => {
+        e.preventDefault();
+        
+        // デバッグ情報をコンソールに出力
+        console.log('=== CSRF Debug Info ===');
+        console.log('Meta CSRF token:', document.querySelector('meta[name="csrf-token"]')?.content);
+        console.log('Inertia props csrf_token:', props.csrf_token);
+        console.log('Document cookies:', document.cookie);
+        console.log('Current URL:', window.location.href);
+        console.log('Axios default headers:', window.axios?.defaults?.headers?.common);
+        
+        router.post(route('logout'), {}, {
+            onBefore: (visit) => {
+                console.log('=== Request Details ===');
+                console.log('Visit object:', visit);
+                console.log('Request headers will include:', {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                    'X-Requested-With': 'XMLHttpRequest'
+                });
+            },
+            onError: (errors) => {
+                console.log('=== Logout Error ===');
+                console.log('Errors:', errors);
+            },
+            onSuccess: () => {
+                console.log('=== Logout Success ===');
+            }
+        });
+    };
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -66,13 +97,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             Profile
                                         </Dropdown.Link>
-                                        <Dropdown.Link
-                                            href={route('logout')}
-                                            method="post"
-                                            as="button"
+                                        <button
+                                            onClick={handleLogout}
+                                            className="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-800 dark:focus:bg-gray-800"
                                         >
-                                            Log Out
-                                        </Dropdown.Link>
+                                            Log Out (Debug)
+                                        </button>
                                     </Dropdown.Content>
                                 </Dropdown>
                             </div>
@@ -150,13 +180,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             <ResponsiveNavLink href={route('profile.edit')}>
                                 Profile
                             </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                method="post"
-                                href={route('logout')}
-                                as="button"
+                            <button
+                                onClick={handleLogout}
+                                className="block w-full px-4 py-2 text-start text-base font-medium text-gray-600 transition duration-150 ease-in-out hover:bg-gray-50 hover:text-gray-800 focus:bg-gray-50 focus:text-gray-800 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200 dark:focus:bg-gray-700 dark:focus:text-gray-200"
                             >
-                                Log Out
-                            </ResponsiveNavLink>
+                                Log Out (Debug)
+                            </button>
                         </div>
                     </div>
                 </div>
