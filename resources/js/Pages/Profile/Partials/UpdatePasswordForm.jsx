@@ -3,12 +3,13 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 
 export default function UpdatePasswordForm({ className = '' }) {
     const passwordInput = useRef();
     const currentPasswordInput = useRef();
+    const user = usePage().props.auth.user;
 
     const {
         data,
@@ -58,6 +59,16 @@ export default function UpdatePasswordForm({ className = '' }) {
             </header>
 
             <form onSubmit={updatePassword} className="mt-6 space-y-6">
+                {/* アクセシビリティのために隠しusernameフィールドを追加 */}
+                <input
+                    type="text"
+                    name="username"
+                    value={user.username || ''}
+                    autoComplete="username"
+                    style={{ display: 'none' }}
+                    readOnly
+                />
+                
                 <div>
                     <InputLabel
                         htmlFor="current_password"
