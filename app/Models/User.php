@@ -59,11 +59,4 @@ class User extends Authenticatable
         return $this->hasOne(Permission::class);
     }
 
-    /**
-     * Get the name of the unique identifier for the user.
-     */
-    public function getAuthIdentifierName()
-    {
-        return 'username';
-    }
 }
