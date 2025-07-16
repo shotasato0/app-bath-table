@@ -21,6 +21,13 @@ export default function Login({ status, canResetPassword }) {
         });
     };
 
+    const handleUsernameKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('password').focus();
+        }
+    };
+
     return (
         <GuestLayout>
             <Head title="ログイン" />
@@ -44,6 +51,7 @@ export default function Login({ status, canResetPassword }) {
                         autoComplete="username"
                         isFocused={true}
                         onChange={(e) => setData('username', e.target.value)}
+                        onKeyDown={handleUsernameKeyDown}
                     />
 
                     <InputError message={errors.username} className="mt-2" />
