@@ -1,23 +1,23 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { Head, Link, useForm } from "@inertiajs/react";
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        username: '',
-        password: '',
-        password_confirmation: '',
+        name: "",
+        username: "",
+        password: "",
+        password_confirmation: "",
     });
 
     const submit = (e) => {
         e.preventDefault();
 
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+        post(route("register"), {
+            onFinish: () => reset("password", "password_confirmation"),
         });
     };
 
@@ -37,7 +37,7 @@ export default function Register() {
                         autoComplete="name"
                         isFocused={true}
                         placeholder="田中 太郎"
-                        onChange={(e) => setData('name', e.target.value)}
+                        onChange={(e) => setData("name", e.target.value)}
                         required
                     />
 
@@ -45,8 +45,10 @@ export default function Register() {
                 </div>
 
                 <div className="mt-6">
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">ログイン情報</h3>
-                    
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+                        ログイン情報
+                    </h3>
+
                     <InputLabel htmlFor="username" value="ログインID" />
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                         ログイン時に使用する英数字のIDです
@@ -60,7 +62,7 @@ export default function Register() {
                         className="mt-1 block w-full"
                         autoComplete="username"
                         placeholder="tanaka_taro"
-                        onChange={(e) => setData('username', e.target.value)}
+                        onChange={(e) => setData("username", e.target.value)}
                         required
                     />
 
@@ -77,7 +79,7 @@ export default function Register() {
                         value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
+                        onChange={(e) => setData("password", e.target.value)}
                         required
                     />
 
@@ -98,7 +100,7 @@ export default function Register() {
                         className="mt-1 block w-full"
                         autoComplete="new-password"
                         onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
+                            setData("password_confirmation", e.target.value)
                         }
                         required
                     />
@@ -111,20 +113,21 @@ export default function Register() {
 
                 <div className="mt-6">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                        ※ 職種や部署設定は、ログイン後にプロフィールから行えます。
+                        ※
+                        職種や部署設定は、ログイン後にプロフィールから行えます。
                     </p>
                 </div>
 
                 <div className="mt-4 flex items-center justify-end">
                     <Link
-                        href={route('login')}
+                        href={route("login")}
                         className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
                     >
                         既にアカウントをお持ちですか？
                     </Link>
 
                     <PrimaryButton className="ms-4" disabled={processing}>
-登録
+                        登録
                     </PrimaryButton>
                 </div>
             </form>
