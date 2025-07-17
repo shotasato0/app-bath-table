@@ -24,7 +24,7 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
             'email' => [
-                'required',
+                'nullable',
                 'string',
                 'lowercase',
                 'email',
@@ -47,7 +47,6 @@ class ProfileUpdateRequest extends FormRequest
             'username.string' => 'ログインIDは文字列で入力してください。',
             'username.max' => 'ログインIDは255文字以内で入力してください。',
             'username.unique' => 'このログインIDは既に使用されています。',
-            'email.required' => 'メールアドレスは必須です。',
             'email.string' => 'メールアドレスは文字列で入力してください。',
             'email.lowercase' => 'メールアドレスは小文字で入力してください。',
             'email.email' => '有効なメールアドレスを入力してください。',
