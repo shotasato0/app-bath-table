@@ -29,17 +29,17 @@ export default function UpdateProfileInformation({
         <section className={className}>
             <header>
                 <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                    Profile Information
+                    プロフィール情報
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    Update your account's profile information and email address.
+                    アカウントのプロフィール情報を更新してください。
                 </p>
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                    <InputLabel htmlFor="name" value="氏名" />
 
                     <TextInput
                         id="name"
@@ -112,7 +112,7 @@ export default function UpdateProfileInformation({
                 )}
 
                 <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                    <PrimaryButton disabled={processing}>保存</PrimaryButton>
 
                     <Transition
                         show={recentlySuccessful}
@@ -122,7 +122,7 @@ export default function UpdateProfileInformation({
                         leaveTo="opacity-0"
                     >
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Saved.
+                            保存しました。
                         </p>
                     </Transition>
                 </div>
