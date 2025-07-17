@@ -14,8 +14,9 @@ export default function UpdateProfileInformation({
 
     const { data, setData, patch, errors, processing, recentlySuccessful } =
         useForm({
-            name: user.name,
-            email: user.email,
+            name: user.name || '',
+            username: user.username || '',
+            email: user.email || '',
         });
 
     const submit = (e) => {
@@ -28,17 +29,17 @@ export default function UpdateProfileInformation({
         <section className={className}>
             <header>
                 <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                    Profile Information
+                    プロフィール情報
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    Update your account's profile information and email address.
+                    アカウントのプロフィール情報を更新してください。
                 </p>
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                    <InputLabel htmlFor="name" value="氏名" />
 
                     <TextInput
                         id="name"
@@ -54,16 +55,34 @@ export default function UpdateProfileInformation({
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="username" value="ログインID" />
+
+                    <TextInput
+                        id="username"
+                        className="mt-1 block w-full"
+                        value={data.username}
+                        onChange={(e) => setData('username', e.target.value)}
+                        required
+                        autoComplete="username"
+                    />
+
+                    <InputError className="mt-2" message={errors.username} />
+                </div>
+
+                <div>
+                    <InputLabel htmlFor="email" value="メールアドレス（任意）" />
 
                     <TextInput
                         id="email"
                         type="email"
                         className="mt-1 block w-full"
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                        autoComplete="username"
+                        value={data.email || ''}
+                        onChange={(e) => {
+                            const value = e.target.value.trim();
+                            setData('email', value === '' ? null : value);
+                        }}
+                        autoComplete="email"
+                        placeholder="例: tanaka@example.com"
                     />
 
                     <InputError className="mt-2" message={errors.email} />
@@ -93,7 +112,7 @@ export default function UpdateProfileInformation({
                 )}
 
                 <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                    <PrimaryButton disabled={processing}>保存</PrimaryButton>
 
                     <Transition
                         show={recentlySuccessful}
@@ -103,7 +122,7 @@ export default function UpdateProfileInformation({
                         leaveTo="opacity-0"
                     >
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Saved.
+                            保存しました。
                         </p>
                     </Transition>
                 </div>
