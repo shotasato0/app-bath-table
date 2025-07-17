@@ -70,16 +70,19 @@ export default function UpdateProfileInformation({
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value="メールアドレス（任意）" />
 
                     <TextInput
                         id="email"
                         type="email"
                         className="mt-1 block w-full"
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
+                        value={data.email || ''}
+                        onChange={(e) => {
+                            const value = e.target.value.trim();
+                            setData('email', value === '' ? null : value);
+                        }}
                         autoComplete="email"
+                        placeholder="例: tanaka@example.com"
                     />
 
                     <InputError className="mt-2" message={errors.email} />
