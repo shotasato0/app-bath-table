@@ -71,15 +71,42 @@ class ScheduleSeeder extends Seeder
             ], $residentData);
         }
 
-        // テスト予定を作成
+        // カレンダー日付を作成
         $today = Carbon::today();
+        $calendarDate = CalendarDate::firstOrCreate([
+            'calendar_date' => $today,
+        ], [
+            'day_of_week' => $today->dayOfWeek,
+            'is_holiday' => false,
+        ]);
+
+        // スケジュールタイプを作成
+        $scheduleTypes = [
+            ['type_name' => '入浴', 'color_code' => '#3B82F6'],
+            ['type_name' => '医療', 'color_code' => '#EF4444'],
+            ['type_name' => '活動', 'color_code' => '#8B5CF6'],
+            ['type_name' => '一般', 'color_code' => '#6B7280'],
+        ];
+
+        foreach ($scheduleTypes as $typeData) {
+            ScheduleType::firstOrCreate([
+                'type_name' => $typeData['type_name'],
+            ], $typeData);
+        }
+
+        // テスト予定を作成
         $residents = Resident::all();
+        $bathingType = ScheduleType::where('type_name', '入浴')->first();
+        $medicalType = ScheduleType::where('type_name', '医療')->first();
+        $activityType = ScheduleType::where('type_name', '活動')->first();
 
         $schedules = [
             [
                 'title' => '田中さんの入浴',
                 'description' => '午前の入浴予定',
                 'resident_id' => $residents[0]->id,
+                'date_id' => $calendarDate->id,
+                'schedule_type_id' => $bathingType->id,
                 'date' => $today->format('Y-m-d'),
                 'start_time' => '10:00',
                 'end_time' => '11:00',
@@ -95,6 +122,8 @@ class ScheduleSeeder extends Seeder
                 'title' => '佐藤さんの医療チェック',
                 'description' => '血圧測定と薬の服用確認',
                 'resident_id' => $residents[1]->id,
+                'date_id' => $calendarDate->id,
+                'schedule_type_id' => $medicalType->id,
                 'date' => $today->format('Y-m-d'),
                 'start_time' => '09:30',
                 'end_time' => '10:00',
@@ -110,6 +139,8 @@ class ScheduleSeeder extends Seeder
                 'title' => '鈴木さんのリハビリ',
                 'description' => '午後のリハビリテーション',
                 'resident_id' => $residents[2]->id,
+                'date_id' => $calendarDate->id,
+                'schedule_type_id' => $activityType->id,
                 'date' => $today->format('Y-m-d'),
                 'start_time' => '14:00',
                 'end_time' => '15:00',
@@ -127,7 +158,7 @@ class ScheduleSeeder extends Seeder
             Schedule::firstOrCreate([
                 'title' => $scheduleData['title'],
                 'resident_id' => $scheduleData['resident_id'],
-                'date' => $scheduleData['date'],
+                'date_id' => $scheduleData['date_id'],
                 'start_time' => $scheduleData['start_time'],
             ], $scheduleData);
         }
