@@ -33,4 +33,9 @@ class Resident extends Model
     {
         return $this->hasMany(Schedule::class);
     }
+
+    public function primaryStaff()
+    {
+        return $this->belongsTo(User::class, 'primary_staff_id');
+    }
 }
