@@ -10,12 +10,14 @@ class Schedule extends Model
     use HasFactory;
 
     protected $fillable = [
+        'date_id',
         'title',
         'description',
-        'resident_id',
-        'date',
         'start_time',
         'end_time',
+        'schedule_type_id',
+        'resident_id',
+        'date',
         'type',
         'column_type',
         'priority',
