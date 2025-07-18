@@ -6,6 +6,8 @@ use Illuminate\Database\Seeder;
 use App\Models\Schedule;
 use App\Models\Resident;
 use App\Models\User;
+use App\Models\CalendarDate;
+use App\Models\ScheduleType;
 use Carbon\Carbon;
 
 class ScheduleSeeder extends Seeder

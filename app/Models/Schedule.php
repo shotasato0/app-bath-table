@@ -38,6 +38,16 @@ class Schedule extends Model
         ];
     }
 
+    public function calendarDate()
+    {
+        return $this->belongsTo(CalendarDate::class, 'date_id');
+    }
+
+    public function scheduleType()
+    {
+        return $this->belongsTo(ScheduleType::class);
+    }
+
     public function resident()
     {
         return $this->belongsTo(Resident::class);
