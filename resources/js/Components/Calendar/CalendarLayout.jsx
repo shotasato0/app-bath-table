@@ -79,8 +79,8 @@ export default function CalendarLayout({
     };
 
     // 入浴予定作成
-    const handleAddBathingSchedule = (date) => {
-        handleAddSchedule('bathing', date);
+    const handleAddBathingSchedule = () => {
+        handleAddSchedule('bathing');
     };
 
     // モーダルを閉じる
@@ -231,7 +231,7 @@ export default function CalendarLayout({
                             <ResidentSidebar
                                 residents={residents}
                                 userRole={user?.role}
-                                onResidentSelect={(resident) => {
+                                onResidentSelect={() => {
                                     // 利用者選択時の処理
                                 }}
                                 className="flex-shrink-0"
