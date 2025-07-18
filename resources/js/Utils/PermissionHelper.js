@@ -1,4 +1,4 @@
-import { usePage } from '@inertiajs/react';
+import { usePage } from "@inertiajs/react";
 
 // 権限管理ヘルパー関数
 export class PermissionHelper {
@@ -10,31 +10,31 @@ export class PermissionHelper {
         nurse: 70,
         care_worker: 60,
         nutritionist: 50,
-        staff: 40
+        staff: 40,
     };
 
     // 権限レベルごとの操作可能な機能
     static PERMISSIONS = {
         // カレンダー関連
-        CALENDAR_VIEW: 40,          // カレンダー閲覧
-        SCHEDULE_CREATE: 60,        // 予定作成
-        SCHEDULE_EDIT_OWN: 60,      // 自分の予定編集
-        SCHEDULE_EDIT_ALL: 80,      // 全ての予定編集
-        SCHEDULE_DELETE: 80,        // 予定削除
-        
+        CALENDAR_VIEW: 40, // カレンダー閲覧
+        SCHEDULE_CREATE: 60, // 予定作成
+        SCHEDULE_EDIT_OWN: 60, // 自分の予定編集
+        SCHEDULE_EDIT_ALL: 80, // 全ての予定編集
+        SCHEDULE_DELETE: 80, // 予定削除
+
         // 入浴スケジュール関連
-        BATHING_VIEW: 40,           // 入浴スケジュール閲覧
-        BATHING_SCHEDULE: 60,       // 入浴スケジュール作成・編集
-        BATHING_MANAGE: 70,         // 入浴スケジュール管理
-        
+        BATHING_VIEW: 40, // 入浴スケジュール閲覧
+        BATHING_SCHEDULE: 60, // 入浴スケジュール作成・編集
+        BATHING_MANAGE: 70, // 入浴スケジュール管理
+
         // 利用者関連
-        RESIDENT_VIEW: 40,          // 利用者情報閲覧
-        RESIDENT_EDIT: 70,          // 利用者情報編集
-        RESIDENT_MANAGE: 80,        // 利用者管理
-        
+        RESIDENT_VIEW: 40, // 利用者情報閲覧
+        RESIDENT_EDIT: 70, // 利用者情報編集
+        RESIDENT_MANAGE: 80, // 利用者管理
+
         // システム管理
-        USER_MANAGE: 90,            // ユーザー管理
-        SYSTEM_ADMIN: 100           // システム管理
+        USER_MANAGE: 90, // ユーザー管理
+        SYSTEM_ADMIN: 100, // システム管理
     };
 
     /**
@@ -58,7 +58,7 @@ export class PermissionHelper {
     static hasPermission(user, permission) {
         const userLevel = this.getUserLevel(user);
         const requiredLevel = this.PERMISSIONS[permission];
-        
+
         return userLevel >= requiredLevel;
     }
 
@@ -69,7 +69,9 @@ export class PermissionHelper {
      * @returns {boolean} いずれかの権限があるかどうか
      */
     static hasAnyPermission(user, permissions) {
-        return permissions.some(permission => this.hasPermission(user, permission));
+        return permissions.some((permission) =>
+            this.hasPermission(user, permission)
+        );
     }
 
     /**
@@ -79,7 +81,9 @@ export class PermissionHelper {
      * @returns {boolean} 全ての権限があるかどうか
      */
     static hasAllPermissions(user, permissions) {
-        return permissions.every(permission => this.hasPermission(user, permission));
+        return permissions.every((permission) =>
+            this.hasPermission(user, permission)
+        );
     }
 
     /**
@@ -90,15 +94,15 @@ export class PermissionHelper {
      */
     static canEditSchedule(user, schedule) {
         // 全ての予定を編集できる権限があるかチェック
-        if (this.hasPermission(user, 'SCHEDULE_EDIT_ALL')) {
+        if (this.hasPermission(user, "SCHEDULE_EDIT_ALL")) {
             return true;
         }
-        
+
         // 自分の予定のみ編集できる権限があるかチェック
-        if (this.hasPermission(user, 'SCHEDULE_EDIT_OWN')) {
+        if (this.hasPermission(user, "SCHEDULE_EDIT_OWN")) {
             return schedule.created_by === user.id;
         }
-        
+
         return false;
     }
 
@@ -109,15 +113,15 @@ export class PermissionHelper {
      * @returns {boolean} 削除権限があるかどうか
      */
     static canDeleteSchedule(user, schedule) {
-        if (!this.hasPermission(user, 'SCHEDULE_DELETE')) {
+        if (!this.hasPermission(user, "SCHEDULE_DELETE")) {
             return false;
         }
-        
+
         // 管理者レベルなら全て削除可能
         if (this.getUserLevel(user) >= this.ROLE_HIERARCHY.manager) {
             return true;
         }
-        
+
         // それ以外は自分が作成した予定のみ削除可能
         return schedule.created_by === user.id;
     }
@@ -129,16 +133,16 @@ export class PermissionHelper {
      */
     static getRoleDisplayName(role) {
         const roleNames = {
-            admin: '管理者',
-            manager: '施設長',
-            care_manager: 'ケアマネージャー',
-            nurse: '看護師',
-            care_worker: '介護士',
-            nutritionist: '栄養士',
-            staff: 'スタッフ'
+            admin: "管理者",
+            manager: "施設長",
+            care_manager: "ケアマネージャー",
+            nurse: "看護師",
+            care_worker: "介護士",
+            nutritionist: "栄養士",
+            staff: "スタッフ",
         };
-        
-        return roleNames[role] || '不明';
+
+        return roleNames[role] || "不明";
     }
 
     /**
@@ -149,12 +153,12 @@ export class PermissionHelper {
      */
     static getButtonStyle(user, permission) {
         const hasPermission = this.hasPermission(user, permission);
-        
+
         return {
             disabled: !hasPermission,
-            className: hasPermission 
-                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            className: hasPermission
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed",
         };
     }
 }
@@ -163,16 +167,23 @@ export class PermissionHelper {
 export function usePermissions() {
     const { props } = usePage();
     const user = props.auth.user;
-    
+
     return {
         user,
-        hasPermission: (permission) => PermissionHelper.hasPermission(user, permission),
-        hasAnyPermission: (permissions) => PermissionHelper.hasAnyPermission(user, permissions),
-        hasAllPermissions: (permissions) => PermissionHelper.hasAllPermissions(user, permissions),
-        canEditSchedule: (schedule) => PermissionHelper.canEditSchedule(user, schedule),
-        canDeleteSchedule: (schedule) => PermissionHelper.canDeleteSchedule(user, schedule),
+        hasPermission: (permission) =>
+            PermissionHelper.hasPermission(user, permission),
+        hasAnyPermission: (permissions) =>
+            PermissionHelper.hasAnyPermission(user, permissions),
+        hasAllPermissions: (permissions) =>
+            PermissionHelper.hasAllPermissions(user, permissions),
+        canEditSchedule: (schedule) =>
+            PermissionHelper.canEditSchedule(user, schedule),
+        canDeleteSchedule: (schedule) =>
+            PermissionHelper.canDeleteSchedule(user, schedule),
         getUserLevel: () => PermissionHelper.getUserLevel(user),
-        getRoleDisplayName: () => PermissionHelper.getRoleDisplayName(user?.role),
-        getButtonStyle: (permission) => PermissionHelper.getButtonStyle(user, permission)
+        getRoleDisplayName: () =>
+            PermissionHelper.getRoleDisplayName(user?.role),
+        getButtonStyle: (permission) =>
+            PermissionHelper.getButtonStyle(user, permission),
     };
 }
