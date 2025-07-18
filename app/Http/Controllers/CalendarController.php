@@ -21,13 +21,13 @@ class CalendarController extends Controller
         $user = Auth::user();
         $currentDate = $request->get('date', now()->format('Y-m-d'));
         
-        // 権限チェック
-        if (!$this->hasPermission($user, 'CALENDAR_VIEW')) {
-            return Inertia::render('Error', [
-                'status' => 403,
-                'message' => 'カレンダーを閲覧する権限がありません'
-            ]);
-        }
+        // 権限チェック（無効化 - 誰でもアクセス可能）
+        // if (!$this->hasPermission($user, 'CALENDAR_VIEW')) {
+        //     return Inertia::render('Error', [
+        //         'status' => 403,
+        //         'message' => 'カレンダーを閲覧する権限がありません'
+        //     ]);
+        // }
         
         // 予定を取得（当日および前後1週間）
         $startDate = Carbon::parse($currentDate)->subDays(7);
@@ -226,9 +226,10 @@ class CalendarController extends Controller
      */
     private function getResidents($user)
     {
-        if (!$this->hasPermission($user, 'RESIDENT_VIEW')) {
-            return [];
-        }
+        // 権限チェック（無効化 - 誰でもアクセス可能）
+        // if (!$this->hasPermission($user, 'RESIDENT_VIEW')) {
+        //     return [];
+        // }
         
         return Resident::where('status', 'active')
             ->orderBy('room_number')
