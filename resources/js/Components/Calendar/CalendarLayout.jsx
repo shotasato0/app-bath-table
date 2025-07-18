@@ -49,7 +49,7 @@ export default function CalendarLayout({
     };
 
     // 新規予定作成
-    const handleAddSchedule = (columnType, date) => {
+    const handleAddSchedule = (columnType) => {
         setModalMode('create');
         setModalColumnType(columnType);
         setSelectedSchedule(null);
