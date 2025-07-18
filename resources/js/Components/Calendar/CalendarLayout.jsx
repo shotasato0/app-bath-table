@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Head } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import DragDropProvider from './DragDropProvider';
 import ScheduleColumn from './ScheduleColumn';
@@ -10,9 +10,7 @@ import {
     CalendarIcon, 
     ChevronLeftIcon, 
     ChevronRightIcon, 
-    PlusIcon,
-    Cog6ToothIcon,
-    PrinterIcon
+    Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 import { usePermissions } from '@/Utils/PermissionHelper';
 
