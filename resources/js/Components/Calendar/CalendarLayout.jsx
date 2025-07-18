@@ -26,7 +26,6 @@ export default function CalendarLayout({
     const [selectedSchedule, setSelectedSchedule] = useState(null);
     const [modalColumnType, setModalColumnType] = useState('general');
     const [showSidebar, setShowSidebar] = useState(true);
-    const [viewMode, setViewMode] = useState('day'); // 'day', 'week', 'month'
     
     const { hasPermission, user } = usePermissions();
 
