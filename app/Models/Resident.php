@@ -13,7 +13,13 @@ class Resident extends Model
         'name',
         'gender',
         'birth_date',
+        'age',
+        'room_number',
+        'care_level',
+        'status',
         'medical_notes',
+        'special_requirements',
+        'primary_staff_id',
     ];
 
     protected function casts(): array
