@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             ScheduleTypeSeeder::class,
             ResidentSeeder::class,
             UserSeeder::class,
+            ScheduleSeeder::class,
         ]);
     }
 }
