@@ -40,18 +40,22 @@ export default function Calendar() {
             />
             <div className="container max-w-full mx-auto p-2">
                 <div className="flex gap-3">
-                    <CalendarSidebar 
-                        currentDate={currentDate}
-                        selectedDate={selectedDate}
-                        onDateSelect={setSelectedDate}
-                        onMonthChange={setCurrentDate}
-                    />
-                    <CalendarGrid 
-                        calendarDays={calendarDays}
-                        currentDate={currentDate}
-                        selectedDate={selectedDate}
-                        onDateSelect={setSelectedDate}
-                    />
+                    <div className="hidden md:block">
+                        <CalendarSidebar 
+                            currentDate={currentDate}
+                            selectedDate={selectedDate}
+                            onDateSelect={setSelectedDate}
+                            onMonthChange={setCurrentDate}
+                        />
+                    </div>
+                    <div className="flex-1">
+                        <CalendarGrid 
+                            calendarDays={calendarDays}
+                            currentDate={currentDate}
+                            selectedDate={selectedDate}
+                            onDateSelect={setSelectedDate}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
