@@ -29,4 +29,15 @@ class CalendarDate extends Model
     {
         return $this->hasMany(Schedule::class, 'date_id');
     }
+
+    public function scopeForMonth($query, $year, $month)
+    {
+        return $query->whereYear('calendar_date', $year)
+                    ->whereMonth('calendar_date', $month);
+    }
+
+    public function scopeWithSchedules($query)
+    {
+        return $query->with(['schedules.scheduleType', 'schedules.resident']);
+    }
 }
