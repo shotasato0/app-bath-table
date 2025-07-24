@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Schedule;
 use App\Models\CalendarDate;
+use App\Http\Requests\StoreScheduleRequest;
+use App\Http\Requests\UpdateScheduleRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
@@ -46,19 +48,9 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreScheduleRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'date_id' => 'required|exists:calendar_dates,id',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'start_time' => 'nullable|date_format:H:i',
-            'end_time' => 'nullable|date_format:H:i|after:start_time',
-            'schedule_type_id' => 'required|exists:schedule_types,id',
-            'resident_id' => 'nullable|exists:residents,id',
-        ]);
-
-        $schedule = Schedule::create($validated);
+        $schedule = Schedule::create($request->validated());
         $schedule->load(['calendarDate', 'scheduleType', 'resident']);
 
         return response()->json([
@@ -78,19 +70,9 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function update(Request $request, Schedule $schedule): JsonResponse
+    public function update(UpdateScheduleRequest $request, Schedule $schedule): JsonResponse
     {
-        $validated = $request->validate([
-            'date_id' => 'sometimes|exists:calendar_dates,id',
-            'title' => 'sometimes|string|max:255',
-            'description' => 'nullable|string',
-            'start_time' => 'nullable|date_format:H:i',
-            'end_time' => 'nullable|date_format:H:i|after:start_time',
-            'schedule_type_id' => 'sometimes|exists:schedule_types,id',
-            'resident_id' => 'nullable|exists:residents,id',
-        ]);
-
-        $schedule->update($validated);
+        $schedule->update($request->validated());
         $schedule->load(['calendarDate', 'scheduleType', 'resident']);
 
         return response()->json([
