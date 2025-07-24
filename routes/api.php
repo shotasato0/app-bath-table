@@ -11,8 +11,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware(['auth:sanctum'])->group(function () {
     // スケジュール関連のルート
-    Route::apiResource('schedules', ScheduleController::class);
     Route::get('schedules/monthly', [ScheduleController::class, 'getMonthlySchedules']);
+    Route::apiResource('schedules', ScheduleController::class);
     
     // スケジュールタイプ関連のルート
     Route::apiResource('schedule-types', ScheduleTypeController::class);
