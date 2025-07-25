@@ -17,8 +17,8 @@ class ScheduleTypeFactory extends Factory
     public function definition(): array
     {
         return [
-            'type_name' => $this->faker->randomElement(['入浴', '食事', 'レクリエーション', '医療', 'その他']),
-            'color_code' => $this->faker->hexColor(),
+            'type_name' => fake()->randomElement(['入浴', '食事', 'レクリエーション', '医療', 'その他']),
+            'color_code' => fake()->hexColor(),
         ];
     }
 }
