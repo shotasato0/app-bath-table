@@ -19,13 +19,13 @@ class ScheduleFactory extends Factory
      */
     public function definition(): array
     {
-        $startHour = $this->faker->numberBetween(6, 20);
-        $endHour = $startHour + $this->faker->numberBetween(1, 3);
+        $startHour = fake()->numberBetween(6, 20);
+        $endHour = $startHour + fake()->numberBetween(1, 3);
         
         return [
             'date_id' => CalendarDate::factory(),
-            'title' => $this->faker->randomElement(['入浴サービス', 'ランチタイム', 'レクリエーション', '医療ケア', 'リハビリ']),
-            'description' => $this->faker->optional()->sentence(),
+            'title' => fake()->randomElement(['入浴サービス', 'ランチタイム', 'レクリエーション', '医療ケア', 'リハビリ']),
+            'description' => fake()->optional()->sentence(),
             'start_time' => sprintf('%02d:00', $startHour),
             'end_time' => sprintf('%02d:00', min($endHour, 23)),
             'schedule_type_id' => ScheduleType::factory(),
