@@ -17,7 +17,10 @@ class ResidentFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->name(),
+            'gender' => $this->faker->randomElement(['男性', '女性']),
+            'birth_date' => $this->faker->dateTimeBetween('-100 years', '-65 years')->format('Y-m-d'),
+            'medical_notes' => $this->faker->optional()->paragraph(),
         ];
     }
 }
