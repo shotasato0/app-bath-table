@@ -17,7 +17,7 @@ class CalendarDateFactory extends Factory
     public function definition(): array
     {
         return [
-            'calendar_date' => $this->faker->date(),
+            'calendar_date' => $this->faker->dateTimeBetween('now', '+1 year')->format('Y-m-d'),
             'day_of_week' => $this->faker->numberBetween(0, 6),
             'is_holiday' => $this->faker->boolean(20),
             'holiday_name' => $this->faker->optional()->words(2, true),
