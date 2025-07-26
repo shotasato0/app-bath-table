@@ -9,6 +9,25 @@ import { useScheduleTypes } from '../../hooks/useScheduleTypes';
 export default function Calendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
+    
+    // API連携フック
+    const {
+        monthlyCalendarData,
+        loading: schedulesLoading,
+        error: schedulesError,
+        fetchMonthlySchedules,
+        createSchedule,
+        updateSchedule,
+        deleteSchedule,
+        currentYear,
+        currentMonth
+    } = useSchedules({ autoFetch: true });
+    
+    const {
+        scheduleTypes,
+        loading: typesLoading,
+        error: typesError
+    } = useScheduleTypes();
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
