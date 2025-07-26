@@ -1,12 +1,72 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 
+const SAMPLE_EVENTS = {
+    '2025-08-01': {
+        schedules: [
+            { id: 1, type: 'general', text: '夜勤' },
+            { id: 2, type: 'meal', text: '午前11時 運動局' },
+            { id: 3, type: 'activity', text: '午後2時 みかんチトレー' },
+        ],
+        bathing: [
+            { id: 1, name: '田中太郎' },
+            { id: 2, name: '佐藤花子' },
+        ]
+    },
+    '2025-08-02': {
+        schedules: [
+            { id: 4, type: 'general', text: '休み' },
+            { id: 5, type: 'activity', text: '午前5時 英文朝開定意定ホ' },
+        ],
+        bathing: [
+            { id: 3, name: '山田次郎' },
+        ]
+    },
+    '2025-08-04': {
+        schedules: [
+            { id: 6, type: 'general', text: 'みかやみ' },
+        ],
+        bathing: [
+            { id: 4, name: '鈴木一郎' },
+        ]
+    },
+    '2025-08-08': {
+        schedules: [
+            { id: 7, type: 'general', text: '先見くる' },
+        ],
+        bathing: []
+    },
+    '2025-08-12': {
+        schedules: [
+            { id: 8, type: 'general', text: 'リラクゼーションチュール' },
+        ],
+        bathing: []
+    },
+    '2025-08-18': {
+        schedules: [
+            { id: 9, type: 'meal', text: '午前8時 【WHS関定特典】' },
+        ],
+        bathing: []
+    },
+    '2025-08-20': {
+        schedules: [
+            { id: 10, type: 'activity', text: '実査課生日' },
+        ],
+        bathing: []
+    },
+    '2025-08-24': {
+        schedules: [
+            { id: 11, type: 'general', text: 'みかと麻痺' },
+        ],
+        bathing: []
+    },
+};
+
 const EVENT_STYLES = {
-    入浴: 'bg-blue-900 bg-opacity-40 text-blue-300 border-l-blue-500',
-    食事: 'bg-green-900 bg-opacity-40 text-green-300 border-l-green-500',
-    レクリエーション: 'bg-yellow-900 bg-opacity-40 text-yellow-300 border-l-yellow-500',
-    医療: 'bg-red-900 bg-opacity-40 text-red-300 border-l-red-500',
-    その他: 'bg-purple-900 bg-opacity-40 text-purple-300 border-l-purple-500',
+    general: 'bg-purple-900 bg-opacity-40 text-purple-300 border-l-purple-500',
+    meal: 'bg-green-900 bg-opacity-40 text-green-300 border-l-green-500',
+    activity: 'bg-yellow-900 bg-opacity-40 text-yellow-300 border-l-yellow-500',
+    medical: 'bg-red-900 bg-opacity-40 text-red-300 border-l-red-500',
 };
 
 export default function CalendarDay({ 
@@ -15,32 +75,11 @@ export default function CalendarDay({
     isToday, 
     isSelected, 
     onClick, 
-    dayIndex,
-    schedules = [],
-    scheduleTypes = [],
-    onCreateSchedule,
-    onUpdateSchedule,
-    onDeleteSchedule
+    dayIndex 
 }) {
     const [dragOver, setDragOver] = useState(false);
     const dateKey = format(date, 'yyyy-MM-dd');
-
-    // スケジュールタイプIDから名前を取得
-    const getScheduleTypeName = (typeId) => {
-        const type = scheduleTypes.find(t => t.id === typeId);
-        return type?.type_name || 'その他';
-    };
-
-    // スケジュールを入浴とその他に分類
-    const bathingSchedules = schedules.filter(schedule => {
-        const typeName = getScheduleTypeName(schedule.schedule_type_id);
-        return typeName === '入浴';
-    });
-
-    const otherSchedules = schedules.filter(schedule => {
-        const typeName = getScheduleTypeName(schedule.schedule_type_id);
-        return typeName !== '入浴';
-    });
+    const dayEvents = SAMPLE_EVENTS[dateKey] || { schedules: [], bathing: [] };
 
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -51,49 +90,15 @@ export default function CalendarDay({
         setDragOver(false);
     };
 
-    const handleDrop = async (e) => {
+    const handleDrop = (e) => {
         e.preventDefault();
         setDragOver(false);
         
         try {
             const residentData = JSON.parse(e.dataTransfer.getData('application/json'));
             console.log('Dropped resident:', residentData, 'on date:', dateKey);
-            
-            // 入浴スケジュールを作成
-            if (onCreateSchedule) {
-                // 入浴タイプのIDを取得
-                const bathingType = scheduleTypes.find(type => type.type_name === '入浴');
-                if (bathingType) {
-                    await onCreateSchedule({
-                        date_id: dateKey, // 実際はcalendar_dates.idが必要
-                        title: `${residentData.name}の入浴`,
-                        description: '入浴スケジュール',
-                        start_time: '10:00',
-                        end_time: '11:00',
-                        schedule_type_id: bathingType.id,
-                        resident_id: residentData.id,
-                    });
-                }
-            }
         } catch (error) {
             console.error('Invalid drop data:', error);
-        }
-    };
-
-    const handleScheduleClick = (schedule, event) => {
-        event.stopPropagation();
-        console.log('Schedule clicked:', schedule);
-        // モーダルやフォームを開く処理をここに追加
-    };
-
-    const handleScheduleDoubleClick = async (schedule, event) => {
-        event.stopPropagation();
-        if (onDeleteSchedule && confirm('このスケジュールを削除しますか？')) {
-            try {
-                await onDeleteSchedule(schedule.id);
-            } catch (error) {
-                alert('削除に失敗しました: ' + (error.response?.data?.message || error.message));
-            }
         }
     };
 
@@ -118,11 +123,6 @@ export default function CalendarDay({
                 }`}>
                     {format(date, 'd')}
                 </div>
-                {schedules.length > 0 && (
-                    <div className="text-xs text-gray-400">
-                        {schedules.length}
-                    </div>
-                )}
             </div>
 
             {/* 日の内容 */}
@@ -132,27 +132,14 @@ export default function CalendarDay({
                     <div className="text-purple-300 text-[8px] text-center pb-0.5 border-b border-gray-600 font-medium">
                         予定
                     </div>
-                    {otherSchedules.map((schedule) => {
-                        const typeName = getScheduleTypeName(schedule.schedule_type_id);
-                        const styleClass = EVENT_STYLES[typeName] || EVENT_STYLES['その他'];
-                        
-                        return (
-                            <div
-                                key={schedule.id}
-                                className={`text-[9px] px-1 py-0.5 rounded-sm cursor-pointer border-l-2 transition-all hover:-translate-y-px hover:brightness-110 line-clamp-2 ${styleClass}`}
-                                onClick={(e) => handleScheduleClick(schedule, e)}
-                                onDoubleClick={(e) => handleScheduleDoubleClick(schedule, e)}
-                                title={`${schedule.title}\n${schedule.start_time} - ${schedule.end_time}\n${schedule.description || ''}`}
-                            >
-                                <div className="font-medium">{schedule.title}</div>
-                                {schedule.start_time && (
-                                    <div className="text-[8px] opacity-75">
-                                        {schedule.start_time.slice(0, 5)} - {schedule.end_time?.slice(0, 5)}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
+                    {dayEvents.schedules.map((event) => (
+                        <div
+                            key={event.id}
+                            className={`text-[9px] px-1 py-0.5 rounded-sm cursor-pointer border-l-2 transition-all hover:-translate-y-px hover:brightness-110 line-clamp-2 ${EVENT_STYLES[event.type]}`}
+                        >
+                            {event.text}
+                        </div>
+                    ))}
                 </div>
 
                 {/* 入浴側 */}
@@ -160,20 +147,12 @@ export default function CalendarDay({
                     <div className="text-blue-300 text-[8px] text-center pb-0.5 border-b border-gray-600 font-medium">
                         🛁 入浴
                     </div>
-                    {bathingSchedules.map((schedule) => (
+                    {dayEvents.bathing.map((resident) => (
                         <div
-                            key={schedule.id}
+                            key={resident.id}
                             className="text-[9px] px-1 py-0.5 rounded-sm bg-blue-900 bg-opacity-40 text-blue-300 border-l-2 border-l-blue-500 cursor-pointer transition-all hover:-translate-y-px hover:brightness-110"
-                            onClick={(e) => handleScheduleClick(schedule, e)}
-                            onDoubleClick={(e) => handleScheduleDoubleClick(schedule, e)}
-                            title={`${schedule.resident?.name || ''}\n${schedule.start_time} - ${schedule.end_time}\n${schedule.description || ''}`}
                         >
-                            <div className="font-medium">{schedule.resident?.name || schedule.title}</div>
-                            {schedule.start_time && (
-                                <div className="text-[8px] opacity-75">
-                                    {schedule.start_time.slice(0, 5)} - {schedule.end_time?.slice(0, 5)}
-                                </div>
-                            )}
+                            {resident.name}
                         </div>
                     ))}
                     
@@ -188,7 +167,7 @@ export default function CalendarDay({
                         onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
                     >
-                        {dragOver ? 'ここにドロップ' : bathingSchedules.length === 0 ? 'ドロップで追加' : ''}
+                        {dragOver ? 'ここにドロップ' : dayEvents.bathing.length === 0 ? 'ドロップで追加' : ''}
                     </div>
                 </div>
             </div>

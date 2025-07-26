@@ -8,24 +8,8 @@ export default function CalendarGrid({
     calendarDays, 
     currentDate, 
     selectedDate, 
-    onDateSelect,
-    monthlyCalendarData = [],
-    scheduleTypes = [],
-    onCreateSchedule,
-    onUpdateSchedule,
-    onDeleteSchedule
+    onDateSelect 
 }) {
-    // 日付に対応するスケジュールデータを取得する関数
-    const getSchedulesForDate = (date) => {
-        const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD形式
-        
-        // monthlyCalendarDataから該当する日付のデータを検索
-        const dayData = monthlyCalendarData.find(
-            item => item.calendar_date === dateString
-        );
-        
-        return dayData?.schedules || [];
-    };
     return (
         <div className="flex-1 bg-gray-800 rounded-lg overflow-hidden">
             {/* 曜日ヘッダー */}
@@ -55,11 +39,6 @@ export default function CalendarGrid({
                         isSelected={day.toDateString() === selectedDate.toDateString()}
                         onClick={() => onDateSelect(day)}
                         dayIndex={index}
-                        schedules={getSchedulesForDate(day)}
-                        scheduleTypes={scheduleTypes}
-                        onCreateSchedule={onCreateSchedule}
-                        onUpdateSchedule={onUpdateSchedule}
-                        onDeleteSchedule={onDeleteSchedule}
                     />
                 ))}
             </div>
