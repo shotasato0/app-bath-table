@@ -18,7 +18,7 @@ class ResidentFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'gender' => fake()->randomElement(['男性', '女性']),
+            'gender' => fake()->randomElement(['male', 'female', 'other']),
             'birth_date' => fake()->dateTimeBetween('-100 years', '-65 years')->format('Y-m-d'),
             'medical_notes' => fake()->optional()->paragraph(),
         ];
