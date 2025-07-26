@@ -144,8 +144,8 @@ describe('Schedule Model', function () {
             // データベースから再取得
             $schedule = Schedule::find($schedule->id);
 
-            expect($schedule->start_time)->toBeInstanceOf(DateTime::class);
-            expect($schedule->end_time)->toBeInstanceOf(DateTime::class);
+            expect($schedule->start_time)->toBeInstanceOf(\Carbon\Carbon::class);
+            expect($schedule->end_time)->toBeInstanceOf(\Carbon\Carbon::class);
             expect($schedule->start_time->format('H:i'))->toBe('09:30');
             expect($schedule->end_time->format('H:i'))->toBe('10:45');
         });
