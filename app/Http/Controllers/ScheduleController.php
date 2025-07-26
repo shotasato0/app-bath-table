@@ -40,7 +40,30 @@ class ScheduleController extends Controller
         $calendarDates = CalendarDate::forMonth($year, $month)
             ->withSchedules()
             ->orderBy('calendar_date')
-            ->get();
+            ->get()
+            ->map(function ($calendarDate) {
+                return [
+                    'id' => $calendarDate->id,
+                    'calendar_date' => $calendarDate->calendar_date->format('Y-m-d'),
+                    'day_of_week' => $calendarDate->day_of_week,
+                    'is_holiday' => $calendarDate->is_holiday,
+                    'holiday_name' => $calendarDate->holiday_name,
+                    'notes' => $calendarDate->notes,
+                    'schedules' => $calendarDate->schedules->map(function ($schedule) {
+                        return [
+                            'id' => $schedule->id,
+                            'title' => $schedule->title,
+                            'description' => $schedule->description,
+                            'start_time' => $schedule->start_time ? $schedule->start_time->format('H:i') : null,
+                            'end_time' => $schedule->end_time ? $schedule->end_time->format('H:i') : null,
+                            'schedule_type_id' => $schedule->schedule_type_id,
+                            'resident_id' => $schedule->resident_id,
+                            'schedule_type' => $schedule->scheduleType,
+                            'resident' => $schedule->resident,
+                        ];
+                    })
+                ];
+            });
 
         return response()->json([
             'status' => 'success',
