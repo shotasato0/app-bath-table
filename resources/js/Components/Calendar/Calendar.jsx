@@ -72,6 +72,26 @@ export default function Calendar() {
         }
     }, [currentDate, currentYear, currentMonth, fetchMonthlySchedules]);
 
+    // ローディング状態の表示
+    if (schedulesLoading || typesLoading) {
+        return (
+            <div className="bg-gray-900 min-h-screen flex items-center justify-center">
+                <div className="text-white text-lg">読み込み中...</div>
+            </div>
+        );
+    }
+
+    // エラー状態の表示
+    if (schedulesError || typesError) {
+        return (
+            <div className="bg-gray-900 min-h-screen flex items-center justify-center">
+                <div className="text-red-400 text-lg">
+                    エラーが発生しました: {schedulesError || typesError}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="bg-gray-900">
             <CalendarHeader 
@@ -88,6 +108,7 @@ export default function Calendar() {
                             selectedDate={selectedDate}
                             onDateSelect={setSelectedDate}
                             onMonthChange={setCurrentDate}
+                            monthlyCalendarData={monthlyCalendarData}
                         />
                     </div>
                     <div className="flex-1">
@@ -96,6 +117,11 @@ export default function Calendar() {
                             currentDate={currentDate}
                             selectedDate={selectedDate}
                             onDateSelect={setSelectedDate}
+                            monthlyCalendarData={monthlyCalendarData}
+                            scheduleTypes={scheduleTypes}
+                            onCreateSchedule={createSchedule}
+                            onUpdateSchedule={updateSchedule}
+                            onDeleteSchedule={deleteSchedule}
                         />
                     </div>
                 </div>
