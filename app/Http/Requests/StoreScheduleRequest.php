@@ -72,12 +72,18 @@ class StoreScheduleRequest extends FormRequest
         return Schedule::where('date_id', $this->date_id)
             ->where('resident_id', $this->resident_id)
             ->where(function ($query) {
-                $query->whereBetween('start_time', [$this->start_time, $this->end_time])
-                      ->orWhereBetween('end_time', [$this->start_time, $this->end_time])
-                      ->orWhere(function ($q) {
-                          $q->where('start_time', '<=', $this->start_time)
-                            ->where('end_time', '>=', $this->end_time);
-                      });
+                $query->where(function ($q) {
+                    $q->whereBetween('start_time', [$this->start_time, $this->end_time])
+                      ->orWhereBetween('end_time', [$this->start_time, $this->end_time]);
+                })
+                ->orWhere(function ($q) {
+                    $q->where('start_time', '<=', $this->start_time)
+                      ->where('end_time', '>=', $this->end_time);
+                })
+                ->orWhere(function ($q) {
+                    $q->where('start_time', '>=', $this->start_time)
+                      ->where('end_time', '<=', $this->end_time);
+                });
             })
             ->exists();
     }
