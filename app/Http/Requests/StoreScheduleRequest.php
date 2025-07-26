@@ -73,14 +73,22 @@ class StoreScheduleRequest extends FormRequest
             ->where('resident_id', $this->resident_id)
             ->where(function ($query) {
                 $query->where(function ($q) {
-                    $q->whereBetween('start_time', [$this->start_time, $this->end_time])
-                      ->orWhereBetween('end_time', [$this->start_time, $this->end_time]);
+                    // 既存スケジュールの開始時刻が新規の時間範囲内（境界除く）
+                    $q->where('start_time', '>', $this->start_time)
+                      ->where('start_time', '<', $this->end_time);
                 })
                 ->orWhere(function ($q) {
+                    // 既存スケジュールの終了時刻が新規の時間範囲内（境界除く）
+                    $q->where('end_time', '>', $this->start_time)
+                      ->where('end_time', '<', $this->end_time);
+                })
+                ->orWhere(function ($q) {
+                    // 既存スケジュールが新規スケジュールを完全に包含
                     $q->where('start_time', '<=', $this->start_time)
                       ->where('end_time', '>=', $this->end_time);
                 })
                 ->orWhere(function ($q) {
+                    // 新規スケジュールが既存スケジュールを完全に包含
                     $q->where('start_time', '>=', $this->start_time)
                       ->where('end_time', '<=', $this->end_time);
                 });
