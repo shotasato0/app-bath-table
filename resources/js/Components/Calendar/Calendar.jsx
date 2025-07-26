@@ -54,7 +54,23 @@ export default function Calendar() {
         const today = new Date();
         setCurrentDate(today);
         setSelectedDate(today);
+        
+        // API連携：今日に戻る時もスケジュールデータを取得
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1;
+        fetchMonthlySchedules(year, month);
     };
+
+    // 初期データ取得: currentDateが変更されたときにAPI呼び出し
+    useEffect(() => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
+        
+        // 現在表示中の月と異なる場合のみ取得
+        if (year !== currentYear || month !== currentMonth) {
+            fetchMonthlySchedules(year, month);
+        }
+    }, [currentDate, currentYear, currentMonth, fetchMonthlySchedules]);
 
     return (
         <div className="bg-gray-900">
