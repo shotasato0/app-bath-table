@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 import CalendarHeader from './CalendarHeader';
 import CalendarSidebar from './CalendarSidebar';
 import CalendarGrid from './CalendarGrid';
+import { useSchedules } from '../../hooks/useSchedules';
+import { useScheduleTypes } from '../../hooks/useScheduleTypes';
 
 export default function Calendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
