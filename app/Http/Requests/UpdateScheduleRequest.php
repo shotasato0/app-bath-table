@@ -74,14 +74,22 @@ class UpdateScheduleRequest extends FormRequest
             ->where('id', '!=', $schedule->id)
             ->where(function ($query) use ($startTime, $endTime) {
                 $query->where(function ($q) use ($startTime, $endTime) {
-                    $q->whereBetween('start_time', [$startTime, $endTime])
-                      ->orWhereBetween('end_time', [$startTime, $endTime]);
+                    // 既存スケジュールの開始時刻が新規の時間範囲内（境界除く）
+                    $q->where('start_time', '>', $startTime)
+                      ->where('start_time', '<', $endTime);
                 })
                 ->orWhere(function ($q) use ($startTime, $endTime) {
+                    // 既存スケジュールの終了時刻が新規の時間範囲内（境界除く）
+                    $q->where('end_time', '>', $startTime)
+                      ->where('end_time', '<', $endTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    // 既存スケジュールが新規スケジュールを完全に包含
                     $q->where('start_time', '<=', $startTime)
                       ->where('end_time', '>=', $endTime);
                 })
                 ->orWhere(function ($q) use ($startTime, $endTime) {
+                    // 新規スケジュールが既存スケジュールを完全に包含
                     $q->where('start_time', '>=', $startTime)
                       ->where('end_time', '<=', $endTime);
                 });
