@@ -43,6 +43,11 @@ export default function Calendar() {
         const newDate = new Date(currentDate);
         newDate.setMonth(currentDate.getMonth() + direction);
         setCurrentDate(newDate);
+        
+        // API連携：月が変わったらスケジュールデータを取得
+        const year = newDate.getFullYear();
+        const month = newDate.getMonth() + 1;
+        fetchMonthlySchedules(year, month);
     };
 
     const goToToday = () => {
