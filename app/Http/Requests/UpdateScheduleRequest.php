@@ -73,12 +73,18 @@ class UpdateScheduleRequest extends FormRequest
             ->where('resident_id', $residentId)
             ->where('id', '!=', $schedule->id)
             ->where(function ($query) use ($startTime, $endTime) {
-                $query->whereBetween('start_time', [$startTime, $endTime])
-                      ->orWhereBetween('end_time', [$startTime, $endTime])
-                      ->orWhere(function ($q) use ($startTime, $endTime) {
-                          $q->where('start_time', '<=', $startTime)
-                            ->where('end_time', '>=', $endTime);
-                      });
+                $query->where(function ($q) use ($startTime, $endTime) {
+                    $q->whereBetween('start_time', [$startTime, $endTime])
+                      ->orWhereBetween('end_time', [$startTime, $endTime]);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    $q->where('start_time', '<=', $startTime)
+                      ->where('end_time', '>=', $endTime);
+                })
+                ->orWhere(function ($q) use ($startTime, $endTime) {
+                    $q->where('start_time', '>=', $startTime)
+                      ->where('end_time', '<=', $endTime);
+                });
             })
             ->exists();
     }
