@@ -41,4 +41,23 @@ class Schedule extends Model
     {
         return $this->belongsTo(Resident::class);
     }
+
+    public function scopeForDate($query, $date)
+    {
+        return $query->whereHas('calendarDate', function ($q) use ($date) {
+            $q->where('calendar_date', $date);
+        });
+    }
+
+    public function scopeForDateRange($query, $startDate, $endDate)
+    {
+        return $query->whereHas('calendarDate', function ($q) use ($startDate, $endDate) {
+            $q->whereBetween('calendar_date', [$startDate, $endDate]);
+        });
+    }
+
+    public function scopeWithRelations($query)
+    {
+        return $query->with(['calendarDate', 'scheduleType', 'resident']);
+    }
 }
