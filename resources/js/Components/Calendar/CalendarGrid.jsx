@@ -55,6 +55,11 @@ export default function CalendarGrid({
                         isSelected={day.toDateString() === selectedDate.toDateString()}
                         onClick={() => onDateSelect(day)}
                         dayIndex={index}
+                        schedules={getSchedulesForDate(day)}
+                        scheduleTypes={scheduleTypes}
+                        onCreateSchedule={onCreateSchedule}
+                        onUpdateSchedule={onUpdateSchedule}
+                        onDeleteSchedule={onDeleteSchedule}
                     />
                 ))}
             </div>
