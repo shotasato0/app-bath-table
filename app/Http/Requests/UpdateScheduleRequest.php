@@ -90,8 +90,8 @@ class UpdateScheduleRequest extends FormRequest
                 })
                 ->orWhere(function ($q) use ($startTime, $endTime) {
                     // 新規スケジュールが既存スケジュールを完全に包含
-                    $q->where('start_time', '>=', $startTime)
-                      ->where('end_time', '<=', $endTime);
+                    $q->where('start_time', '>', $startTime)
+                      ->where('end_time', '<', $endTime);
                 });
             })
             ->exists();
