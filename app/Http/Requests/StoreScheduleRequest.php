@@ -89,8 +89,8 @@ class StoreScheduleRequest extends FormRequest
                 })
                 ->orWhere(function ($q) {
                     // 新規スケジュールが既存スケジュールを完全に包含
-                    $q->where('start_time', '>=', $this->start_time)
-                      ->where('end_time', '<=', $this->end_time);
+                    $q->where('start_time', '>', $this->start_time)
+                      ->where('end_time', '<', $this->end_time);
                 });
             })
             ->exists();
