@@ -154,14 +154,24 @@ export default function CalendarDay({
                     <div className="text-purple-300 text-[8px] text-center pb-0.5 border-b border-gray-600 font-medium">
                         予定
                     </div>
-                    {dayEvents.schedules.map((event) => (
-                        <div
-                            key={event.id}
-                            className={`text-[9px] px-1 py-0.5 rounded-sm cursor-pointer border-l-2 transition-all hover:-translate-y-px hover:brightness-110 line-clamp-2 ${EVENT_STYLES[event.type]}`}
-                        >
-                            {event.text}
-                        </div>
-                    ))}
+                    {dayEvents.schedules.map((event) => {
+                        const scheduleType = scheduleTypes.find(type => type.id === event.schedule_type_id);
+                        const backgroundColor = scheduleType?.color_code || '#9B59B6';
+                        const displayText = event.title || event.text || 'スケジュール';
+                        
+                        return (
+                            <div
+                                key={event.id}
+                                className="text-[9px] px-1 py-0.5 rounded-sm cursor-pointer border-l-2 transition-all hover:-translate-y-px hover:brightness-110 line-clamp-2 text-white"
+                                style={{
+                                    backgroundColor: backgroundColor + '40', // 透明度40%
+                                    borderLeftColor: backgroundColor
+                                }}
+                            >
+                                {displayText}
+                            </div>
+                        );
+                    })}
                 </div>
 
                 {/* 入浴側 */}
