@@ -3,7 +3,7 @@ import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval } f
 import CalendarHeader from './CalendarHeader';
 import CalendarSidebar from './CalendarSidebar';
 import CalendarGrid from './CalendarGrid';
-// import { useSchedules } from '../../hooks/useSchedules';
+import { useSchedules } from '../../hooks/useSchedules';
 import { useScheduleTypes } from '../../hooks/useScheduleTypes';
 
 export default function Calendar() {
