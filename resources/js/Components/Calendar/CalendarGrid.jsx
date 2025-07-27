@@ -8,7 +8,14 @@ export default function CalendarGrid({
     calendarDays, 
     currentDate, 
     selectedDate, 
-    onDateSelect 
+    onDateSelect,
+    monthlyCalendarData = [],
+    scheduleTypes = [],
+    createSchedule,
+    updateSchedule,
+    deleteSchedule,
+    loading = false,
+    error = null
 }) {
     return (
         <div className="flex-1 bg-gray-800 rounded-lg overflow-hidden">
