@@ -75,7 +75,14 @@ export default function CalendarDay({
     isToday, 
     isSelected, 
     onClick, 
-    dayIndex 
+    dayIndex,
+    schedules = [],
+    scheduleTypes = [],
+    createSchedule,
+    updateSchedule,
+    deleteSchedule,
+    loading = false,
+    error = null
 }) {
     const [dragOver, setDragOver] = useState(false);
     const dateKey = format(date, 'yyyy-MM-dd');
