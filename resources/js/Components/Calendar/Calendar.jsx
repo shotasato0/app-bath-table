@@ -10,18 +10,17 @@ export default function Calendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
     
-    // TODO: API連携フックを後で有効化
-    // const {
-    //     monthlyCalendarData,
-    //     loading: schedulesLoading,
-    //     error: schedulesError,
-    //     fetchMonthlySchedules,
-    //     createSchedule,
-    //     updateSchedule,
-    //     deleteSchedule,
-    //     currentYear,
-    //     currentMonth
-    // } = useSchedules({ autoFetch: true });
+    const {
+        monthlyCalendarData,
+        loading: schedulesLoading,
+        error: schedulesError,
+        fetchMonthlySchedules,
+        createSchedule,
+        updateSchedule,
+        deleteSchedule,
+        currentYear,
+        currentMonth
+    } = useSchedules({ autoFetch: true });
     
     const {
         scheduleTypes,
