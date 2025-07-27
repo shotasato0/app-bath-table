@@ -4,7 +4,7 @@ import CalendarHeader from './CalendarHeader';
 import CalendarSidebar from './CalendarSidebar';
 import CalendarGrid from './CalendarGrid';
 // import { useSchedules } from '../../hooks/useSchedules';
-// import { useScheduleTypes } from '../../hooks/useScheduleTypes';
+import { useScheduleTypes } from '../../hooks/useScheduleTypes';
 
 export default function Calendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -23,11 +23,11 @@ export default function Calendar() {
     //     currentMonth
     // } = useSchedules({ autoFetch: true });
     
-    // const {
-    //     scheduleTypes,
-    //     loading: typesLoading,
-    //     error: typesError
-    // } = useScheduleTypes();
+    const {
+        scheduleTypes,
+        loading: typesLoading,
+        error: typesError
+    } = useScheduleTypes();
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
