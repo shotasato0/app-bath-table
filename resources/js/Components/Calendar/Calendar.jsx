@@ -74,6 +74,13 @@ export default function Calendar() {
                             currentDate={currentDate}
                             selectedDate={selectedDate}
                             onDateSelect={setSelectedDate}
+                            monthlyCalendarData={monthlyCalendarData}
+                            scheduleTypes={scheduleTypes}
+                            createSchedule={createSchedule}
+                            updateSchedule={updateSchedule}
+                            deleteSchedule={deleteSchedule}
+                            loading={schedulesLoading || typesLoading}
+                            error={schedulesError || typesError}
                         />
                     </div>
                 </div>
