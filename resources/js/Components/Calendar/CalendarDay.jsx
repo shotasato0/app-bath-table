@@ -86,7 +86,22 @@ export default function CalendarDay({
 }) {
     const [dragOver, setDragOver] = useState(false);
     const dateKey = format(date, 'yyyy-MM-dd');
-    const dayEvents = SAMPLE_EVENTS[dateKey] || { schedules: [], bathing: [] };
+    
+    // APIデータを優先的に使用し、フォールバックとしてサンプルデータを使用
+    const dayEvents = {
+        schedules: schedules.length > 0 ? schedules : (SAMPLE_EVENTS[dateKey]?.schedules || []),
+        bathing: SAMPLE_EVENTS[dateKey]?.bathing || [] // 入浴データは現在サンプルのままで
+    };
+    
+    // スケジュールタイプに基づいてスタイルを決定
+    const getScheduleStyle = (schedule) => {
+        const scheduleType = scheduleTypes.find(type => type.id === schedule.schedule_type_id);
+        if (scheduleType) {
+            return `bg-opacity-40 text-white border-l-2`;
+        }
+        // フォールバック用の古いスタイリング
+        return EVENT_STYLES[schedule.type] || EVENT_STYLES.general;
+    };
 
     const handleDragOver = (e) => {
         e.preventDefault();
