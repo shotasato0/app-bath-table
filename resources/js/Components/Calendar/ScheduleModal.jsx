@@ -37,9 +37,20 @@ export default function ScheduleModal({
                 
                 // 時間フィールドの安全な処理
                 const formatTime = (timeStr) => {
-                    if (!timeStr) return '';
-                    // すでにHH:MM形式の場合はそのまま、HH:MM:SS形式の場合は最初の5文字を取得
-                    return timeStr.length > 5 ? timeStr.substring(0, 5) : timeStr;
+                    if (!timeStr || typeof timeStr !== 'string') return '';
+                    
+                    // 日付が混入している場合（"2025-"で始まる場合）は空文字を返す
+                    if (timeStr.includes('-') || timeStr.length < 4) {
+                        console.warn('Invalid time format detected:', timeStr);
+                        return '';
+                    }
+                    
+                    // HH:MM:SS形式の場合は最初の5文字を取得、HH:MM形式はそのまま
+                    if (timeStr.length >= 5) {
+                        return timeStr.substring(0, 5);
+                    }
+                    
+                    return timeStr;
                 };
                 
                 setFormData({
