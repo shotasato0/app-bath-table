@@ -36,13 +36,13 @@ export default function ScheduleModal({
                 const scheduleDate = schedule.date || schedule.calendar_date?.calendar_date || format(date, 'yyyy-MM-dd');
                 
                 // 時間フィールドの安全な処理
-                const formatTime = (timeStr) => {
-                    if (!timeStr || typeof timeStr !== 'string') return '';
+                const formatTime = (timeStr, fallbackTime = '') => {
+                    if (!timeStr || typeof timeStr !== 'string') return fallbackTime;
                     
-                    // 日付が混入している場合（"2025-"で始まる場合）は空文字を返す
+                    // 日付が混入している場合（"2025-"で始まる場合）はフォールバック値を返す
                     if (timeStr.includes('-') || timeStr.length < 4) {
-                        console.warn('Invalid time format detected:', timeStr);
-                        return '';
+                        console.warn('Invalid time format detected:', timeStr, 'using fallback:', fallbackTime);
+                        return fallbackTime;
                     }
                     
                     // HH:MM:SS形式の場合は最初の5文字を取得、HH:MM形式はそのまま
