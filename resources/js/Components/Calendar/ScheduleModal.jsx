@@ -35,10 +35,9 @@ export default function ScheduleModal({
                 setFormData({
                     title: schedule.title || '',
                     description: schedule.description || '',
-                    start_date: schedule.start_date || '',
-                    start_time: schedule.start_time || '',
-                    end_date: schedule.end_date || '',
-                    end_time: schedule.end_time || '',
+                    date: schedule.date || '',
+                    start_time: schedule.start_time ? schedule.start_time.substring(0, 5) : '',
+                    end_time: schedule.end_time ? schedule.end_time.substring(0, 5) : '',
                     schedule_type_id: schedule.schedule_type_id || '',
                     all_day: schedule.all_day || false
                 });
@@ -48,9 +47,8 @@ export default function ScheduleModal({
                 setFormData({
                     title: '',
                     description: '',
-                    start_date: dateStr,
+                    date: dateStr,
                     start_time: '09:00',
-                    end_date: dateStr,
                     end_time: '10:00',
                     schedule_type_id: scheduleTypes.length > 0 ? scheduleTypes[0].id : '',
                     all_day: false
