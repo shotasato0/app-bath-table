@@ -38,7 +38,7 @@ export default function CalendarGrid({
             {/* カレンダーグリッド */}
             <div className="flex flex-wrap w-full">
                 {calendarDays.map((day, index) => {
-                    const dateKey = day.toISOString().split('T')[0];
+                    const dateKey = format(day, 'yyyy-MM-dd');
                     const dayData = monthlyCalendarData.find(data => data.date === dateKey);
                     
                     return (
