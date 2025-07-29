@@ -119,15 +119,6 @@ export default function CalendarDay({
         bathing: [...bathingSchedules, ...sampleBathing]
     };
     
-    // スケジュールタイプに基づいてスタイルを決定
-    const getScheduleStyle = (schedule) => {
-        const scheduleType = scheduleTypes.find(type => type.id === schedule.schedule_type_id);
-        if (scheduleType) {
-            return `bg-opacity-40 text-white border-l-2`;
-        }
-        // フォールバック用の古いスタイリング
-        return EVENT_STYLES[schedule.type] || EVENT_STYLES.general;
-    };
 
     const handleDragOver = (e) => {
         e.preventDefault();
