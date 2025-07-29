@@ -37,15 +37,37 @@ export default function ScheduleModal({
                 
                 console.log('Raw schedule data for editing:', schedule);
                 
-                // 時間フィールドを直接使用（フォーマット処理を簡素化）
-                const safeStartTime = schedule.start_time || '09:00';
-                const safeEndTime = schedule.end_time || '10:00';
+                // 時間フィールドから正しく時間部分を抽出する関数
+                const extractTimeFromValue = (timeValue) => {
+                    if (!timeValue) return '';
+                    
+                    // 文字列型の場合
+                    if (typeof timeValue === 'string') {
+                        // ISO 8601形式（例: "2025-07-29T01:00:00.000000Z"）の場合
+                        if (timeValue.includes('T')) {
+                            const timepart = timeValue.split('T')[1];
+                            if (timepart) {
+                                // HH:MM:SS.SSS形式からHH:MMを抽出
+                                return timepart.substring(0, 5);
+                            }
+                        }
+                        // すでにHH:MM形式またはHH:MM:SS形式の場合
+                        else if (timeValue.includes(':')) {
+                            return timeValue.substring(0, 5);
+                        }
+                    }
+                    
+                    return '';
+                };
+                
+                const safeStartTime = extractTimeFromValue(schedule.start_time) || '09:00';
+                const safeEndTime = extractTimeFromValue(schedule.end_time) || '10:00';
                 
                 console.log('Time field processing:', {
                     original_start_time: schedule.start_time,
                     original_end_time: schedule.end_time,
-                    safe_start_time: safeStartTime,
-                    safe_end_time: safeEndTime
+                    extracted_start_time: safeStartTime,
+                    extracted_end_time: safeEndTime
                 });
                 
                 setFormData({
