@@ -57,8 +57,8 @@ export default function ScheduleModal({
                     title: schedule.title || '',
                     description: schedule.description || '',
                     date: scheduleDate,
-                    start_time: formatTime(schedule.start_time),
-                    end_time: formatTime(schedule.end_time),
+                    start_time: formatTime(schedule.start_time, '09:00'),
+                    end_time: formatTime(schedule.end_time, '10:00'),
                     schedule_type_id: schedule.schedule_type_id || '',
                     all_day: schedule.all_day || false
                 });
