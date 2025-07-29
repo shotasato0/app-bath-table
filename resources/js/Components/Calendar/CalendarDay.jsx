@@ -406,7 +406,10 @@ export default function CalendarDay({
                         onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
                     >
-                        {dragOver ? 'ここにドロップ' : dayEvents.bathing.length === 0 ? 'ドロップで追加' : ''}
+                        {dragOver 
+                            ? '住民を入浴予定に追加' 
+                            : (dayEvents.bathing.length === 0 ? '住民をドロップ' : '+')
+                        }
                     </div>
                 </div>
             </div>
