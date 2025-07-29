@@ -129,6 +129,45 @@ export default function CalendarDay({
         setDragOver(false);
     };
 
+    // 次の利用可能な入浴時間を計算
+    const getNextAvailableTime = () => {
+        const bathingSchedules = dayEvents.bathing.filter(item => item.title !== undefined); // APIスケジュールのみ
+        
+        if (bathingSchedules.length === 0) {
+            return { start_time: '10:00', end_time: '10:30' };
+        }
+        
+        // 最後の入浴スケジュールの終了時間を取得
+        const lastSchedule = bathingSchedules
+            .map(schedule => ({
+                ...schedule,
+                end_time_minutes: timeToMinutes(schedule.end_time || '10:30')
+            }))
+            .sort((a, b) => a.end_time_minutes - b.end_time_minutes)
+            .pop();
+        
+        const nextStartMinutes = lastSchedule.end_time_minutes;
+        const nextEndMinutes = nextStartMinutes + 30; // 30分後
+        
+        return {
+            start_time: minutesToTime(nextStartMinutes),
+            end_time: minutesToTime(nextEndMinutes)
+        };
+    };
+    
+    // 時間文字列を分に変換
+    const timeToMinutes = (timeStr) => {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        return hours * 60 + minutes;
+    };
+    
+    // 分を時間文字列に変換
+    const minutesToTime = (minutes) => {
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+    };
+
     const handleDrop = async (e) => {
         e.preventDefault();
         setDragOver(false);
@@ -136,20 +175,23 @@ export default function CalendarDay({
         try {
             const residentData = JSON.parse(e.dataTransfer.getData('application/json'));
             
+            // 次の利用可能な時間を計算
+            const { start_time, end_time } = getNextAvailableTime();
+            
             // 住民の入浴スケジュールを自動作成
             const bathingSchedule = {
                 title: `${residentData.name}さんの入浴`,
                 description: `${residentData.room} ${residentData.name}さんの入浴時間`,
                 date: dateKey,
-                start_time: '10:00', // デフォルト開始時間
-                end_time: '10:30',   // デフォルト終了時間（30分）
+                start_time,
+                end_time,
                 schedule_type_id: 1, // 入浴タイプ
                 resident_id: residentData.id
             };
             
             try {
                 await createSchedule(bathingSchedule);
-                console.log('入浴スケジュールを作成しました:', residentData.name);
+                console.log(`入浴スケジュールを作成しました: ${residentData.name} (${start_time}-${end_time})`);
             } catch (error) {
                 console.error('入浴スケジュール作成エラー:', error);
                 alert('入浴スケジュールの作成に失敗しました');
