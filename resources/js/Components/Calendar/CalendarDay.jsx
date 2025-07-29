@@ -144,7 +144,10 @@ export default function CalendarDay({
     // スケジュール作成モーダルを開く
     const handleCreateSchedule = (e) => {
         e.stopPropagation();
-        setSelectedSchedule(null);
+        setSelectedSchedule({
+            isNewSchedule: true, // 新規作成フラグ
+            isBathingSchedule: false // 一般スケジュール
+        });
         setShowScheduleModal(true);
     };
 
