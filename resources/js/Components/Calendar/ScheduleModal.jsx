@@ -105,14 +105,19 @@ export default function ScheduleModal({
         if (!formData.title.trim()) {
             newErrors.title = 'タイトルは必須です';
         }
-        if (!formData.date) {
+        if (!formData.date || formData.date.includes('undefined')) {
             newErrors.date = '日付は必須です';
         }
         if (!formData.schedule_type_id) {
             newErrors.schedule_type_id = 'スケジュールタイプを選択してください';
         }
-        if (!formData.all_day && !formData.start_time) {
-            newErrors.start_time = '開始時間は必須です';
+        if (!formData.all_day) {
+            if (!formData.start_time || formData.start_time.includes('-') || formData.start_time.length < 4) {
+                newErrors.start_time = '開始時間は必須です（HH:MM形式）';
+            }
+            if (formData.end_time && (formData.end_time.includes('-') || formData.end_time.length < 4)) {
+                newErrors.end_time = '終了時間はHH:MM形式で入力してください';
+            }
         }
 
         if (Object.keys(newErrors).length > 0) {
