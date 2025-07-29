@@ -81,8 +81,8 @@ export default function ScheduleModal({
         if (!formData.title.trim()) {
             newErrors.title = 'タイトルは必須です';
         }
-        if (!formData.start_date) {
-            newErrors.start_date = '開始日は必須です';
+        if (!formData.date) {
+            newErrors.date = '日付は必須です';
         }
         if (!formData.schedule_type_id) {
             newErrors.schedule_type_id = 'スケジュールタイプを選択してください';
