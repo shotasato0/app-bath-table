@@ -49,7 +49,7 @@ export default function ScheduleModal({
             if (schedule && !schedule.isNewSchedule) {
                 // 編集モード: 既存スケジュールデータを設定
                 // dateフィールドがnullの場合はcalendar_dateから取得
-                const scheduleDate = schedule.date || schedule.calendar_date?.calendar_date || format(date, 'yyyy-MM-dd');
+                const scheduleDate = extractScheduleDate(schedule, date);
                 
                 console.log('Raw schedule data for editing:', schedule);
                 
