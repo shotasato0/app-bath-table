@@ -131,7 +131,10 @@ export default function CalendarDay({
 
     // 次の利用可能な入浴時間を計算
     const getNextAvailableTime = () => {
-        const bathingSchedules = dayEvents.bathing.filter(item => item.title !== undefined); // APIスケジュールのみ
+        // APIスケジュールのみを対象とする（titleプロパティがあり、start_timeとend_timeが存在するもの）
+        const bathingSchedules = dayEvents.bathing.filter(item => 
+            item.title !== undefined && item.start_time && item.end_time
+        );
         
         if (bathingSchedules.length === 0) {
             return { start_time: '10:00', end_time: '10:30' };
@@ -141,7 +144,7 @@ export default function CalendarDay({
         const lastSchedule = bathingSchedules
             .map(schedule => ({
                 ...schedule,
-                end_time_minutes: timeToMinutes(schedule.end_time || '10:30')
+                end_time_minutes: timeToMinutes(schedule.end_time)
             }))
             .sort((a, b) => a.end_time_minutes - b.end_time_minutes)
             .pop();
