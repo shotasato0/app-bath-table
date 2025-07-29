@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import api from '../../services/api';
 
 const SAMPLE_RESIDENTS = [
     { id: 1, name: '田中太郎', room: '101号室', color: 'bg-blue-600' },
@@ -8,10 +9,41 @@ const SAMPLE_RESIDENTS = [
     { id: 5, name: '高橋美子', room: '105号室', color: 'bg-red-600' },
 ];
 
+const COLORS = ['bg-blue-600', 'bg-green-600', 'bg-purple-600', 'bg-yellow-600', 'bg-red-600', 'bg-orange-600', 'bg-pink-600', 'bg-indigo-600'];
+
 export default function ResidentList() {
     const [searchTerm, setSearchTerm] = useState('');
+    const [residents, setResidents] = useState(SAMPLE_RESIDENTS);
+    const [loading, setLoading] = useState(true);
 
-    const filteredResidents = SAMPLE_RESIDENTS.filter(resident =>
+    // 住民データを取得
+    useEffect(() => {
+        const fetchResidents = async () => {
+            try {
+                const response = await api.get('/residents');
+                const apiResidents = response.data.data || [];
+                
+                // APIデータに色を追加
+                const residentsWithColors = apiResidents.map((resident, index) => ({
+                    ...resident,
+                    room: resident.room_number || `${resident.id}号室`,
+                    color: COLORS[index % COLORS.length]
+                }));
+                
+                setResidents(residentsWithColors.length > 0 ? residentsWithColors : SAMPLE_RESIDENTS);
+            } catch (error) {
+                console.error('住民データ取得エラー:', error);
+                // エラー時はサンプルデータを使用
+                setResidents(SAMPLE_RESIDENTS);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchResidents();
+    }, []);
+
+    const filteredResidents = residents.filter(resident =>
         resident.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
