@@ -19,9 +19,8 @@ export default function ScheduleModal({
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        start_date: '',
+        date: '',
         start_time: '',
-        end_date: '',
         end_time: '',
         schedule_type_id: '',
         all_day: false
