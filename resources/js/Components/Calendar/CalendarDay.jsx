@@ -148,6 +148,16 @@ export default function CalendarDay({
         setShowScheduleModal(true);
     };
 
+    // 入浴スケジュール作成モーダルを開く
+    const handleCreateBathingSchedule = (e) => {
+        e.stopPropagation();
+        setSelectedSchedule({
+            isBathingSchedule: true, // 入浴スケジュール用フラグ
+            schedule_type_id: 1 // 入浴タイプに初期設定
+        });
+        setShowScheduleModal(true);
+    };
+
     // スケジュール編集モーダルを開く
     const handleEditSchedule = (schedule, e) => {
         e.stopPropagation();
