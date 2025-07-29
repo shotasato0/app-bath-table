@@ -90,10 +90,33 @@ export default function CalendarDay({
     const [selectedSchedule, setSelectedSchedule] = useState(null);
     const dateKey = format(date, 'yyyy-MM-dd');
     
-    // APIデータを優先的に使用し、フォールバックとしてサンプルデータを使用
+    // スケジュールを左右に分離するロジック
+    const separateSchedules = (allSchedules) => {
+        const generalSchedules = [];
+        const bathingSchedules = [];
+        
+        allSchedules.forEach(schedule => {
+            // 入浴タイプ（ID: 1）または住民IDがある場合は入浴側へ
+            if (schedule.schedule_type_id === 1 || schedule.resident_id) {
+                bathingSchedules.push(schedule);
+            } else {
+                generalSchedules.push(schedule);
+            }
+        });
+        
+        return { generalSchedules, bathingSchedules };
+    };
+
+    // APIデータを優先的に使用し、左右に分離
+    const allSchedules = schedules.length > 0 ? schedules : (SAMPLE_EVENTS[dateKey]?.schedules || []);
+    const { generalSchedules, bathingSchedules } = separateSchedules(allSchedules);
+    
+    // サンプルデータと結合（後でAPI化するまでの暫定処理）
+    const sampleBathing = SAMPLE_EVENTS[dateKey]?.bathing || [];
+    
     const dayEvents = {
-        schedules: schedules.length > 0 ? schedules : (SAMPLE_EVENTS[dateKey]?.schedules || []),
-        bathing: SAMPLE_EVENTS[dateKey]?.bathing || [] // 入浴データは現在サンプルのままで
+        schedules: generalSchedules,
+        bathing: [...bathingSchedules, ...sampleBathing]
     };
     
     // スケジュールタイプに基づいてスタイルを決定
