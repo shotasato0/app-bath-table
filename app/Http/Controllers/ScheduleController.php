@@ -48,9 +48,39 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function store(StoreScheduleRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
-        $schedule = Schedule::create($request->validated());
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'date' => ['required', 'date'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
+            'schedule_type_id' => ['required', 'exists:schedule_types,id'],
+            'resident_id' => ['nullable', 'exists:residents,id'],
+            'all_day' => ['boolean']
+        ]);
+
+        // CalendarDateを作成または取得
+        $calendarDate = CalendarDate::firstOrCreate([
+            'calendar_date' => $validated['date']
+        ], [
+            'day_of_week' => Carbon::parse($validated['date'])->dayOfWeek,
+            'is_holiday' => false
+        ]);
+
+        // スケジュールデータを準備
+        $scheduleData = [
+            'date_id' => $calendarDate->id,
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'] ?? null,
+            'schedule_type_id' => $validated['schedule_type_id'],
+            'resident_id' => $validated['resident_id'] ?? null
+        ];
+
+        $schedule = Schedule::create($scheduleData);
         $schedule->load(['calendarDate', 'scheduleType', 'resident']);
 
         return response()->json([
