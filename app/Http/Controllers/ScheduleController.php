@@ -90,10 +90,11 @@ class ScheduleController extends Controller
         ]);
 
         // CalendarDateを作成または取得
+        $dateInstance = Carbon::createFromFormat('Y-m-d', $validated['date'], config('app.timezone', 'UTC'));
         $calendarDate = CalendarDate::firstOrCreate([
             'calendar_date' => $validated['date']
         ], [
-            'day_of_week' => Carbon::parse($validated['date'])->dayOfWeek,
+            'day_of_week' => $dateInstance->dayOfWeek,
             'is_holiday' => false
         ]);
 
@@ -142,10 +143,11 @@ class ScheduleController extends Controller
         ]);
 
         // CalendarDateを作成または取得
+        $dateInstance = Carbon::createFromFormat('Y-m-d', $validated['date'], config('app.timezone', 'UTC'));
         $calendarDate = CalendarDate::firstOrCreate([
             'calendar_date' => $validated['date']
         ], [
-            'day_of_week' => Carbon::parse($validated['date'])->dayOfWeek,
+            'day_of_week' => $dateInstance->dayOfWeek,
             'is_holiday' => false
         ]);
 
