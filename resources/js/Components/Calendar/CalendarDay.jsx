@@ -153,7 +153,8 @@ export default function CalendarDay({
         e.stopPropagation();
         setSelectedSchedule({
             isBathingSchedule: true, // 入浴スケジュール用フラグ
-            schedule_type_id: 1 // 入浴タイプに初期設定
+            schedule_type_id: 1, // 入浴タイプに初期設定
+            isNewSchedule: true // 新規作成フラグ
         });
         setShowScheduleModal(true);
     };
