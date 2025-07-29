@@ -32,10 +32,13 @@ export default function ScheduleModal({
         if (isOpen) {
             if (schedule && !schedule.isNewSchedule) {
                 // 編集モード: 既存スケジュールデータを設定
+                // dateフィールドがnullの場合はcalendar_dateから取得
+                const scheduleDate = schedule.date || schedule.calendar_date?.calendar_date || format(date, 'yyyy-MM-dd');
+                
                 setFormData({
                     title: schedule.title || '',
                     description: schedule.description || '',
-                    date: schedule.date || '',
+                    date: scheduleDate,
                     start_time: schedule.start_time ? schedule.start_time.substring(0, 5) : '',
                     end_time: schedule.end_time ? schedule.end_time.substring(0, 5) : '',
                     schedule_type_id: schedule.schedule_type_id || '',
