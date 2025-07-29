@@ -44,7 +44,11 @@ class ScheduleController extends Controller
 
         // フロントエンドが期待する形式に変換
         $monthlyData = $calendarDates->map(function ($calendarDate) {
-            $formattedDate = $calendarDate->calendar_date->format('Y-m-d');
+            // 日付を文字列として直接使用（タイムゾーンの影響を回避）
+            $formattedDate = $calendarDate->calendar_date instanceof \DateTime 
+                ? $calendarDate->calendar_date->format('Y-m-d')
+                : (string) $calendarDate->calendar_date;
+            
             return [
                 'date' => $formattedDate,
                 'schedules' => $calendarDate->schedules->map(function ($schedule) use ($formattedDate) {
