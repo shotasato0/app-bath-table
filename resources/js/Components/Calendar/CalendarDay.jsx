@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
+import ScheduleModal from './ScheduleModal';
 
 const SAMPLE_EVENTS = {
     '2025-08-01': {
