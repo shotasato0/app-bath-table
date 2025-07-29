@@ -127,6 +127,44 @@ export default function CalendarDay({
         }
     };
 
+    // スケジュール作成モーダルを開く
+    const handleCreateSchedule = (e) => {
+        e.stopPropagation();
+        setSelectedSchedule(null);
+        setShowScheduleModal(true);
+    };
+
+    // スケジュール編集モーダルを開く
+    const handleEditSchedule = (schedule, e) => {
+        e.stopPropagation();
+        setSelectedSchedule(schedule);
+        setShowScheduleModal(true);
+    };
+
+    // スケジュール削除
+    const handleDeleteSchedule = async (schedule, e) => {
+        e.stopPropagation();
+        if (window.confirm('このスケジュールを削除しますか？')) {
+            try {
+                await deleteSchedule(schedule.id);
+            } catch (error) {
+                console.error('スケジュール削除エラー:', error);
+                alert('スケジュールの削除に失敗しました');
+            }
+        }
+    };
+
+    // スケジュール保存
+    const handleSaveSchedule = async (formData) => {
+        if (selectedSchedule) {
+            // 更新
+            await updateSchedule(selectedSchedule.id, formData);
+        } else {
+            // 作成
+            await createSchedule(formData);
+        }
+    };
+
     return (
         <div 
             className={`
