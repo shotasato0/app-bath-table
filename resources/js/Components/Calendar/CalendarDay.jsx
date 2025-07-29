@@ -262,8 +262,17 @@ export default function CalendarDay({
 
                 {/* 入浴側 */}
                 <div className="flex-1 flex flex-col gap-0.5 border-l border-gray-600 pl-1">
-                    <div className="text-blue-300 text-[8px] text-center pb-0.5 border-b border-gray-600 font-medium">
-                        🛁 入浴
+                    <div className="text-blue-300 text-[8px] text-center pb-0.5 border-b border-gray-600 font-medium flex justify-between items-center">
+                        <span>🛁 入浴</span>
+                        <button
+                            onClick={handleCreateBathingSchedule}
+                            className="text-blue-400 hover:text-blue-300 transition-colors"
+                            title="入浴スケジュール追加"
+                        >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
                     </div>
                     {dayEvents.bathing.map((item) => {
                         // APIスケジュールの場合とサンプルデータの場合を判別
