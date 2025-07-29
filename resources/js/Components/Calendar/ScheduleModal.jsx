@@ -53,12 +53,23 @@ export default function ScheduleModal({
                     return timeStr;
                 };
                 
+                // より安全にフォールバック値を設定
+                const safeStartTime = formatTime(schedule.start_time, schedule.start_time || '09:00');
+                const safeEndTime = formatTime(schedule.end_time, schedule.end_time || '10:00');
+                
+                console.log('Schedule edit data:', {
+                    original_start_time: schedule.start_time,
+                    original_end_time: schedule.end_time,
+                    formatted_start_time: safeStartTime,
+                    formatted_end_time: safeEndTime
+                });
+                
                 setFormData({
                     title: schedule.title || '',
                     description: schedule.description || '',
                     date: scheduleDate,
-                    start_time: formatTime(schedule.start_time, '09:00'),
-                    end_time: formatTime(schedule.end_time, '10:00'),
+                    start_time: safeStartTime,
+                    end_time: safeEndTime,
                     schedule_type_id: schedule.schedule_type_id || '',
                     all_day: schedule.all_day || false
                 });
