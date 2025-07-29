@@ -44,13 +44,16 @@ export default function ScheduleModal({
             } else {
                 // 作成モード: 選択された日付で初期化
                 const dateStr = date ? format(date, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
+                const isBathingSchedule = schedule?.isBathingSchedule;
+                const defaultScheduleTypeId = isBathingSchedule ? 1 : (scheduleTypes.length > 0 ? scheduleTypes[0].id : '');
+                
                 setFormData({
-                    title: '',
+                    title: isBathingSchedule ? '入浴' : '',
                     description: '',
                     date: dateStr,
                     start_time: '09:00',
                     end_time: '10:00',
-                    schedule_type_id: scheduleTypes.length > 0 ? scheduleTypes[0].id : '',
+                    schedule_type_id: defaultScheduleTypeId,
                     all_day: false
                 });
             }
