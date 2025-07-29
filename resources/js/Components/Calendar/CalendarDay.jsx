@@ -108,14 +108,17 @@ export default function CalendarDay({
     };
 
     // APIデータを優先的に使用し、左右に分離
-    const allSchedules = schedules.length > 0 ? schedules : (SAMPLE_EVENTS[dateKey]?.schedules || []);
+    const allSchedules = schedules.length > 0 ? schedules : [];
     const { generalSchedules, bathingSchedules } = separateSchedules(allSchedules);
     
     // サンプルデータと結合（後でAPI化するまでの暫定処理）
-    const sampleBathing = SAMPLE_EVENTS[dateKey]?.bathing || [];
+    // APIデータがない場合のみサンプルデータを使用
+    const sampleData = schedules.length === 0 ? SAMPLE_EVENTS[dateKey] : null;
+    const sampleSchedules = sampleData?.schedules || [];
+    const sampleBathing = sampleData?.bathing || [];
     
     const dayEvents = {
-        schedules: generalSchedules,
+        schedules: [...generalSchedules, ...sampleSchedules],
         bathing: [...bathingSchedules, ...sampleBathing]
     };
     
