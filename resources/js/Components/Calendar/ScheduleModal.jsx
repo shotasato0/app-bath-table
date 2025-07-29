@@ -35,12 +35,19 @@ export default function ScheduleModal({
                 // dateフィールドがnullの場合はcalendar_dateから取得
                 const scheduleDate = schedule.date || schedule.calendar_date?.calendar_date || format(date, 'yyyy-MM-dd');
                 
+                // 時間フィールドの安全な処理
+                const formatTime = (timeStr) => {
+                    if (!timeStr) return '';
+                    // すでにHH:MM形式の場合はそのまま、HH:MM:SS形式の場合は最初の5文字を取得
+                    return timeStr.length > 5 ? timeStr.substring(0, 5) : timeStr;
+                };
+                
                 setFormData({
                     title: schedule.title || '',
                     description: schedule.description || '',
                     date: scheduleDate,
-                    start_time: schedule.start_time ? schedule.start_time.substring(0, 5) : '',
-                    end_time: schedule.end_time ? schedule.end_time.substring(0, 5) : '',
+                    start_time: formatTime(schedule.start_time),
+                    end_time: formatTime(schedule.end_time),
                     schedule_type_id: schedule.schedule_type_id || '',
                     all_day: schedule.all_day || false
                 });
