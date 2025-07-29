@@ -20,7 +20,7 @@ class CalendarDate extends Model
     protected function casts(): array
     {
         return [
-            'calendar_date' => 'date',
+            'calendar_date' => 'date:Y-m-d',
             'is_holiday' => 'boolean',
         ];
     }
