@@ -30,7 +30,7 @@ export default function ScheduleModal({
     // モーダルが開かれた時にフォームデータを初期化
     useEffect(() => {
         if (isOpen) {
-            if (schedule) {
+            if (schedule && !schedule.isNewSchedule) {
                 // 編集モード: 既存スケジュールデータを設定
                 setFormData({
                     title: schedule.title || '',
