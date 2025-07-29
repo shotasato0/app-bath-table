@@ -163,12 +163,29 @@ export default function CalendarDay({
     
     // 時間文字列を分に変換
     const timeToMinutes = (timeStr) => {
-        const [hours, minutes] = timeStr.split(':').map(Number);
+        if (!timeStr || typeof timeStr !== 'string') {
+            console.warn('Invalid time string:', timeStr);
+            return 0;
+        }
+        const parts = timeStr.split(':');
+        if (parts.length !== 2) {
+            console.warn('Invalid time format:', timeStr);
+            return 0;
+        }
+        const [hours, minutes] = parts.map(Number);
+        if (isNaN(hours) || isNaN(minutes)) {
+            console.warn('Invalid time values:', timeStr);
+            return 0;
+        }
         return hours * 60 + minutes;
     };
     
     // 分を時間文字列に変換
     const minutesToTime = (minutes) => {
+        if (typeof minutes !== 'number' || isNaN(minutes)) {
+            console.warn('Invalid minutes value:', minutes);
+            return '10:00';
+        }
         const hours = Math.floor(minutes / 60);
         const mins = minutes % 60;
         return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
