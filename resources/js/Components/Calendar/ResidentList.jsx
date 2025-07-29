@@ -20,6 +20,12 @@ export default function ResidentList() {
     useEffect(() => {
         const fetchResidents = async () => {
             try {
+                // TODO: /residentsエンドポイントが実装されるまでサンプルデータを使用
+                console.log('住民データ: サンプルデータを使用中（/residentsエンドポイント未実装）');
+                setResidents(SAMPLE_RESIDENTS);
+                
+                // 将来的にAPIが実装されたら以下のコードを有効化
+                /*
                 const response = await api.get('/residents');
                 const apiResidents = response.data.data || [];
                 
@@ -31,6 +37,7 @@ export default function ResidentList() {
                 }));
                 
                 setResidents(residentsWithColors.length > 0 ? residentsWithColors : SAMPLE_RESIDENTS);
+                */
             } catch (error) {
                 console.error('住民データ取得エラー:', error);
                 // エラー時はサンプルデータを使用
