@@ -274,14 +274,52 @@ export default function CalendarDay({
                     <div className="text-blue-300 text-[8px] text-center pb-0.5 border-b border-gray-600 font-medium">
                         🛁 入浴
                     </div>
-                    {dayEvents.bathing.map((resident) => (
-                        <div
-                            key={resident.id}
-                            className="text-[9px] px-1 py-0.5 rounded-sm bg-blue-900 bg-opacity-40 text-blue-300 border-l-2 border-l-blue-500 cursor-pointer transition-all hover:-translate-y-px hover:brightness-110"
-                        >
-                            {resident.name}
-                        </div>
-                    ))}
+                    {dayEvents.bathing.map((item) => {
+                        // APIスケジュールの場合とサンプルデータの場合を判別
+                        const isApiSchedule = item.title !== undefined;
+                        const displayName = isApiSchedule 
+                            ? (item.title || `入浴スケジュール`)
+                            : item.name;
+                        const scheduleType = isApiSchedule && scheduleTypes.find(type => type.id === item.schedule_type_id);
+                        const backgroundColor = scheduleType?.color_code || '#3B82F6';
+                        
+                        return (
+                            <div
+                                key={`${isApiSchedule ? 'schedule' : 'resident'}-${item.id}`}
+                                className="text-[9px] px-1 py-0.5 rounded-sm text-white border-l-2 cursor-pointer transition-all hover:-translate-y-px hover:brightness-110 group relative"
+                                style={{
+                                    backgroundColor: backgroundColor + '40',
+                                    borderLeftColor: backgroundColor
+                                }}
+                            >
+                                <div className="line-clamp-2 pr-1">{displayName}</div>
+                                
+                                {/* APIスケジュールの場合のみ操作ボタンを表示 */}
+                                {isApiSchedule && (
+                                    <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 rounded-sm shadow-lg flex">
+                                        <button
+                                            onClick={(e) => handleEditSchedule(item, e)}
+                                            className="p-0.5 text-blue-400 hover:text-blue-300"
+                                            title="編集"
+                                        >
+                                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            onClick={(e) => handleDeleteSchedule(item, e)}
+                                            className="p-0.5 text-red-400 hover:text-red-300"
+                                            title="削除"
+                                        >
+                                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
                     
                     {/* ドロップゾーン */}
                     <div
