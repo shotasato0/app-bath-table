@@ -129,15 +129,33 @@ export default function CalendarDay({
         setDragOver(false);
     };
 
-    const handleDrop = (e) => {
+    const handleDrop = async (e) => {
         e.preventDefault();
         setDragOver(false);
         
         try {
             const residentData = JSON.parse(e.dataTransfer.getData('application/json'));
-            console.log('Dropped resident:', residentData, 'on date:', dateKey);
+            
+            // 住民の入浴スケジュールを自動作成
+            const bathingSchedule = {
+                title: `${residentData.name}さんの入浴`,
+                description: `${residentData.room} ${residentData.name}さんの入浴時間`,
+                date: dateKey,
+                start_time: '10:00', // デフォルト開始時間
+                end_time: '10:30',   // デフォルト終了時間（30分）
+                schedule_type_id: 1, // 入浴タイプ
+                resident_id: residentData.id
+            };
+            
+            try {
+                await createSchedule(bathingSchedule);
+                console.log('入浴スケジュールを作成しました:', residentData.name);
+            } catch (error) {
+                console.error('入浴スケジュール作成エラー:', error);
+                alert('入浴スケジュールの作成に失敗しました');
+            }
         } catch (error) {
-            console.error('Invalid drop data:', error);
+            console.error('ドロップデータの解析エラー:', error);
         }
     };
 
