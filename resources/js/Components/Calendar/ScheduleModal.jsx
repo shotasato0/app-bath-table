@@ -118,7 +118,10 @@ export default function ScheduleModal({
             <div className="bg-gray-800 p-6">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-semibold text-white">
-                        {schedule ? 'スケジュール編集' : 'スケジュール作成'}
+                        {schedule && !schedule.isNewSchedule 
+                            ? 'スケジュール編集' 
+                            : (schedule?.isBathingSchedule ? '入浴スケジュール作成' : 'スケジュール作成')
+                        }
                     </h2>
                     <button
                         onClick={onClose}
