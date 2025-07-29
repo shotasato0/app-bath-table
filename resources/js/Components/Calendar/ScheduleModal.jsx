@@ -122,8 +122,8 @@ export default function ScheduleModal({
         if (!formData.title.trim()) {
             newErrors.title = 'タイトルは必須です';
         }
-        if (!formData.date || formData.date.includes('undefined')) {
-            newErrors.date = '日付は必須です';
+        if (!formData.date || isNaN(Date.parse(formData.date))) {
+            newErrors.date = '日付は必須です（有効な日付形式で入力してください）';
         }
         if (!formData.schedule_type_id) {
             newErrors.schedule_type_id = 'スケジュールタイプを選択してください';
