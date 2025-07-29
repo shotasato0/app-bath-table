@@ -176,29 +176,17 @@ export default function ScheduleModal({
                         <InputError message={errors.schedule_type_id} className="mt-2" />
                     </div>
 
-                    {/* 日付・時間 */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <InputLabel htmlFor="start_date" value="開始日 *" className="text-gray-300" />
-                            <TextInput
-                                id="start_date"
-                                type="date"
-                                value={formData.start_date}
-                                onChange={(e) => handleInputChange('start_date', e.target.value)}
-                                className="mt-1 block w-full bg-gray-700 border-gray-600 text-white"
-                            />
-                            <InputError message={errors.start_date} className="mt-2" />
-                        </div>
-                        <div>
-                            <InputLabel htmlFor="end_date" value="終了日" className="text-gray-300" />
-                            <TextInput
-                                id="end_date"
-                                type="date"
-                                value={formData.end_date}
-                                onChange={(e) => handleInputChange('end_date', e.target.value)}
-                                className="mt-1 block w-full bg-gray-700 border-gray-600 text-white"
-                            />
-                        </div>
+                    {/* 日付 */}
+                    <div>
+                        <InputLabel htmlFor="date" value="日付 *" className="text-gray-300" />
+                        <TextInput
+                            id="date"
+                            type="date"
+                            value={formData.date}
+                            onChange={(e) => handleInputChange('date', e.target.value)}
+                            className="mt-1 block w-full bg-gray-700 border-gray-600 text-white"
+                        />
+                        <InputError message={errors.date} className="mt-2" />
                     </div>
 
                     {/* 全日チェックボックス */}
