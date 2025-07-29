@@ -44,9 +44,10 @@ class ScheduleController extends Controller
 
         // フロントエンドが期待する形式に変換
         $monthlyData = $calendarDates->map(function ($calendarDate) {
+            $formattedDate = $calendarDate->calendar_date->format('Y-m-d');
             return [
-                'date' => $calendarDate->calendar_date->format('Y-m-d'),
-                'schedules' => $calendarDate->schedules->map(function ($schedule) {
+                'date' => $formattedDate,
+                'schedules' => $calendarDate->schedules->map(function ($schedule) use ($formattedDate) {
                     return [
                         'id' => $schedule->id,
                         'title' => $schedule->title,
@@ -55,7 +56,7 @@ class ScheduleController extends Controller
                         'end_time' => $schedule->end_time,
                         'schedule_type_id' => $schedule->schedule_type_id,
                         'resident_id' => $schedule->resident_id,
-                        'date' => $calendarDate->calendar_date->format('Y-m-d'),
+                        'date' => $formattedDate,
                         'schedule_type' => $schedule->scheduleType
                     ];
                 })
