@@ -1,5 +1,5 @@
 import React from 'react';
-import { isSameMonth, isToday } from 'date-fns';
+import { isSameMonth, isToday, format } from 'date-fns';
 import CalendarDay from './CalendarDay';
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
