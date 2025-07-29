@@ -86,6 +86,8 @@ export default function CalendarDay({
     error = null
 }) {
     const [dragOver, setDragOver] = useState(false);
+    const [showScheduleModal, setShowScheduleModal] = useState(false);
+    const [selectedSchedule, setSelectedSchedule] = useState(null);
     const dateKey = format(date, 'yyyy-MM-dd');
     
     // APIデータを優先的に使用し、フォールバックとしてサンプルデータを使用
