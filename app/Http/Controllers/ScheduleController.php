@@ -42,9 +42,32 @@ class ScheduleController extends Controller
             ->orderBy('calendar_date')
             ->get();
 
+        // フロントエンドが期待する形式に変換
+        $monthlyData = $calendarDates->map(function ($calendarDate) {
+            return [
+                'date' => $calendarDate->calendar_date->format('Y-m-d'),
+                'schedules' => $calendarDate->schedules->map(function ($schedule) {
+                    return [
+                        'id' => $schedule->id,
+                        'title' => $schedule->title,
+                        'description' => $schedule->description,
+                        'start_time' => $schedule->start_time,
+                        'end_time' => $schedule->end_time,
+                        'schedule_type_id' => $schedule->schedule_type_id,
+                        'resident_id' => $schedule->resident_id,
+                        'date' => $calendarDate->calendar_date->format('Y-m-d'),
+                        'schedule_type' => $schedule->scheduleType
+                    ];
+                })
+            ];
+        })->filter(function ($item) {
+            // スケジュールがある日付のみ返す
+            return $item['schedules']->isNotEmpty();
+        });
+
         return response()->json([
             'status' => 'success',
-            'data' => $calendarDates
+            'data' => $monthlyData->values()
         ]);
     }
 
