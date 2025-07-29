@@ -181,7 +181,7 @@ export default function CalendarDay({
 
     // スケジュール保存
     const handleSaveSchedule = async (formData) => {
-        if (selectedSchedule) {
+        if (selectedSchedule && !selectedSchedule.isNewSchedule) {
             // 更新
             await updateSchedule(selectedSchedule.id, formData);
         } else {
