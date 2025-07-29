@@ -275,6 +275,17 @@ export default function CalendarDay({
                     </div>
                 </div>
             </div>
+            
+            {/* スケジュール作成・編集モーダル */}
+            <ScheduleModal
+                isOpen={showScheduleModal}
+                onClose={() => setShowScheduleModal(false)}
+                onSave={handleSaveSchedule}
+                schedule={selectedSchedule}
+                date={date}
+                scheduleTypes={scheduleTypes}
+                loading={loading}
+            />
         </div>
     );
 }
