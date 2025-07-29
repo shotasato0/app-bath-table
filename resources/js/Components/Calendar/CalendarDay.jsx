@@ -134,31 +134,45 @@ export default function CalendarDay({
 
     // 次の利用可能な入浴時間を計算
     const getNextAvailableTime = () => {
+        console.log('=== getNextAvailableTime Debug ===');
+        console.log('dayEvents.bathing:', dayEvents.bathing);
+        
         // APIスケジュールのみを対象とする（titleプロパティがあり、start_timeとend_timeが存在するもの）
         const bathingSchedules = dayEvents.bathing.filter(item => 
             item.title !== undefined && item.start_time && item.end_time
         );
         
+        console.log('Filtered bathingSchedules:', bathingSchedules);
+        
         if (bathingSchedules.length === 0) {
+            console.log('No bathing schedules found, returning default time');
             return { start_time: '10:00', end_time: '10:30' };
         }
         
         // 最後の入浴スケジュールの終了時間を取得
-        const lastSchedule = bathingSchedules
-            .map(schedule => ({
-                ...schedule,
-                end_time_minutes: timeToMinutes(schedule.end_time)
-            }))
+        const schedulesWithMinutes = bathingSchedules.map(schedule => ({
+            ...schedule,
+            end_time_minutes: timeToMinutes(schedule.end_time)
+        }));
+        
+        console.log('Schedules with minutes:', schedulesWithMinutes);
+        
+        const lastSchedule = schedulesWithMinutes
             .sort((a, b) => a.end_time_minutes - b.end_time_minutes)
             .pop();
+        
+        console.log('Last schedule:', lastSchedule);
         
         const nextStartMinutes = lastSchedule.end_time_minutes;
         const nextEndMinutes = nextStartMinutes + 30; // 30分後
         
-        return {
+        const result = {
             start_time: minutesToTime(nextStartMinutes),
             end_time: minutesToTime(nextEndMinutes)
         };
+        
+        console.log('Calculated next time:', result);
+        return result;
     };
     
     // 時間文字列を分に変換
