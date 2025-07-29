@@ -7,6 +7,22 @@ import PrimaryButton from '../PrimaryButton';
 import SecondaryButton from '../SecondaryButton';
 import { format, parseISO } from 'date-fns';
 
+// スケジュールから日付を安全に抽出するヘルパー関数
+const extractScheduleDate = (schedule, fallbackDate) => {
+    if (!schedule) return format(fallbackDate, 'yyyy-MM-dd');
+    
+    // 直接dateプロパティがある場合
+    if (schedule.date) return schedule.date;
+    
+    // calendar_date オブジェクトから抽出
+    if (schedule.calendar_date?.calendar_date) {
+        return schedule.calendar_date.calendar_date;
+    }
+    
+    // フォールバック値
+    return format(fallbackDate, 'yyyy-MM-dd');
+};
+
 export default function ScheduleModal({ 
     isOpen, 
     onClose, 
