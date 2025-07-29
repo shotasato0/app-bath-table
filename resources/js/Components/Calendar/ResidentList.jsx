@@ -65,22 +65,28 @@ export default function ResidentList() {
             </div>
             
             <div className="p-4 max-h-96 overflow-y-auto">
-                {filteredResidents.map((resident) => (
-                    <div
-                        key={resident.id}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, resident)}
-                        className="flex items-center gap-3 p-3 bg-gray-700 border border-gray-600 rounded-md mb-2 cursor-move transition-all hover:bg-gray-600 hover:-translate-y-0.5 hover:shadow-lg"
-                    >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${resident.color}`}>
-                            👤
-                        </div>
-                        <div>
-                            <h4 className="text-sm font-medium text-gray-100">{resident.name}</h4>
-                            <p className="text-xs text-gray-400">{resident.room}</p>
-                        </div>
+                {loading ? (
+                    <div className="flex items-center justify-center py-8">
+                        <div className="text-gray-400 text-sm">住民データを読み込み中...</div>
                     </div>
-                ))}
+                ) : (
+                    filteredResidents.map((resident) => (
+                        <div
+                            key={resident.id}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, resident)}
+                            className="flex items-center gap-3 p-3 bg-gray-700 border border-gray-600 rounded-md mb-2 cursor-move transition-all hover:bg-gray-600 hover:-translate-y-0.5 hover:shadow-lg"
+                        >
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${resident.color}`}>
+                                👤
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-100">{resident.name}</h4>
+                                <p className="text-xs text-gray-400">{resident.room}</p>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
             
             <div className="p-4 border-t border-gray-600 bg-gray-900">
