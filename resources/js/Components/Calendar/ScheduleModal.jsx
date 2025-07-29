@@ -35,33 +35,17 @@ export default function ScheduleModal({
                 // dateフィールドがnullの場合はcalendar_dateから取得
                 const scheduleDate = schedule.date || schedule.calendar_date?.calendar_date || format(date, 'yyyy-MM-dd');
                 
-                // 時間フィールドの安全な処理
-                const formatTime = (timeStr, fallbackTime = '') => {
-                    if (!timeStr || typeof timeStr !== 'string') return fallbackTime;
-                    
-                    // 日付が混入している場合（"2025-"で始まる場合）はフォールバック値を返す
-                    if (timeStr.includes('-') || timeStr.length < 4) {
-                        console.warn('Invalid time format detected:', timeStr, 'using fallback:', fallbackTime);
-                        return fallbackTime;
-                    }
-                    
-                    // HH:MM:SS形式の場合は最初の5文字を取得、HH:MM形式はそのまま
-                    if (timeStr.length >= 5) {
-                        return timeStr.substring(0, 5);
-                    }
-                    
-                    return timeStr;
-                };
+                console.log('Raw schedule data for editing:', schedule);
                 
-                // より安全にフォールバック値を設定
-                const safeStartTime = formatTime(schedule.start_time, schedule.start_time || '09:00');
-                const safeEndTime = formatTime(schedule.end_time, schedule.end_time || '10:00');
+                // 時間フィールドを直接使用（フォーマット処理を簡素化）
+                const safeStartTime = schedule.start_time || '09:00';
+                const safeEndTime = schedule.end_time || '10:00';
                 
-                console.log('Schedule edit data:', {
+                console.log('Time field processing:', {
                     original_start_time: schedule.start_time,
                     original_end_time: schedule.end_time,
-                    formatted_start_time: safeStartTime,
-                    formatted_end_time: safeEndTime
+                    safe_start_time: safeStartTime,
+                    safe_end_time: safeEndTime
                 });
                 
                 setFormData({
