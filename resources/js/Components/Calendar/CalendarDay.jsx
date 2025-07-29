@@ -217,7 +217,7 @@ export default function CalendarDay({
             
             // 住民の入浴スケジュールを自動作成
             const bathingSchedule = {
-                title: `${residentData.name}さんの入浴`,
+                title: `${residentData.name}`,
                 description: `${residentData.room} ${residentData.name}さんの入浴時間`,
                 date: dateKey,
                 start_time,
