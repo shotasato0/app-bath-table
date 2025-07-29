@@ -192,8 +192,17 @@ export default function CalendarDay({
             <div className="flex flex-1 gap-1">
                 {/* 予定側 */}
                 <div className="flex-1 flex flex-col gap-0.5">
-                    <div className="text-purple-300 text-[8px] text-center pb-0.5 border-b border-gray-600 font-medium">
-                        予定
+                    <div className="text-purple-300 text-[8px] text-center pb-0.5 border-b border-gray-600 font-medium flex justify-between items-center">
+                        <span>予定</span>
+                        <button
+                            onClick={handleCreateSchedule}
+                            className="text-purple-400 hover:text-purple-300 transition-colors"
+                            title="スケジュール追加"
+                        >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
                     </div>
                     {dayEvents.schedules.map((event) => {
                         const scheduleType = scheduleTypes.find(type => type.id === event.schedule_type_id);
