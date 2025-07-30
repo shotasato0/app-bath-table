@@ -49,6 +49,22 @@ export default function Calendar() {
         error: typesError
     } = useScheduleTypes();
 
+    // ブラウザのバック・フォワード機能に対応
+    useEffect(() => {
+        const handlePopState = () => {
+            const newDate = getInitialDate();
+            setCurrentDate(newDate);
+            
+            // データを再取得
+            if (fetchMonthlySchedules) {
+                fetchMonthlySchedules(newDate.getFullYear(), newDate.getMonth() + 1);
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [fetchMonthlySchedules]);
+
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
     const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
