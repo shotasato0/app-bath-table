@@ -2,66 +2,7 @@ import React, { useState } from 'react';
 import { format } from 'date-fns';
 import ScheduleModal from './ScheduleModal';
 
-const SAMPLE_EVENTS = {
-    '2025-08-01': {
-        schedules: [
-            { id: 1, type: 'general', text: '夜勤' },
-            { id: 2, type: 'meal', text: '午前11時 運動局' },
-            { id: 3, type: 'activity', text: '午後2時 みかんチトレー' },
-        ],
-        bathing: [
-            { id: 1, name: '田中太郎' },
-            { id: 2, name: '佐藤花子' },
-        ]
-    },
-    '2025-08-02': {
-        schedules: [
-            { id: 4, type: 'general', text: '休み' },
-            { id: 5, type: 'activity', text: '午前5時 英文朝開定意定ホ' },
-        ],
-        bathing: [
-            { id: 3, name: '山田次郎' },
-        ]
-    },
-    '2025-08-04': {
-        schedules: [
-            { id: 6, type: 'general', text: 'みかやみ' },
-        ],
-        bathing: [
-            { id: 4, name: '鈴木一郎' },
-        ]
-    },
-    '2025-08-08': {
-        schedules: [
-            { id: 7, type: 'general', text: '先見くる' },
-        ],
-        bathing: []
-    },
-    '2025-08-12': {
-        schedules: [
-            { id: 8, type: 'general', text: 'リラクゼーションチュール' },
-        ],
-        bathing: []
-    },
-    '2025-08-18': {
-        schedules: [
-            { id: 9, type: 'meal', text: '午前8時 【WHS関定特典】' },
-        ],
-        bathing: []
-    },
-    '2025-08-20': {
-        schedules: [
-            { id: 10, type: 'activity', text: '実査課生日' },
-        ],
-        bathing: []
-    },
-    '2025-08-24': {
-        schedules: [
-            { id: 11, type: 'general', text: 'みかと麻痺' },
-        ],
-        bathing: []
-    },
-};
+const SAMPLE_EVENTS = {};
 
 const EVENT_STYLES = {
     general: 'bg-purple-900 bg-opacity-40 text-purple-300 border-l-purple-500',
