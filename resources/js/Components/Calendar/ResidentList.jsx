@@ -253,6 +253,18 @@ export default function ResidentList() {
                         <div className="flex items-center justify-center py-8">
                             <div className="text-gray-400 text-sm">住民データを読み込み中...</div>
                         </div>
+                    ) : residentsError ? (
+                        <div className="flex flex-col items-center justify-center py-8 space-y-3">
+                            <div className="text-red-400 text-sm text-center">{residentsError}</div>
+                            {useApiEndpoint && (
+                                <button
+                                    onClick={handleRefreshResidents}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-md transition-colors"
+                                >
+                                    再試行
+                                </button>
+                            )}
+                        </div>
                     ) : (
                         filteredResidents.map((resident) => (
                             <div
