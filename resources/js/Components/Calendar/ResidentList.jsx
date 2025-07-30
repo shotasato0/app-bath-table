@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../../services/api';
+import ResidentModal from './ResidentModal';
+import { useResidents } from '../../hooks/useResidents';
 
 const SAMPLE_RESIDENTS = [
     { id: 1, name: '田中太郎', room: '101号室', color: 'bg-blue-600' },
