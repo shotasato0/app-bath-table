@@ -420,6 +420,42 @@ export default function CalendarDay({
         }
     };
 
+    // 入浴スケジュールの重複チェック関数
+    const checkBathingScheduleDuplicate = (formData, excludeId = null) => {
+        // 入浴スケジュール（schedule_type_id === 1）の場合のみチェック
+        if (formData.schedule_type_id !== 1) {
+            return null; // 入浴スケジュール以外は重複チェックしない
+        }
+
+        // resident_idがある場合は住民IDで重複チェック
+        if (formData.resident_id) {
+            const existingSchedule = dayEvents.bathing.find(item => 
+                item.schedule_type_id !== undefined && // APIスケジュールのみ
+                item.resident_id === formData.resident_id && // 同じ住民ID
+                item.id !== excludeId // 除外対象のスケジュールは除く
+            );
+            
+            if (existingSchedule) {
+                return `住民ID:${formData.resident_id}の入浴スケジュールは既にこの日に登録されています。`;
+            }
+        }
+
+        // resident_idがない場合はタイトルで重複チェック（フォールバック）
+        if (formData.title) {
+            const existingSchedule = dayEvents.bathing.find(item => 
+                item.schedule_type_id !== undefined && // APIスケジュールのみ
+                item.title === formData.title && // 同じタイトル
+                item.id !== excludeId // 除外対象のスケジュールは除く
+            );
+            
+            if (existingSchedule) {
+                return `${formData.title}さんの入浴スケジュールは既にこの日に登録されています。`;
+            }
+        }
+
+        return null; // 重複なし
+    };
+
     // スケジュール保存
     const handleSaveSchedule = async (formData) => {
         if (selectedSchedule && !selectedSchedule.isNewSchedule) {
