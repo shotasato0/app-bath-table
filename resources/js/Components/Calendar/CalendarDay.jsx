@@ -500,7 +500,9 @@ export default function CalendarDay({
 
                 {/* 入浴側 */}
                 <div 
-                    className="flex-1 flex flex-col gap-0.5 border-l border-gray-600 pl-1"
+                    className={`flex-1 flex flex-col gap-0.5 border-l border-gray-600 pl-1 transition-colors ${
+                        dragOver ? 'bg-blue-900 bg-opacity-20' : ''
+                    }`}
                     onDragOver={handleDragOver}
                     onDragEnter={handleDragEnter}
                     onDragLeave={handleDragLeave}
