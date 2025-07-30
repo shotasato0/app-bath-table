@@ -262,13 +262,17 @@ export default function CalendarDay({
 
     // 住民からの新規スケジュール作成
     const handleResidentDrop = async (residentData) => {
-        // 既にその住民の入浴スケジュールが存在するかチェック
-        const existingSchedule = dayEvents.bathing.find(item => 
-            item.resident_id === residentData.id && item.schedule_type_id !== undefined
-        );
+        // 入浴スケジュールデータを作成
+        const bathingScheduleData = {
+            title: residentData.name,
+            schedule_type_id: 1, // 入浴タイプ
+            resident_id: residentData.id
+        };
         
-        if (existingSchedule) {
-            alert(`${residentData.name}さんの入浴スケジュールは既に登録されています。`);
+        // 重複チェック
+        const duplicateError = checkBathingScheduleDuplicate(bathingScheduleData);
+        if (duplicateError) {
+            alert(duplicateError);
             return;
         }
         
