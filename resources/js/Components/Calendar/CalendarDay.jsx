@@ -618,6 +618,31 @@ export default function CalendarDay({
                 loading={loading}
             />
             
+            {/* 確認ダイアログ */}
+            {confirmDialog && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-sm mx-4 shadow-xl">
+                        <div className="text-gray-900 mb-4">
+                            {confirmDialog.message}
+                        </div>
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={confirmDialog.onCancel}
+                                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                            >
+                                キャンセル
+                            </button>
+                            <button
+                                onClick={confirmDialog.onConfirm}
+                                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                            >
+                                削除
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
             {/* Toast通知 */}
             <div className="fixed top-4 right-4 z-50 space-y-2">
                 {notifications.map((notification) => (
