@@ -25,7 +25,11 @@ export default function CalendarDay({
     const notificationTimeouts = useRef(new Map());
     const dateKey = format(date, 'yyyy-MM-dd');
     
-    // ユーティリティ関数: APIスケジュールかどうかを判定
+    /**
+     * ユーティリティ関数: APIスケジュールかサンプルデータかを判定
+     * @param {Object} schedule - 判定対象のスケジュールオブジェクト
+     * @returns {boolean} APIスケジュールの場合true、サンプルデータの場合false
+     */
     const isApiSchedule = (schedule) => {
         return schedule && schedule.schedule_type_id !== undefined;
     };
