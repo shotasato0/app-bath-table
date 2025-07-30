@@ -136,7 +136,7 @@ export default function CalendarDay({
 
     const handleDragLeave = (e) => {
         // 子要素から親要素へのleaveイベントを無視
-        if (!e.currentTarget.contains(e.relatedTarget)) {
+        if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget)) {
             setDragOver(false);
         }
     };
