@@ -16,6 +16,7 @@ export default function ResidentList() {
     const [residents, setResidents] = useState(SAMPLE_RESIDENTS);
     const [loading, setLoading] = useState(true);
     const [draggedResident, setDraggedResident] = useState(null);
+    const timeoutRefs = useRef(new Set());
 
     // 住民データを取得
     useEffect(() => {
