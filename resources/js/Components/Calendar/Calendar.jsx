@@ -116,6 +116,7 @@ export default function Calendar() {
                 onPreviousMonth={() => navigateMonth(-1)}
                 onNextMonth={() => navigateMonth(1)}
                 onToday={goToToday}
+                onCreateSchedule={handleCreateSchedule}
             />
             
             {/* エラー表示 */}
