@@ -125,7 +125,21 @@ export default function CalendarDay({
 
     const handleDragOver = (e) => {
         e.preventDefault();
-        e.dataTransfer.dropEffect = 'copy';
+        e.stopPropagation();
+        
+        // ドラッグデータを確認して適切なエフェクトを設定
+        try {
+            const data = e.dataTransfer.getData('application/json');
+            if (data) {
+                const dragData = JSON.parse(data);
+                e.dataTransfer.dropEffect = dragData.type === 'schedule_move' ? 'move' : 'copy';
+            } else {
+                e.dataTransfer.dropEffect = 'copy';
+            }
+        } catch {
+            e.dataTransfer.dropEffect = 'copy';
+        }
+        
         setDragOver(true);
     };
 
