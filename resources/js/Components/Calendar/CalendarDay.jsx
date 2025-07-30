@@ -137,9 +137,9 @@ export default function CalendarDay({
         console.log('=== getNextAvailableTime Debug ===');
         console.log('dayEvents.bathing:', dayEvents.bathing);
         
-        // APIスケジュールのみを対象とする（titleプロパティがあり、start_timeとend_timeが存在するもの）
+        // APIスケジュールのみを対象とする（schedule_type_idが存在するもの）
         const bathingSchedules = dayEvents.bathing.filter(item => 
-            item.title !== undefined && item.start_time && item.end_time
+            item.schedule_type_id !== undefined && item.start_time && item.end_time
         );
         
         console.log('Filtered bathingSchedules:', bathingSchedules);
