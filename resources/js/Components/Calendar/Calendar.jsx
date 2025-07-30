@@ -8,7 +8,23 @@ import { useSchedules } from '../../hooks/useSchedules';
 import { useScheduleTypes } from '../../hooks/useScheduleTypes';
 
 export default function Calendar() {
-    const [currentDate, setCurrentDate] = useState(new Date());
+    // URLパラメータから初期日付を取得
+    const getInitialDate = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const year = urlParams.get('year');
+        const month = urlParams.get('month');
+        
+        if (year && month) {
+            const date = new Date(parseInt(year), parseInt(month) - 1);
+            // 有効な日付かチェック
+            if (!isNaN(date.getTime())) {
+                return date;
+            }
+        }
+        return new Date();
+    };
+
+    const [currentDate, setCurrentDate] = useState(getInitialDate);
     const [selectedDate, setSelectedDate] = useState(new Date());
     
     const {
