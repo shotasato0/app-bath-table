@@ -68,18 +68,29 @@ export default function ResidentList() {
         setDraggedResident(resident.id);
         
         // ドラッグ中の要素のスタイルを設定
-        const dragImage = e.target.cloneNode(true);
+        const dragImage = e.currentTarget.cloneNode(true);
+        dragImage.style.position = 'absolute';
+        dragImage.style.top = '-1000px';
+        dragImage.style.left = '-1000px';
         dragImage.style.opacity = '0.8';
-        dragImage.style.transform = 'rotate(5deg)';
+        dragImage.style.transform = 'rotate(2deg)';
+        dragImage.style.pointerEvents = 'none';
+        dragImage.style.zIndex = '9999';
         document.body.appendChild(dragImage);
-        e.dataTransfer.setDragImage(dragImage, 0, 0);
+        
+        // カーソル位置に近い場所でドラッグイメージを設定
+        const rect = e.currentTarget.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left;
+        const offsetY = e.clientY - rect.top;
+        
+        e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
         
         // 少し遅延後にクローンを削除
         setTimeout(() => {
             if (document.body.contains(dragImage)) {
                 document.body.removeChild(dragImage);
             }
-        }, 0);
+        }, 100);
     };
 
     const handleDragEnd = () => {
