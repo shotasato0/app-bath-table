@@ -387,7 +387,7 @@ export default function CalendarDay({
                     </div>
                     {dayEvents.bathing.map((item) => {
                         // APIスケジュールの場合とサンプルデータの場合を判別
-                        const isApiSchedule = item.title !== undefined;
+                        const isApiSchedule = item.schedule_type_id !== undefined;
                         const displayName = isApiSchedule 
                             ? (item.title || `入浴スケジュール`)
                             : item.name;
