@@ -272,6 +272,23 @@ export default function CalendarDay({
         }
     };
 
+    // スケジュールのドラッグ開始処理
+    const handleScheduleDragStart = (e, schedule) => {
+        e.stopPropagation();
+        
+        // スケジュール移動データを設定
+        const dragData = {
+            type: 'schedule_move',
+            schedule: schedule,
+            sourceDate: dateKey
+        };
+        
+        e.dataTransfer.setData('application/json', JSON.stringify(dragData));
+        e.dataTransfer.effectAllowed = 'move';
+        
+        console.log('スケジュールドラッグ開始:', schedule.title, 'from', dateKey);
+    };
+
     // スケジュール作成モーダルを開く
     const handleCreateSchedule = (e) => {
         e.stopPropagation();
