@@ -577,15 +577,25 @@ export default function CalendarDay({
                     
                     {/* ドロップゾーン */}
                     <div
-                        className={`border border-dashed rounded-sm min-h-[14px] m-0.5 flex items-center justify-center text-[8px] transition-all ${
+                        style={{ minHeight: '20px' }}
+                        className={`border border-dashed rounded-sm flex items-center justify-center text-[8px] transition-all ${
                             dragOver 
                                 ? 'border-blue-400 bg-blue-900 bg-opacity-20 text-blue-400 border-solid' 
                                 : 'border-gray-500 text-gray-500 hover:border-blue-400 hover:bg-blue-900 hover:bg-opacity-10'
                         }`}
-                        onDragOver={handleDragOver}
-                        onDragEnter={handleDragEnter}
-                        onDragLeave={handleDragLeave}
-                        onDrop={handleDrop}
+                        onDragOver={(e) => {
+                            e.preventDefault();
+                            console.log('ドロップゾーンでドラッグオーバー');
+                            setDragOver(true);
+                        }}
+                        onDragLeave={(e) => {
+                            console.log('ドロップゾーンでドラッグリーブ');
+                            setDragOver(false);
+                        }}
+                        onDrop={(e) => {
+                            console.log('ドロップゾーンでドロップ発生!');
+                            handleDrop(e);
+                        }}
                     >
                         {dragOver 
                             ? '住民を入浴予定に追加' 
