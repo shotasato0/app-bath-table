@@ -145,10 +145,11 @@ export default function ScheduleModal({
             newErrors.schedule_type_id = 'スケジュールタイプを選択してください';
         }
         if (!formData.all_day) {
-            if (!formData.start_time || formData.start_time.includes('-') || formData.start_time.length < 4) {
+            const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/; // HH:MM形式に一致
+            if (!formData.start_time || !timeRegex.test(formData.start_time)) {
                 newErrors.start_time = '開始時間は必須です（HH:MM形式）';
             }
-            if (formData.end_time && (formData.end_time.includes('-') || formData.end_time.length < 4)) {
+            if (formData.end_time && !timeRegex.test(formData.end_time)) {
                 newErrors.end_time = '終了時間はHH:MM形式で入力してください';
             }
         }
