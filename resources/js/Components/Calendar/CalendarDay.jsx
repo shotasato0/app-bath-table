@@ -145,8 +145,10 @@ export default function CalendarDay({
     };
 
     const handleDragLeave = (e) => {
+        console.log('ドラッグリーブ発生', e.relatedTarget);
         // 子要素から親要素へのleaveイベントを無視
         if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget)) {
+            console.log('ドラッグオーバー状態をfalseに設定');
             setDragOver(false);
         }
     };
