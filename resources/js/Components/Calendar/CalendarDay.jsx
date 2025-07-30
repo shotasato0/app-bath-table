@@ -25,6 +25,17 @@ export default function CalendarDay({
     const notificationTimeouts = useRef(new Map());
     const dateKey = format(date, 'yyyy-MM-dd');
     
+    // コンポーネントアンマウント時のクリーンアップ
+    useEffect(() => {
+        return () => {
+            // 全ての通知タイマーをクリアしてメモリリークを防止
+            notificationTimeouts.current.forEach(timeoutId => {
+                clearTimeout(timeoutId);
+            });
+            notificationTimeouts.current.clear();
+        };
+    }, []);
+    
     // スケジュールを左右に分離するロジック
     const separateSchedules = (allSchedules) => {
         const generalSchedules = [];
