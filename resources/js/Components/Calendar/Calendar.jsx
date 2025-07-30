@@ -55,10 +55,28 @@ export default function Calendar() {
         end: calendarEnd
     });
 
+    // URLを更新する関数
+    const updateURL = (date) => {
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        
+        router.get('/calendar', 
+            { year, month }, 
+            { 
+                preserveState: true,
+                preserveScroll: true,
+                replace: true
+            }
+        );
+    };
+
     const navigateMonth = (direction) => {
         const newDate = new Date(currentDate);
         newDate.setMonth(currentDate.getMonth() + direction);
         setCurrentDate(newDate);
+        
+        // URLを更新
+        updateURL(newDate);
         
         // 月が変更された時にスケジュールデータを再取得
         if (fetchMonthlySchedules) {
@@ -70,6 +88,14 @@ export default function Calendar() {
         const today = new Date();
         setCurrentDate(today);
         setSelectedDate(today);
+        
+        // URLを更新
+        updateURL(today);
+        
+        // 今日のデータを取得
+        if (fetchMonthlySchedules) {
+            fetchMonthlySchedules(today.getFullYear(), today.getMonth() + 1);
+        }
     };
 
     return (
