@@ -125,11 +125,20 @@ export default function CalendarDay({
 
     const handleDragOver = (e) => {
         e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
         setDragOver(true);
     };
 
-    const handleDragLeave = () => {
-        setDragOver(false);
+    const handleDragEnter = (e) => {
+        e.preventDefault();
+        setDragOver(true);
+    };
+
+    const handleDragLeave = (e) => {
+        // 子要素から親要素へのleaveイベントを無視
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+            setDragOver(false);
+        }
     };
 
     // 次の利用可能な入浴時間を計算
