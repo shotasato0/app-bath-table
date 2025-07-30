@@ -598,6 +598,7 @@ export default function CalendarDay({
                             e.preventDefault();
                             e.stopPropagation();
                             setDragOver(false);
+                            dragCounter.current = 0; // カウンターをリセット
                             handleDrop(e);
                         }}
                     >
