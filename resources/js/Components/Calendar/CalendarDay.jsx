@@ -356,7 +356,7 @@ export default function CalendarDay({
         // resident_idがない場合はタイトルで重複チェック（フォールバック）
         if (formData.title) {
             const existingSchedule = dayEvents.bathing.find(item => 
-                item.schedule_type_id !== undefined && // APIスケジュールのみ
+                isApiSchedule(item) && // APIスケジュールのみ
                 item.title === formData.title && // 同じタイトル
                 item.id !== excludeId // 除外対象のスケジュールは除く
             );
