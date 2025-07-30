@@ -272,6 +272,15 @@ export default function CalendarDay({
             notificationTimeouts.current.delete(id);
         }
     };
+    
+    // 確認ダイアログ表示
+    const showConfirmDialog = (message, onConfirm) => {
+        setConfirmDialog({
+            message,
+            onConfirm,
+            onCancel: () => setConfirmDialog(null)
+        });
+    };
 
     // スケジュールのドラッグ開始処理
     const handleScheduleDragStart = (e, schedule) => {
