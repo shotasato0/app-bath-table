@@ -317,8 +317,7 @@ export default function CalendarDay({
         e.stopPropagation();
         
         // APIスケジュールかどうかをチェック
-        const isApiSchedule = schedule.schedule_type_id !== undefined;
-        if (!isApiSchedule) {
+        if (!isApiSchedule(schedule)) {
             showWarningMessage('サンプル住民データは削除できません');
             return;
         }
