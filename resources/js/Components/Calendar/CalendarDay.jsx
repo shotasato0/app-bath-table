@@ -499,7 +499,13 @@ export default function CalendarDay({
                 </div>
 
                 {/* 入浴側 */}
-                <div className="flex-1 flex flex-col gap-0.5 border-l border-gray-600 pl-1">
+                <div 
+                    className="flex-1 flex flex-col gap-0.5 border-l border-gray-600 pl-1"
+                    onDragOver={handleDragOver}
+                    onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                >
                     <div className="text-blue-300 text-[8px] text-center pb-0.5 border-b border-gray-600 font-medium flex justify-between items-center">
                         <span>🛁 入浴</span>
                         <button
