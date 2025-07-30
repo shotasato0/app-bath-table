@@ -2,7 +2,7 @@ import React from 'react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
-export default function CalendarHeader({ currentDate, onPreviousMonth, onNextMonth, onToday }) {
+export default function CalendarHeader({ currentDate, onPreviousMonth, onNextMonth, onToday, onCreateSchedule }) {
     return (
         <div className="bg-gray-800 border-b border-gray-600 px-6 py-4 flex justify-between items-center">
             <div className="flex items-center gap-6">
