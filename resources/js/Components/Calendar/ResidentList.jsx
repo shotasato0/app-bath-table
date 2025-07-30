@@ -15,10 +15,28 @@ const COLORS = ['bg-blue-600', 'bg-green-600', 'bg-purple-600', 'bg-yellow-600',
 
 export default function ResidentList() {
     const [searchTerm, setSearchTerm] = useState('');
-    const [residents, setResidents] = useState(SAMPLE_RESIDENTS);
-    const [loading, setLoading] = useState(true);
     const [draggedResident, setDraggedResident] = useState(null);
+    const [showResidentModal, setShowResidentModal] = useState(false);
+    const [selectedResident, setSelectedResident] = useState(null);
+    const [notifications, setNotifications] = useState([]);
     const timeoutRefs = useRef(new Set());
+    const notificationTimeouts = useRef(new Map());
+
+    // 利用者管理フック
+    const {
+        residents: apiResidents,
+        loading: residentsLoading,
+        error: residentsError,
+        fetchResidents,
+        createResident,
+        updateResident,
+        deleteResident
+    } = useResidents({ autoFetch: false });
+
+    // APIと接続する場合の利用者データ、そうでなければサンプルデータ
+    const useApiEndpoint = import.meta.env.VITE_USE_RESIDENTS_API === 'true';
+    const residents = useApiEndpoint ? apiResidents : SAMPLE_RESIDENTS;
+    const loading = useApiEndpoint ? residentsLoading : false;
 
     // 住民データを取得
     useEffect(() => {
