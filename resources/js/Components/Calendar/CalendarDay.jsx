@@ -311,15 +311,10 @@ export default function CalendarDay({
             return;
         }
         
-        // 移動先に同名（同じ住民）の入浴スケジュールが既に存在するかチェック
-        const existingSchedule = dayEvents.bathing.find(item => 
-            item.schedule_type_id !== undefined && // APIスケジュールのみ
-            item.resident_id === schedule.resident_id && // 同じ住民
-            item.id !== schedule.id // 移動対象のスケジュール自体は除外
-        );
-        
-        if (existingSchedule) {
-            alert(`${schedule.title}さんの入浴スケジュールは既にこの日に登録されています。`);
+        // 重複チェック
+        const duplicateError = checkBathingScheduleDuplicate(schedule, schedule.id);
+        if (duplicateError) {
+            alert(duplicateError);
             return;
         }
         
