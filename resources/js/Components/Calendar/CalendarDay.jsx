@@ -269,6 +269,14 @@ export default function CalendarDay({
     // スケジュール削除
     const handleDeleteSchedule = async (schedule, e) => {
         e.stopPropagation();
+        
+        // APIスケジュールかどうかをチェック
+        const isApiSchedule = schedule.schedule_type_id !== undefined;
+        if (!isApiSchedule) {
+            alert('サンプル住民データは削除できません');
+            return;
+        }
+        
         if (window.confirm('このスケジュールを削除しますか？')) {
             try {
                 await deleteSchedule(schedule.id);
