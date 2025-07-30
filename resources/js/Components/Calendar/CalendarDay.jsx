@@ -318,7 +318,9 @@ export default function CalendarDay({
             );
             
             if (existingSchedule) {
-                return `住民ID:${formData.resident_id}の入浴スケジュールは既にこの日に登録されています。`;
+                // タイトル（利用者名）がある場合は利用者名を表示、なければIDを表示
+                const displayName = formData.title || `住民ID:${formData.resident_id}`;
+                return `${displayName}さんの入浴スケジュールは既にこの日に登録されています。`;
             }
         }
 
