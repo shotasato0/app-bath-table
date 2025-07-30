@@ -37,9 +37,6 @@ export default function CalendarHeader({ currentDate, onPreviousMonth, onNextMon
                 </div>
             </div>
             <div className="flex items-center gap-2">
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors">
-                    + 作成
-                </button>
                 <button className="p-2 text-gray-400 hover:bg-gray-700 rounded transition-colors">
                     🔍
                 </button>

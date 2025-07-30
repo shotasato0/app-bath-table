@@ -67,15 +67,19 @@ export const useSchedules = (options = {}) => {
     /**
      * スケジュール作成
      */
-    const createSchedule = useCallback(async (scheduleData) => {
+    const createSchedule = useCallback(async (scheduleData, refreshYear, refreshMonth) => {
         setLoading(true);
         setError(null);
         
         try {
             const response = await scheduleService.createSchedule(scheduleData);
             
-            // 成功時は月別データを再取得
-            await fetchMonthlySchedules();
+            // 成功時は月別データを再取得（明示的な年月指定があれば使用）
+            if (refreshYear && refreshMonth) {
+                await fetchMonthlySchedules(refreshYear, refreshMonth);
+            } else {
+                await fetchMonthlySchedules();
+            }
             
             return response;
         } catch (error) {
@@ -89,15 +93,19 @@ export const useSchedules = (options = {}) => {
     /**
      * スケジュール更新
      */
-    const updateSchedule = useCallback(async (scheduleId, scheduleData) => {
+    const updateSchedule = useCallback(async (scheduleId, scheduleData, refreshYear, refreshMonth) => {
         setLoading(true);
         setError(null);
         
         try {
             const response = await scheduleService.updateSchedule(scheduleId, scheduleData);
             
-            // 成功時は月別データを再取得
-            await fetchMonthlySchedules();
+            // 成功時は月別データを再取得（明示的な年月指定があれば使用）
+            if (refreshYear && refreshMonth) {
+                await fetchMonthlySchedules(refreshYear, refreshMonth);
+            } else {
+                await fetchMonthlySchedules();
+            }
             
             return response;
         } catch (error) {
@@ -111,15 +119,19 @@ export const useSchedules = (options = {}) => {
     /**
      * スケジュール削除
      */
-    const deleteSchedule = useCallback(async (scheduleId) => {
+    const deleteSchedule = useCallback(async (scheduleId, refreshYear, refreshMonth) => {
         setLoading(true);
         setError(null);
         
         try {
             const response = await scheduleService.deleteSchedule(scheduleId);
             
-            // 成功時は月別データを再取得
-            await fetchMonthlySchedules();
+            // 成功時は月別データを再取得（明示的な年月指定があれば使用）
+            if (refreshYear && refreshMonth) {
+                await fetchMonthlySchedules(refreshYear, refreshMonth);
+            } else {
+                await fetchMonthlySchedules();
+            }
             
             return response;
         } catch (error) {

@@ -1,74 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import ScheduleModal from './ScheduleModal';
 
-const SAMPLE_EVENTS = {
-    '2025-08-01': {
-        schedules: [
-            { id: 1, type: 'general', text: '夜勤' },
-            { id: 2, type: 'meal', text: '午前11時 運動局' },
-            { id: 3, type: 'activity', text: '午後2時 みかんチトレー' },
-        ],
-        bathing: [
-            { id: 1, name: '田中太郎' },
-            { id: 2, name: '佐藤花子' },
-        ]
-    },
-    '2025-08-02': {
-        schedules: [
-            { id: 4, type: 'general', text: '休み' },
-            { id: 5, type: 'activity', text: '午前5時 英文朝開定意定ホ' },
-        ],
-        bathing: [
-            { id: 3, name: '山田次郎' },
-        ]
-    },
-    '2025-08-04': {
-        schedules: [
-            { id: 6, type: 'general', text: 'みかやみ' },
-        ],
-        bathing: [
-            { id: 4, name: '鈴木一郎' },
-        ]
-    },
-    '2025-08-08': {
-        schedules: [
-            { id: 7, type: 'general', text: '先見くる' },
-        ],
-        bathing: []
-    },
-    '2025-08-12': {
-        schedules: [
-            { id: 8, type: 'general', text: 'リラクゼーションチュール' },
-        ],
-        bathing: []
-    },
-    '2025-08-18': {
-        schedules: [
-            { id: 9, type: 'meal', text: '午前8時 【WHS関定特典】' },
-        ],
-        bathing: []
-    },
-    '2025-08-20': {
-        schedules: [
-            { id: 10, type: 'activity', text: '実査課生日' },
-        ],
-        bathing: []
-    },
-    '2025-08-24': {
-        schedules: [
-            { id: 11, type: 'general', text: 'みかと麻痺' },
-        ],
-        bathing: []
-    },
-};
-
-const EVENT_STYLES = {
-    general: 'bg-purple-900 bg-opacity-40 text-purple-300 border-l-purple-500',
-    meal: 'bg-green-900 bg-opacity-40 text-green-300 border-l-green-500',
-    activity: 'bg-yellow-900 bg-opacity-40 text-yellow-300 border-l-yellow-500',
-    medical: 'bg-red-900 bg-opacity-40 text-red-300 border-l-red-500',
-};
+const SAMPLE_EVENTS = {};
 
 export default function CalendarDay({ 
     date, 
@@ -82,13 +16,36 @@ export default function CalendarDay({
     createSchedule,
     updateSchedule,
     deleteSchedule,
-    loading = false,
-    error = null
+    loading = false
 }) {
     const [dragOver, setDragOver] = useState(false);
+    const dragCounter = useRef(0);
     const [showScheduleModal, setShowScheduleModal] = useState(false);
     const [selectedSchedule, setSelectedSchedule] = useState(null);
+    const [notifications, setNotifications] = useState([]);
+    const [confirmDialog, setConfirmDialog] = useState(null);
+    const notificationTimeouts = useRef(new Map());
     const dateKey = format(date, 'yyyy-MM-dd');
+    
+    /**
+     * ユーティリティ関数: APIスケジュールかサンプルデータかを判定
+     * @param {Object} schedule - 判定対象のスケジュールオブジェクト
+     * @returns {boolean} APIスケジュールの場合true、サンプルデータの場合false
+     */
+    const isApiSchedule = (schedule) => {
+        return schedule && schedule.schedule_type_id !== undefined;
+    };
+    
+    // コンポーネントアンマウント時のクリーンアップ
+    useEffect(() => {
+        return () => {
+            // 全ての通知タイマーをクリアしてメモリリークを防止
+            notificationTimeouts.current.forEach(timeoutId => {
+                clearTimeout(timeoutId);
+            });
+            notificationTimeouts.current.clear();
+        };
+    }, []);
     
     // スケジュールを左右に分離するロジック
     const separateSchedules = (allSchedules) => {
@@ -123,29 +80,15 @@ export default function CalendarDay({
     };
     
 
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        setDragOver(true);
-    };
-
-    const handleDragLeave = () => {
-        setDragOver(false);
-    };
 
     // 次の利用可能な入浴時間を計算
     const getNextAvailableTime = () => {
-        console.log('=== getNextAvailableTime Debug ===');
-        console.log('dayEvents.bathing:', dayEvents.bathing);
-        
         // APIスケジュールのみを対象とする（schedule_type_idが存在するもの）
         const bathingSchedules = dayEvents.bathing.filter(item => 
-            item.schedule_type_id !== undefined && item.start_time && item.end_time
+            isApiSchedule(item) && item.start_time && item.end_time
         );
         
-        console.log('Filtered bathingSchedules:', bathingSchedules);
-        
         if (bathingSchedules.length === 0) {
-            console.log('No bathing schedules found, returning default time');
             return { start_time: '10:00', end_time: '10:30' };
         }
         
@@ -155,40 +98,30 @@ export default function CalendarDay({
             end_time_minutes: timeToMinutes(schedule.end_time)
         }));
         
-        console.log('Schedules with minutes:', schedulesWithMinutes);
-        
         const lastSchedule = schedulesWithMinutes
             .sort((a, b) => a.end_time_minutes - b.end_time_minutes)
             .pop();
         
-        console.log('Last schedule:', lastSchedule);
-        
         const nextStartMinutes = lastSchedule.end_time_minutes;
         const nextEndMinutes = nextStartMinutes + 30; // 30分後
         
-        const result = {
+        return {
             start_time: minutesToTime(nextStartMinutes),
             end_time: minutesToTime(nextEndMinutes)
         };
-        
-        console.log('Calculated next time:', result);
-        return result;
     };
     
     // 時間文字列を分に変換
     const timeToMinutes = (timeStr) => {
         if (!timeStr || typeof timeStr !== 'string') {
-            console.warn('Invalid time string:', timeStr);
             return 0;
         }
         const parts = timeStr.split(':');
         if (parts.length !== 2) {
-            console.warn('Invalid time format:', timeStr);
             return 0;
         }
         const [hours, minutes] = parts.map(Number);
         if (isNaN(hours) || isNaN(minutes)) {
-            console.warn('Invalid time values:', timeStr);
             return 0;
         }
         return hours * 60 + minutes;
@@ -197,7 +130,6 @@ export default function CalendarDay({
     // 分を時間文字列に変換
     const minutesToTime = (minutes) => {
         if (typeof minutes !== 'number' || isNaN(minutes)) {
-            console.warn('Invalid minutes value:', minutes);
             return '10:00';
         }
         const hours = Math.floor(minutes / 60);
@@ -207,35 +139,164 @@ export default function CalendarDay({
 
     const handleDrop = async (e) => {
         e.preventDefault();
+        e.stopPropagation();
         setDragOver(false);
         
         try {
-            const residentData = JSON.parse(e.dataTransfer.getData('application/json'));
+            const jsonData = e.dataTransfer.getData('application/json');
             
-            // 次の利用可能な時間を計算
-            const { start_time, end_time } = getNextAvailableTime();
+            if (!jsonData) {
+                showErrorMessage('ドラッグデータが見つかりませんでした');
+                return;
+            }
             
-            // 住民の入浴スケジュールを自動作成
-            const bathingSchedule = {
-                title: `${residentData.name}`,
-                description: `${residentData.room} ${residentData.name}さんの入浴時間`,
-                date: dateKey,
-                start_time,
-                end_time,
-                schedule_type_id: 1, // 入浴タイプ
-                resident_id: residentData.id
-            };
+            const dragData = JSON.parse(jsonData);
             
-            try {
-                await createSchedule(bathingSchedule);
-                console.log(`入浴スケジュールを作成しました: ${residentData.name} (${start_time}-${end_time})`);
-            } catch (error) {
-                console.error('入浴スケジュール作成エラー:', error);
-                alert('入浴スケジュールの作成に失敗しました');
+            // ドラッグデータのタイプで処理を分岐
+            if (dragData.type === 'schedule_move') {
+                await handleScheduleMove(dragData);
+            } else {
+                await handleResidentDrop(dragData);
             }
         } catch (error) {
-            console.error('ドロップデータの解析エラー:', error);
+            showErrorMessage('ドロップしたデータの読み込みに失敗しました: ' + error.message);
         }
+    };
+
+    // 住民からの新規スケジュール作成
+    const handleResidentDrop = async (residentData) => {
+        // 入浴スケジュールデータを作成
+        const bathingScheduleData = {
+            title: residentData.name,
+            schedule_type_id: 1, // 入浴タイプ
+            resident_id: residentData.id
+        };
+        
+        // 重複チェック
+        const duplicateError = checkBathingScheduleDuplicate(bathingScheduleData);
+        if (duplicateError) {
+            showWarningMessage(duplicateError);
+            return;
+        }
+        
+        // 次の利用可能な時間を計算
+        const { start_time, end_time } = getNextAvailableTime();
+        
+        // 住民の入浴スケジュールを自動作成
+        const bathingSchedule = {
+            title: `${residentData.name}`,
+            description: `${residentData.room} ${residentData.name}さんの入浴時間`,
+            date: dateKey,
+            start_time,
+            end_time,
+            schedule_type_id: 1, // 入浴タイプ
+            resident_id: residentData.id,
+            all_day: false
+        };
+        
+        try {
+            await createSchedule(bathingSchedule);
+            showSuccessMessage(`${residentData.name}さんの入浴スケジュールを作成しました`);
+        } catch (error) {
+            showErrorMessage(`入浴スケジュールの作成に失敗しました: ${error.message || 'エラーが発生しました'}`);
+        }
+    };
+
+    // スケジュール移動処理
+    const handleScheduleMove = async (dragData) => {
+        const { schedule, sourceDate } = dragData;
+        
+        // 同じ日への移動は無視
+        if (sourceDate === dateKey) {
+            return;
+        }
+        
+        // 重複チェック
+        const duplicateError = checkBathingScheduleDuplicate(schedule, schedule.id);
+        if (duplicateError) {
+            showWarningMessage(duplicateError);
+            return;
+        }
+        
+        // 移動先の時間を計算
+        const { start_time, end_time } = getNextAvailableTime();
+        
+        // スケジュールを更新
+        const updatedSchedule = {
+            ...schedule,
+            date: dateKey,
+            start_time,
+            end_time
+        };
+        
+        try {
+            await updateSchedule(schedule.id, updatedSchedule);
+            showSuccessMessage(`${schedule.title}のスケジュールを${dateKey}に移動しました`);
+        } catch (error) {
+            showErrorMessage(`スケジュールの移動に失敗しました: ${error.message || 'エラーが発生しました'}`);
+        }
+    };
+
+    // 通知システム（メモリリーク対策付き）
+    const showNotification = (message, type = 'success') => {
+        const id = Date.now() + Math.random();
+        const notification = { id, message, type };
+        
+        setNotifications(prev => [...prev, notification]);
+        
+        const timeoutId = setTimeout(() => {
+            setNotifications(prev => prev.filter(n => n.id !== id));
+            notificationTimeouts.current.delete(id);
+        }, type === 'error' ? 5000 : 3000);
+        
+        notificationTimeouts.current.set(id, timeoutId);
+    };
+    
+    const showSuccessMessage = (message) => {
+        showNotification(message, 'success');
+    };
+    
+    const showErrorMessage = (message) => {
+        showNotification(message, 'error');
+    };
+    
+    const showWarningMessage = (message) => {
+        showNotification(message, 'warning');
+    };
+    
+    // 通知の手動削除
+    const removeNotification = (id) => {
+        setNotifications(prev => prev.filter(n => n.id !== id));
+        const timeoutId = notificationTimeouts.current.get(id);
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+            notificationTimeouts.current.delete(id);
+        }
+    };
+    
+    // 確認ダイアログ表示
+    const showConfirmDialog = (message, onConfirm) => {
+        setConfirmDialog({
+            message,
+            onConfirm,
+            onCancel: () => setConfirmDialog(null)
+        });
+    };
+
+    // スケジュールのドラッグ開始処理
+    const handleScheduleDragStart = (e, schedule) => {
+        e.stopPropagation();
+        
+        // スケジュール移動データを設定
+        const dragData = {
+            type: 'schedule_move',
+            schedule: schedule,
+            sourceDate: dateKey
+        };
+        
+        e.dataTransfer.setData('application/json', JSON.stringify(dragData));
+        e.dataTransfer.effectAllowed = 'move';
+        
     };
 
     // スケジュール作成モーダルを開く
@@ -269,22 +330,83 @@ export default function CalendarDay({
     // スケジュール削除
     const handleDeleteSchedule = async (schedule, e) => {
         e.stopPropagation();
-        if (window.confirm('このスケジュールを削除しますか？')) {
-            try {
-                await deleteSchedule(schedule.id);
-            } catch (error) {
-                console.error('スケジュール削除エラー:', error);
-                alert('スケジュールの削除に失敗しました');
+        
+        // APIスケジュールかどうかをチェック
+        if (!isApiSchedule(schedule)) {
+            showWarningMessage('サンプル住民データは削除できません');
+            return;
+        }
+        
+        showConfirmDialog(
+            'このスケジュールを削除しますか？',
+            async () => {
+                try {
+                    await deleteSchedule(schedule.id);
+                    setConfirmDialog(null);
+                } catch (error) {
+                    showErrorMessage('スケジュールの削除に失敗しました');
+                    setConfirmDialog(null);
+                }
+            }
+        );
+    };
+
+    // 入浴スケジュールの重複チェック関数
+    const checkBathingScheduleDuplicate = (formData, excludeId = null) => {
+        // 入浴スケジュール（schedule_type_id === 1）の場合のみチェック
+        if (formData.schedule_type_id !== 1) {
+            return null; // 入浴スケジュール以外は重複チェックしない
+        }
+
+        // resident_idがある場合は住民IDで重複チェック
+        if (formData.resident_id) {
+            const existingSchedule = dayEvents.bathing.find(item => 
+                isApiSchedule(item) && // APIスケジュールのみ
+                item.resident_id === formData.resident_id && // 同じ住民ID
+                item.id !== excludeId // 除外対象のスケジュールは除く
+            );
+            
+            if (existingSchedule) {
+                // タイトル（利用者名）がある場合は利用者名を表示、なければIDを表示
+                const displayName = formData.title || `住民ID:${formData.resident_id}`;
+                return `${displayName}さんの入浴スケジュールは既にこの日に登録されています。`;
             }
         }
+
+        // resident_idがない場合はタイトルで重複チェック（フォールバック）
+        if (formData.title) {
+            const existingSchedule = dayEvents.bathing.find(item => 
+                isApiSchedule(item) && // APIスケジュールのみ
+                item.title === formData.title && // 同じタイトル
+                item.id !== excludeId // 除外対象のスケジュールは除く
+            );
+            
+            if (existingSchedule) {
+                return `${formData.title}さんの入浴スケジュールは既にこの日に登録されています。`;
+            }
+        }
+
+        return null; // 重複なし
     };
 
     // スケジュール保存
     const handleSaveSchedule = async (formData) => {
         if (selectedSchedule && !selectedSchedule.isNewSchedule) {
+            // 更新の場合の重複チェック
+            const duplicateError = checkBathingScheduleDuplicate(formData, selectedSchedule.id);
+            if (duplicateError) {
+                showWarningMessage(duplicateError);
+                return;
+            }
             // 更新
             await updateSchedule(selectedSchedule.id, formData);
         } else {
+            // 新規作成の場合の重複チェック
+            const duplicateError = checkBathingScheduleDuplicate(formData);
+            if (duplicateError) {
+                showWarningMessage(duplicateError);
+                return;
+            }
             // 作成
             await createSchedule(formData);
         }
@@ -345,34 +467,40 @@ export default function CalendarDay({
                             >
                                 <div className="line-clamp-2 pr-1">{displayText}</div>
                                 
-                                {/* ホバー時の操作ボタン */}
-                                <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 rounded-sm shadow-lg flex">
-                                    <button
-                                        onClick={(e) => handleEditSchedule(event, e)}
-                                        className="p-0.5 text-blue-400 hover:text-blue-300"
-                                        title="編集"
-                                    >
-                                        <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                    </button>
-                                    <button
-                                        onClick={(e) => handleDeleteSchedule(event, e)}
-                                        className="p-0.5 text-red-400 hover:text-red-300"
-                                        title="削除"
-                                    >
-                                        <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                    </button>
-                                </div>
+                                {/* ホバー時の操作ボタン（APIスケジュールのみ表示） */}
+                                {isApiSchedule(event) && (
+                                    <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 rounded-sm shadow-lg flex">
+                                        <button
+                                            onClick={(e) => handleEditSchedule(event, e)}
+                                            className="p-0.5 text-blue-400 hover:text-blue-300"
+                                            title="編集"
+                                        >
+                                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            onClick={(e) => handleDeleteSchedule(event, e)}
+                                            className="p-0.5 text-red-400 hover:text-red-300"
+                                            title="削除"
+                                        >
+                                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         );
                     })}
                 </div>
 
                 {/* 入浴側 */}
-                <div className="flex-1 flex flex-col gap-0.5 border-l border-gray-600 pl-1">
+                <div 
+                    className={`flex-1 flex flex-col gap-0.5 border-l border-gray-600 pl-1 transition-colors ${
+                        dragOver ? 'bg-blue-900 bg-opacity-20' : ''
+                    }`}
+                >
                     <div className="text-blue-300 text-[8px] text-center pb-0.5 border-b border-gray-600 font-medium flex justify-between items-center">
                         <span>🛁 入浴</span>
                         <button
@@ -387,17 +515,21 @@ export default function CalendarDay({
                     </div>
                     {dayEvents.bathing.map((item) => {
                         // APIスケジュールの場合とサンプルデータの場合を判別
-                        const isApiSchedule = item.schedule_type_id !== undefined;
-                        const displayName = isApiSchedule 
+                        const isScheduleFromApi = isApiSchedule(item);
+                        const displayName = isScheduleFromApi 
                             ? (item.title || `入浴スケジュール`)
                             : item.name;
-                        const scheduleType = isApiSchedule && scheduleTypes.find(type => type.id === item.schedule_type_id);
+                        const scheduleType = isScheduleFromApi && scheduleTypes.find(type => type.id === item.schedule_type_id);
                         const backgroundColor = scheduleType?.color_code || '#3B82F6';
                         
                         return (
                             <div
-                                key={`${isApiSchedule ? 'schedule' : 'resident'}-${item.id}`}
-                                className="text-[9px] px-1 py-0.5 rounded-sm text-white border-l-2 cursor-pointer transition-all hover:-translate-y-px hover:brightness-110 group relative"
+                                key={`${isScheduleFromApi ? 'schedule' : 'resident'}-${item.id}`}
+                                draggable={isScheduleFromApi}
+                                onDragStart={isScheduleFromApi ? (e) => handleScheduleDragStart(e, item) : undefined}
+                                className={`text-[9px] px-1 py-0.5 rounded-sm text-white border-l-2 transition-all hover:-translate-y-px hover:brightness-110 group relative ${
+                                    isScheduleFromApi ? 'cursor-move' : 'cursor-pointer'
+                                }`}
                                 style={{
                                     backgroundColor: backgroundColor + '40',
                                     borderLeftColor: backgroundColor
@@ -406,7 +538,7 @@ export default function CalendarDay({
                                 <div className="line-clamp-2 pr-1">{displayName}</div>
                                 
                                 {/* APIスケジュールの場合のみ操作ボタンを表示 */}
-                                {isApiSchedule && (
+                                {isScheduleFromApi && (
                                     <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 rounded-sm shadow-lg flex">
                                         <button
                                             onClick={(e) => handleEditSchedule(item, e)}
@@ -434,14 +566,41 @@ export default function CalendarDay({
                     
                     {/* ドロップゾーン */}
                     <div
-                        className={`border border-dashed rounded-sm min-h-[14px] m-0.5 flex items-center justify-center text-[8px] transition-all ${
+                        style={{ minHeight: '20px' }}
+                        className={`border border-dashed rounded-sm flex items-center justify-center text-[8px] transition-all ${
                             dragOver 
                                 ? 'border-blue-400 bg-blue-900 bg-opacity-20 text-blue-400 border-solid' 
                                 : 'border-gray-500 text-gray-500 hover:border-blue-400 hover:bg-blue-900 hover:bg-opacity-10'
                         }`}
-                        onDragOver={handleDragOver}
-                        onDragLeave={handleDragLeave}
-                        onDrop={handleDrop}
+                        onDragOver={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            // dragOverはdragEnterで管理するため、ここでは設定しない
+                        }}
+                        onDragEnter={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            // ドラッグカウンター方式でより正確な状態管理
+                            dragCounter.current++;
+                            if (dragCounter.current === 1) {
+                                setDragOver(true);
+                            }
+                        }}
+                        onDragLeave={(e) => {
+                            e.stopPropagation();
+                            // ドラッグカウンター方式で効率的な判定
+                            dragCounter.current--;
+                            if (dragCounter.current === 0) {
+                                setDragOver(false);
+                            }
+                        }}
+                        onDrop={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setDragOver(false);
+                            dragCounter.current = 0; // カウンターをリセット
+                            handleDrop(e);
+                        }}
                     >
                         {dragOver 
                             ? '住民を入浴予定に追加' 
@@ -461,6 +620,77 @@ export default function CalendarDay({
                 scheduleTypes={scheduleTypes}
                 loading={loading}
             />
+            
+            {/* 確認ダイアログ */}
+            {confirmDialog && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-sm mx-4 shadow-xl">
+                        <div className="text-gray-900 mb-4">
+                            {confirmDialog.message}
+                        </div>
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={confirmDialog.onCancel}
+                                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                            >
+                                キャンセル
+                            </button>
+                            <button
+                                onClick={confirmDialog.onConfirm}
+                                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                            >
+                                削除
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {/* Toast通知 */}
+            <div className="fixed top-4 right-4 z-50 space-y-2">
+                {notifications.map((notification) => (
+                    <div
+                        key={notification.id}
+                        className={`px-4 py-3 rounded-lg shadow-lg text-white text-sm max-w-sm transform transition-all duration-300 ease-in-out ${
+                            notification.type === 'success' 
+                                ? 'bg-green-600' 
+                                : notification.type === 'error'
+                                ? 'bg-red-600'
+                                : notification.type === 'warning'
+                                ? 'bg-yellow-600'
+                                : 'bg-blue-600'
+                        } animate-slide-in`}
+                    >
+                        <div className="flex items-center gap-2">
+                            {notification.type === 'success' && (
+                                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                            )}
+                            {notification.type === 'error' && (
+                                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                </svg>
+                            )}
+                            {notification.type === 'warning' && (
+                                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
+                            )}
+                            <span className="break-words flex-1">{notification.message}</span>
+                            <button
+                                onClick={() => removeNotification(notification.id)}
+                                className="ml-2 text-white hover:text-gray-200 focus:outline-none focus:text-gray-200 transition-colors"
+                                aria-label="通知を閉じる"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }

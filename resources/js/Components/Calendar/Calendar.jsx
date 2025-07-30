@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
+import { router } from '@inertiajs/react';
 import CalendarHeader from './CalendarHeader';
 import CalendarSidebar from './CalendarSidebar';
 import CalendarGrid from './CalendarGrid';
@@ -7,7 +8,23 @@ import { useSchedules } from '../../hooks/useSchedules';
 import { useScheduleTypes } from '../../hooks/useScheduleTypes';
 
 export default function Calendar() {
-    const [currentDate, setCurrentDate] = useState(new Date());
+    // URLパラメータから初期日付を取得
+    const getInitialDate = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const year = urlParams.get('year');
+        const month = urlParams.get('month');
+        
+        if (year && month) {
+            const date = new Date(parseInt(year), parseInt(month) - 1);
+            // 有効な日付かチェック
+            if (!isNaN(date.getTime())) {
+                return date;
+            }
+        }
+        return new Date();
+    };
+
+    const [currentDate, setCurrentDate] = useState(getInitialDate);
     const [selectedDate, setSelectedDate] = useState(new Date());
     
     const {
@@ -20,13 +37,33 @@ export default function Calendar() {
         deleteSchedule,
         currentYear,
         currentMonth
-    } = useSchedules({ autoFetch: true });
+    } = useSchedules({ 
+        autoFetch: true, 
+        initialYear: currentDate.getFullYear(),
+        initialMonth: currentDate.getMonth() + 1
+    });
     
     const {
         scheduleTypes,
         loading: typesLoading,
         error: typesError
     } = useScheduleTypes();
+
+    // ブラウザのバック・フォワード機能に対応
+    useEffect(() => {
+        const handlePopState = () => {
+            const newDate = getInitialDate();
+            setCurrentDate(newDate);
+            
+            // データを再取得
+            if (fetchMonthlySchedules) {
+                fetchMonthlySchedules(newDate.getFullYear(), newDate.getMonth() + 1);
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [fetchMonthlySchedules]);
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
@@ -38,10 +75,28 @@ export default function Calendar() {
         end: calendarEnd
     });
 
+    // URLを更新する関数
+    const updateURL = (date) => {
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        
+        router.get('/calendar', 
+            { year, month }, 
+            { 
+                preserveState: true,
+                preserveScroll: true,
+                replace: true
+            }
+        );
+    };
+
     const navigateMonth = (direction) => {
         const newDate = new Date(currentDate);
         newDate.setMonth(currentDate.getMonth() + direction);
         setCurrentDate(newDate);
+        
+        // URLを更新
+        updateURL(newDate);
         
         // 月が変更された時にスケジュールデータを再取得
         if (fetchMonthlySchedules) {
@@ -53,7 +108,34 @@ export default function Calendar() {
         const today = new Date();
         setCurrentDate(today);
         setSelectedDate(today);
+        
+        // URLを更新
+        updateURL(today);
+        
+        // 今日のデータを取得
+        if (fetchMonthlySchedules) {
+            fetchMonthlySchedules(today.getFullYear(), today.getMonth() + 1);
+        }
     };
+
+    // 現在表示中の月の年月を使ってスケジュール操作を行うラッパー関数
+    const handleCreateSchedule = useCallback(async (scheduleData) => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
+        return await createSchedule(scheduleData, year, month);
+    }, [createSchedule, currentDate]);
+
+    const handleUpdateSchedule = useCallback(async (scheduleId, scheduleData) => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
+        return await updateSchedule(scheduleId, scheduleData, year, month);
+    }, [updateSchedule, currentDate]);
+
+    const handleDeleteSchedule = useCallback(async (scheduleId) => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
+        return await deleteSchedule(scheduleId, year, month);
+    }, [deleteSchedule, currentDate]);
 
     return (
         <div className="bg-gray-900">
@@ -115,9 +197,9 @@ export default function Calendar() {
                             onDateSelect={setSelectedDate}
                             monthlyCalendarData={monthlyCalendarData}
                             scheduleTypes={scheduleTypes}
-                            createSchedule={createSchedule}
-                            updateSchedule={updateSchedule}
-                            deleteSchedule={deleteSchedule}
+                            createSchedule={handleCreateSchedule}
+                            updateSchedule={handleUpdateSchedule}
+                            deleteSchedule={handleDeleteSchedule}
                             loading={schedulesLoading || typesLoading}
                             error={schedulesError || typesError}
                         />

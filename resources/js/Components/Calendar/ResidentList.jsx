@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../../services/api';
 
 const SAMPLE_RESIDENTS = [
@@ -15,6 +15,8 @@ export default function ResidentList() {
     const [searchTerm, setSearchTerm] = useState('');
     const [residents, setResidents] = useState(SAMPLE_RESIDENTS);
     const [loading, setLoading] = useState(true);
+    const [draggedResident, setDraggedResident] = useState(null);
+    const timeoutRefs = useRef(new Set());
 
     // 住民データを取得
     useEffect(() => {
@@ -57,12 +59,66 @@ export default function ResidentList() {
         fetchResidents();
     }, []);
 
+    // コンポーネントアンマウント時のクリーンアップ
+    useEffect(() => {
+        return () => {
+            // 全てのタイマーをクリアしてメモリリークを防止
+            timeoutRefs.current.forEach(timeoutId => {
+                clearTimeout(timeoutId);
+            });
+            timeoutRefs.current.clear();
+        };
+    }, []);
+
     const filteredResidents = residents.filter(resident =>
         resident.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleDragStart = (e, resident) => {
         e.dataTransfer.setData('application/json', JSON.stringify(resident));
+        e.dataTransfer.effectAllowed = 'copy';
+        setDraggedResident(resident.id);
+        
+        // ドラッグ中の要素のスタイルを設定
+        const dragImage = e.currentTarget.cloneNode(true);
+        dragImage.style.position = 'absolute';
+        dragImage.style.top = '-1000px';
+        dragImage.style.left = '-1000px';
+        dragImage.style.opacity = '0.8';
+        dragImage.style.transform = 'rotate(2deg)';
+        dragImage.style.pointerEvents = 'none';
+        dragImage.style.zIndex = '9999';
+        document.body.appendChild(dragImage);
+        
+        // カーソル位置に近い場所でドラッグイメージを設定
+        const rect = e.currentTarget.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left;
+        const offsetY = e.clientY - rect.top;
+        
+        e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
+        
+        // 少し遅延後にクローンを削除（メモリリーク対策付き）
+        const timeoutId = setTimeout(() => {
+            if (document.body.contains(dragImage)) {
+                document.body.removeChild(dragImage);
+            }
+            // タイマーIDをSetから削除
+            timeoutRefs.current.delete(timeoutId);
+        }, 100);
+        
+        // タイマーIDを記録
+        timeoutRefs.current.add(timeoutId);
+    };
+
+    const handleDragEnd = () => {
+        setDraggedResident(null);
+        
+        // ドラッグ終了時に念のため残っているタイマーをクリーンアップ
+        // (通常は自動的にクリアされるが、異常終了時の保険)
+        timeoutRefs.current.forEach(timeoutId => {
+            clearTimeout(timeoutId);
+        });
+        timeoutRefs.current.clear();
     };
 
     return (
@@ -89,7 +145,10 @@ export default function ResidentList() {
                             key={resident.id}
                             draggable
                             onDragStart={(e) => handleDragStart(e, resident)}
-                            className="flex items-center gap-3 p-3 bg-gray-700 border border-gray-600 rounded-md mb-2 cursor-move transition-all hover:bg-gray-600 hover:-translate-y-0.5 hover:shadow-lg"
+                            onDragEnd={handleDragEnd}
+                            className={`flex items-center gap-3 p-3 bg-gray-700 border border-gray-600 rounded-md mb-2 cursor-move transition-all hover:bg-gray-600 hover:-translate-y-0.5 hover:shadow-lg ${
+                                draggedResident === resident.id ? 'opacity-50 scale-95' : ''
+                            }`}
                         >
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${resident.color}`}>
                                 👤
