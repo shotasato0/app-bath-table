@@ -31,7 +31,7 @@ export default function ResidentList() {
         createResident,
         updateResident,
         deleteResident
-    } = useResidents({ autoFetch: false });
+    } = useResidents({ autoFetch: useApiEndpoint });
 
     // APIと接続する場合の利用者データ、そうでなければサンプルデータ
     const useApiEndpoint = import.meta.env.VITE_USE_RESIDENTS_API === 'true';
