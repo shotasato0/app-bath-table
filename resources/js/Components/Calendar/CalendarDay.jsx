@@ -130,11 +130,15 @@ export default function CalendarDay({
         // デフォルトでcopyエフェクトを設定
         e.dataTransfer.dropEffect = 'copy';
         
-        setDragOver(true);
+        if (!dragOver) {
+            setDragOver(true);
+        }
     };
 
     const handleDragEnter = (e) => {
         e.preventDefault();
+        e.stopPropagation();
+        console.log('ドラッグエンター');
         setDragOver(true);
     };
 
