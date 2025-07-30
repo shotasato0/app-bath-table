@@ -79,7 +79,7 @@ export default function CalendarDay({
     const getNextAvailableTime = () => {
         // APIスケジュールのみを対象とする（schedule_type_idが存在するもの）
         const bathingSchedules = dayEvents.bathing.filter(item => 
-            item.schedule_type_id !== undefined && item.start_time && item.end_time
+            isApiSchedule(item) && item.start_time && item.end_time
         );
         
         if (bathingSchedules.length === 0) {
