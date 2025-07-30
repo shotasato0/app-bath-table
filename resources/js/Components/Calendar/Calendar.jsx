@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 import { router } from '@inertiajs/react';
 import CalendarHeader from './CalendarHeader';
@@ -118,6 +118,24 @@ export default function Calendar() {
         }
     };
 
+    // 現在表示中の月の年月を使ってスケジュール操作を行うラッパー関数
+    const handleCreateSchedule = useCallback(async (scheduleData) => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
+        return await createSchedule(scheduleData, year, month);
+    }, [createSchedule, currentDate]);
+
+    const handleUpdateSchedule = useCallback(async (scheduleId, scheduleData) => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
+        return await updateSchedule(scheduleId, scheduleData, year, month);
+    }, [updateSchedule, currentDate]);
+
+    const handleDeleteSchedule = useCallback(async (scheduleId) => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
+        return await deleteSchedule(scheduleId, year, month);
+    }, [deleteSchedule, currentDate]);
 
     return (
         <div className="bg-gray-900">
@@ -179,9 +197,9 @@ export default function Calendar() {
                             onDateSelect={setSelectedDate}
                             monthlyCalendarData={monthlyCalendarData}
                             scheduleTypes={scheduleTypes}
-                            createSchedule={createSchedule}
-                            updateSchedule={updateSchedule}
-                            deleteSchedule={deleteSchedule}
+                            createSchedule={handleCreateSchedule}
+                            updateSchedule={handleUpdateSchedule}
+                            deleteSchedule={handleDeleteSchedule}
                             loading={schedulesLoading || typesLoading}
                             error={schedulesError || typesError}
                         />
