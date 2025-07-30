@@ -459,6 +459,7 @@ export default function CalendarDay({
                                 : 'border-gray-500 text-gray-500 hover:border-blue-400 hover:bg-blue-900 hover:bg-opacity-10'
                         }`}
                         onDragOver={handleDragOver}
+                        onDragEnter={handleDragEnter}
                         onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
                     >
