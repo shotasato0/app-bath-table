@@ -336,13 +336,18 @@ export default function CalendarDay({
             return;
         }
         
-        if (window.confirm('このスケジュールを削除しますか？')) {
-            try {
-                await deleteSchedule(schedule.id);
-            } catch (error) {
-                showErrorMessage('スケジュールの削除に失敗しました');
+        showConfirmDialog(
+            'このスケジュールを削除しますか？',
+            async () => {
+                try {
+                    await deleteSchedule(schedule.id);
+                    setConfirmDialog(null);
+                } catch (error) {
+                    showErrorMessage('スケジュールの削除に失敗しました');
+                    setConfirmDialog(null);
+                }
             }
-        }
+        );
     };
 
     // 入浴スケジュールの重複チェック関数
