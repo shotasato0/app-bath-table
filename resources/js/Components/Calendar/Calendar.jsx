@@ -37,7 +37,11 @@ export default function Calendar() {
         deleteSchedule,
         currentYear,
         currentMonth
-    } = useSchedules({ autoFetch: true });
+    } = useSchedules({ 
+        autoFetch: true, 
+        initialYear: currentDate.getFullYear(),
+        initialMonth: currentDate.getMonth() + 1
+    });
     
     const {
         scheduleTypes,
