@@ -124,6 +124,7 @@ export default function CalendarDay({
     
 
     const handleDragOver = (e) => {
+        console.log('ドラッグオーバー発生');
         e.preventDefault();
         e.stopPropagation();
         
@@ -131,6 +132,7 @@ export default function CalendarDay({
         e.dataTransfer.dropEffect = 'copy';
         
         if (!dragOver) {
+            console.log('ドラッグオーバー状態をtrueに設定');
             setDragOver(true);
         }
     };
