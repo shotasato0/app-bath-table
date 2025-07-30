@@ -20,4 +20,7 @@ Route::middleware($middleware)->group(function () {
     
     // スケジュールタイプ関連のルート
     Route::apiResource('schedule-types', ScheduleTypeController::class);
+    
+    // 利用者関連のルート
+    Route::apiResource('residents', ResidentController::class);
 });
