@@ -448,7 +448,7 @@ export default function CalendarDay({
                                 <div className="line-clamp-2 pr-1">{displayText}</div>
                                 
                                 {/* ホバー時の操作ボタン（APIスケジュールのみ表示） */}
-                                {event.schedule_type_id !== undefined && (
+                                {isApiSchedule(event) && (
                                     <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 rounded-sm shadow-lg flex">
                                         <button
                                             onClick={(e) => handleEditSchedule(event, e)}
