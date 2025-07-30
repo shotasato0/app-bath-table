@@ -583,12 +583,9 @@ export default function CalendarDay({
                         }}
                         onDragLeave={(e) => {
                             e.stopPropagation();
-                            // ドロップゾーンから完全に出た場合のみfalseに設定
-                            const rect = e.currentTarget.getBoundingClientRect();
-                            const x = e.clientX;
-                            const y = e.clientY;
-                            
-                            if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+                            // relatedTargetを使用した効率的な判定
+                            // 子要素から親要素へのleaveイベントを無視
+                            if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget)) {
                                 setDragOver(false);
                             }
                         }}
