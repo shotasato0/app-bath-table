@@ -423,9 +423,38 @@ export default function CalendarDay({
     // スケジュール保存
     const handleSaveSchedule = async (formData) => {
         if (selectedSchedule && !selectedSchedule.isNewSchedule) {
+            // 更新の場合の重複チェック
+            if (formData.schedule_type_id === 1 && formData.resident_id) {
+                // 入浴スケジュールの場合、他の住民との重複をチェック
+                const existingSchedule = dayEvents.bathing.find(item => 
+                    item.schedule_type_id !== undefined && // APIスケジュールのみ
+                    item.resident_id === formData.resident_id && // 同じ住民
+                    item.id !== selectedSchedule.id // 更新対象のスケジュール自体は除外
+                );
+                
+                if (existingSchedule) {
+                    const residentName = formData.title || `住民ID:${formData.resident_id}`;
+                    alert(`${residentName}さんの入浴スケジュールは既にこの日に登録されています。`);
+                    return;
+                }
+            }
             // 更新
             await updateSchedule(selectedSchedule.id, formData);
         } else {
+            // 新規作成の場合の重複チェック
+            if (formData.schedule_type_id === 1 && formData.resident_id) {
+                // 入浴スケジュールの場合、同じ住民の重複をチェック
+                const existingSchedule = dayEvents.bathing.find(item => 
+                    item.schedule_type_id !== undefined && // APIスケジュールのみ
+                    item.resident_id === formData.resident_id // 同じ住民
+                );
+                
+                if (existingSchedule) {
+                    const residentName = formData.title || `住民ID:${formData.resident_id}`;
+                    alert(`${residentName}さんの入浴スケジュールは既にこの日に登録されています。`);
+                    return;
+                }
+            }
             // 作成
             await createSchedule(formData);
         }
