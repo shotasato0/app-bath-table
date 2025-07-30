@@ -252,6 +252,16 @@ export default function CalendarDay({
     const showWarningMessage = (message) => {
         showNotification(message, 'warning');
     };
+    
+    // 通知の手動削除
+    const removeNotification = (id) => {
+        setNotifications(prev => prev.filter(n => n.id !== id));
+        const timeoutId = notificationTimeouts.current.get(id);
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+            notificationTimeouts.current.delete(id);
+        }
+    };
 
     // スケジュールのドラッグ開始処理
     const handleScheduleDragStart = (e, schedule) => {
