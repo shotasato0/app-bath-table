@@ -97,12 +97,17 @@ export default function ResidentList() {
         
         e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
         
-        // 少し遅延後にクローンを削除
-        setTimeout(() => {
+        // 少し遅延後にクローンを削除（メモリリーク対策付き）
+        const timeoutId = setTimeout(() => {
             if (document.body.contains(dragImage)) {
                 document.body.removeChild(dragImage);
             }
+            // タイマーIDをSetから削除
+            timeoutRefs.current.delete(timeoutId);
         }, 100);
+        
+        // タイマーIDを記録
+        timeoutRefs.current.add(timeoutId);
     };
 
     const handleDragEnd = () => {
