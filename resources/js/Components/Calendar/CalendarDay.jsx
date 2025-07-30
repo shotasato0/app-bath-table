@@ -581,15 +581,33 @@ export default function CalendarDay({
                         }`}
                         onDragOver={(e) => {
                             e.preventDefault();
+                            e.stopPropagation();
                             console.log('ドロップゾーンでドラッグオーバー');
                             setDragOver(true);
                         }}
+                        onDragEnter={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('ドロップゾーンでドラッグエンター');
+                            setDragOver(true);
+                        }}
                         onDragLeave={(e) => {
-                            console.log('ドロップゾーンでドラッグリーブ');
-                            setDragOver(false);
+                            e.stopPropagation();
+                            // ドロップゾーンから完全に出た場合のみfalseに設定
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = e.clientX;
+                            const y = e.clientY;
+                            
+                            if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+                                console.log('ドロップゾーンから完全に出ました');
+                                setDragOver(false);
+                            }
                         }}
                         onDrop={(e) => {
                             console.log('ドロップゾーンでドロップ発生!');
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setDragOver(false);
                             handleDrop(e);
                         }}
                     >
