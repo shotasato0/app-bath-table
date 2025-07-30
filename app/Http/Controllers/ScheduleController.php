@@ -90,7 +90,11 @@ class ScheduleController extends Controller
         ]);
 
         // CalendarDateを作成または取得
-        $dateInstance = Carbon::createFromFormat('Y-m-d', $validated['date'], config('app.timezone', 'UTC'));
+        $timezone = config('app.timezone');
+        if (is_null($timezone)) {
+            throw new \RuntimeException('アプリケーションのタイムゾーンが設定で構成されていません。');
+        }
+        $dateInstance = Carbon::createFromFormat('Y-m-d', $validated['date'], $timezone);
         $calendarDate = CalendarDate::firstOrCreate([
             'calendar_date' => $validated['date']
         ], [
@@ -143,7 +147,11 @@ class ScheduleController extends Controller
         ]);
 
         // CalendarDateを作成または取得
-        $dateInstance = Carbon::createFromFormat('Y-m-d', $validated['date'], config('app.timezone', 'UTC'));
+        $timezone = config('app.timezone');
+        if (is_null($timezone)) {
+            throw new \RuntimeException('アプリケーションのタイムゾーンが設定で構成されていません。');
+        }
+        $dateInstance = Carbon::createFromFormat('Y-m-d', $validated['date'], $timezone);
         $calendarDate = CalendarDate::firstOrCreate([
             'calendar_date' => $validated['date']
         ], [
