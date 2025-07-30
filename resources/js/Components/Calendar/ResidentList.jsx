@@ -265,6 +265,17 @@ export default function ResidentList() {
                                 </button>
                             )}
                         </div>
+                    ) : filteredResidents.length === 0 ? (
+                        <div className="flex items-center justify-center py-8">
+                            <div className="text-gray-400 text-sm text-center">
+                                {searchTerm ? '検索結果が見つかりません' : '利用者が登録されていません'}
+                                {!useApiEndpoint && (
+                                    <div className="mt-2 text-xs">
+                                        (現在はサンプルデータモードです)
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     ) : (
                         filteredResidents.map((resident) => (
                             <div
