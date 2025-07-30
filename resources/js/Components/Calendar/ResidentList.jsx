@@ -59,6 +59,17 @@ export default function ResidentList() {
         fetchResidents();
     }, []);
 
+    // コンポーネントアンマウント時のクリーンアップ
+    useEffect(() => {
+        return () => {
+            // 全てのタイマーをクリアしてメモリリークを防止
+            timeoutRefs.current.forEach(timeoutId => {
+                clearTimeout(timeoutId);
+            });
+            timeoutRefs.current.clear();
+        };
+    }, []);
+
     const filteredResidents = residents.filter(resident =>
         resident.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
