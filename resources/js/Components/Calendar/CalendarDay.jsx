@@ -22,6 +22,7 @@ export default function CalendarDay({
     const [showScheduleModal, setShowScheduleModal] = useState(false);
     const [selectedSchedule, setSelectedSchedule] = useState(null);
     const [notifications, setNotifications] = useState([]);
+    const [confirmDialog, setConfirmDialog] = useState(null);
     const notificationTimeouts = useRef(new Map());
     const dateKey = format(date, 'yyyy-MM-dd');
     
