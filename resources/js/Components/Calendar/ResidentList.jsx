@@ -22,6 +22,9 @@ export default function ResidentList() {
     const timeoutRefs = useRef(new Set());
     const notificationTimeouts = useRef(new Map());
 
+    // APIと接続する場合の利用者データ、そうでなければサンプルデータ
+    const useApiEndpoint = import.meta.env.VITE_USE_RESIDENTS_API === 'true';
+
     // 利用者管理フック
     const {
         residents: apiResidents,
@@ -32,9 +35,6 @@ export default function ResidentList() {
         updateResident,
         deleteResident
     } = useResidents({ autoFetch: useApiEndpoint });
-
-    // APIと接続する場合の利用者データ、そうでなければサンプルデータ
-    const useApiEndpoint = import.meta.env.VITE_USE_RESIDENTS_API === 'true';
     const residents = useApiEndpoint ? apiResidents : SAMPLE_RESIDENTS;
     const loading = useApiEndpoint ? residentsLoading : false;
 
