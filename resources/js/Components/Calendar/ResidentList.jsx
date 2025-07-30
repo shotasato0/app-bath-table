@@ -63,6 +63,21 @@ export default function ResidentList() {
 
     const handleDragStart = (e, resident) => {
         e.dataTransfer.setData('application/json', JSON.stringify(resident));
+        e.dataTransfer.effectAllowed = 'copy';
+        
+        // ドラッグ中の要素のスタイルを設定
+        const dragImage = e.target.cloneNode(true);
+        dragImage.style.opacity = '0.8';
+        dragImage.style.transform = 'rotate(5deg)';
+        document.body.appendChild(dragImage);
+        e.dataTransfer.setDragImage(dragImage, 0, 0);
+        
+        // 少し遅延後にクローンを削除
+        setTimeout(() => {
+            if (document.body.contains(dragImage)) {
+                document.body.removeChild(dragImage);
+            }
+        }, 0);
     };
 
     return (
