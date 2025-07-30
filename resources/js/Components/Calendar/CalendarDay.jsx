@@ -575,18 +575,22 @@ export default function CalendarDay({
                         onDragOver={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            setDragOver(true);
+                            // dragOverはdragEnterで管理するため、ここでは設定しない
                         }}
                         onDragEnter={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            setDragOver(true);
+                            // ドラッグカウンター方式でより正確な状態管理
+                            dragCounter.current++;
+                            if (dragCounter.current === 1) {
+                                setDragOver(true);
+                            }
                         }}
                         onDragLeave={(e) => {
                             e.stopPropagation();
-                            // relatedTargetを使用した効率的な判定
-                            // 子要素から親要素へのleaveイベントを無視
-                            if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget)) {
+                            // ドラッグカウンター方式で効率的な判定
+                            dragCounter.current--;
+                            if (dragCounter.current === 0) {
                                 setDragOver(false);
                             }
                         }}
