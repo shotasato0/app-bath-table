@@ -23,8 +23,32 @@ class Resident extends Model
         ];
     }
 
+    // リレーション
     public function schedules()
     {
         return $this->hasMany(Schedule::class);
+    }
+
+    // スコープ
+    public function scopeWithRelations($query)
+    {
+        return $query->withCount('schedules');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->whereNotNull('name');
+    }
+
+    // アクセサ
+    public function getRoomNumberAttribute()
+    {
+        // 将来的に部屋番号フィールドを追加する場合の準備
+        return $this->room ?? null;
+    }
+
+    public function getAgeAttribute()
+    {
+        return $this->birth_date ? $this->birth_date->age : null;
     }
 }
