@@ -53,8 +53,90 @@ export default function ResidentList() {
                 clearTimeout(timeoutId);
             });
             timeoutRefs.current.clear();
+            
+            // 通知タイマーもクリア
+            notificationTimeouts.current.forEach(timeoutId => {
+                clearTimeout(timeoutId);
+            });
+            notificationTimeouts.current.clear();
         };
     }, []);
+
+    // 通知システム
+    const showNotification = (message, type = 'success') => {
+        const id = Date.now() + Math.random();
+        const notification = { id, message, type };
+        
+        setNotifications(prev => [...prev, notification]);
+        
+        const timeoutId = setTimeout(() => {
+            setNotifications(prev => prev.filter(n => n.id !== id));
+            notificationTimeouts.current.delete(id);
+        }, type === 'error' ? 5000 : 3000);
+        
+        notificationTimeouts.current.set(id, timeoutId);
+    };
+
+    const showSuccessMessage = (message) => {
+        showNotification(message, 'success');
+    };
+
+    const showErrorMessage = (message) => {
+        showNotification(message, 'error');
+    };
+
+    const removeNotification = (id) => {
+        setNotifications(prev => prev.filter(n => n.id !== id));
+        const timeoutId = notificationTimeouts.current.get(id);
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+            notificationTimeouts.current.delete(id);
+        }
+    };
+
+    // 利用者管理機能
+    const handleAddResident = () => {
+        setSelectedResident({ isNewResident: true });
+        setShowResidentModal(true);
+    };
+
+    const handleEditResident = (resident) => {
+        setSelectedResident(resident);
+        setShowResidentModal(true);
+    };
+
+    const handleDeleteResident = async (resident) => {
+        if (!useApiEndpoint) {
+            showErrorMessage('サンプルデータは削除できません');
+            return;
+        }
+
+        if (window.confirm(`${resident.name}さんを削除しますか？`)) {
+            try {
+                await deleteResident(resident.id);
+                showSuccessMessage(`${resident.name}さんを削除しました`);
+            } catch (error) {
+                showErrorMessage(`削除に失敗しました: ${error.message}`);
+            }
+        }
+    };
+
+    const handleSaveResident = async (formData) => {
+        try {
+            if (selectedResident?.isNewResident) {
+                await createResident(formData);
+                showSuccessMessage(`${formData.name}さんを追加しました`);
+            } else {
+                await updateResident(selectedResident.id, formData);
+                showSuccessMessage(`${formData.name}さんの情報を更新しました`);
+            }
+            setShowResidentModal(false);
+            setSelectedResident(null);
+        } catch (error) {
+            showErrorMessage(`保存に失敗しました: ${error.message}`);
+            throw error;
+        }
+    };
 
     const filteredResidents = residents.filter(resident =>
         resident.name.toLowerCase().includes(searchTerm.toLowerCase())
