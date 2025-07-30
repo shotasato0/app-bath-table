@@ -21,6 +21,7 @@ export default function CalendarDay({
     const [dragOver, setDragOver] = useState(false);
     const [showScheduleModal, setShowScheduleModal] = useState(false);
     const [selectedSchedule, setSelectedSchedule] = useState(null);
+    const [notifications, setNotifications] = useState([]);
     const dateKey = format(date, 'yyyy-MM-dd');
     
     // スケジュールを左右に分離するロジック
@@ -122,7 +123,7 @@ export default function CalendarDay({
             const jsonData = e.dataTransfer.getData('application/json');
             
             if (!jsonData) {
-                alert('ドラッグデータが見つかりませんでした');
+                showErrorMessage('ドラッグデータが見つかりませんでした');
                 return;
             }
             
@@ -135,7 +136,7 @@ export default function CalendarDay({
                 await handleResidentDrop(dragData);
             }
         } catch (error) {
-            alert('ドロップしたデータの読み込みに失敗しました: ' + error.message);
+            showErrorMessage('ドロップしたデータの読み込みに失敗しました: ' + error.message);
         }
     };
 
@@ -151,7 +152,7 @@ export default function CalendarDay({
         // 重複チェック
         const duplicateError = checkBathingScheduleDuplicate(bathingScheduleData);
         if (duplicateError) {
-            alert(duplicateError);
+            showWarningMessage(duplicateError);
             return;
         }
         
@@ -174,7 +175,7 @@ export default function CalendarDay({
             await createSchedule(bathingSchedule);
             showSuccessMessage(`${residentData.name}さんの入浴スケジュールを作成しました`);
         } catch (error) {
-            alert(`入浴スケジュールの作成に失敗しました: ${error.message || 'エラーが発生しました'}`);
+            showErrorMessage(`入浴スケジュールの作成に失敗しました: ${error.message || 'エラーが発生しました'}`);
         }
     };
 
@@ -190,7 +191,7 @@ export default function CalendarDay({
         // 重複チェック
         const duplicateError = checkBathingScheduleDuplicate(schedule, schedule.id);
         if (duplicateError) {
-            alert(duplicateError);
+            showWarningMessage(duplicateError);
             return;
         }
         
@@ -209,22 +210,32 @@ export default function CalendarDay({
             await updateSchedule(schedule.id, updatedSchedule);
             showSuccessMessage(`${schedule.title}のスケジュールを${dateKey}に移動しました`);
         } catch (error) {
-            alert(`スケジュールの移動に失敗しました: ${error.message || 'エラーが発生しました'}`);
+            showErrorMessage(`スケジュールの移動に失敗しました: ${error.message || 'エラーが発生しました'}`);
         }
     };
 
-    // 成功メッセージ表示
-    const showSuccessMessage = (message) => {
-        const successMessage = document.createElement('div');
-        successMessage.textContent = message;
-        successMessage.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-md shadow-lg z-50';
-        document.body.appendChild(successMessage);
+    // 通知システム
+    const showNotification = (message, type = 'success') => {
+        const id = Date.now() + Math.random();
+        const notification = { id, message, type };
+        
+        setNotifications(prev => [...prev, notification]);
         
         setTimeout(() => {
-            if (document.body.contains(successMessage)) {
-                document.body.removeChild(successMessage);
-            }
-        }, 3000);
+            setNotifications(prev => prev.filter(n => n.id !== id));
+        }, type === 'error' ? 5000 : 3000);
+    };
+    
+    const showSuccessMessage = (message) => {
+        showNotification(message, 'success');
+    };
+    
+    const showErrorMessage = (message) => {
+        showNotification(message, 'error');
+    };
+    
+    const showWarningMessage = (message) => {
+        showNotification(message, 'warning');
     };
 
     // スケジュールのドラッグ開始処理
@@ -278,7 +289,7 @@ export default function CalendarDay({
         // APIスケジュールかどうかをチェック
         const isApiSchedule = schedule.schedule_type_id !== undefined;
         if (!isApiSchedule) {
-            alert('サンプル住民データは削除できません');
+            showWarningMessage('サンプル住民データは削除できません');
             return;
         }
         
@@ -286,7 +297,7 @@ export default function CalendarDay({
             try {
                 await deleteSchedule(schedule.id);
             } catch (error) {
-                alert('スケジュールの削除に失敗しました');
+                showErrorMessage('スケジュールの削除に失敗しました');
             }
         }
     };
@@ -333,7 +344,7 @@ export default function CalendarDay({
             // 更新の場合の重複チェック
             const duplicateError = checkBathingScheduleDuplicate(formData, selectedSchedule.id);
             if (duplicateError) {
-                alert(duplicateError);
+                showWarningMessage(duplicateError);
                 return;
             }
             // 更新
@@ -342,7 +353,7 @@ export default function CalendarDay({
             // 新規作成の場合の重複チェック
             const duplicateError = checkBathingScheduleDuplicate(formData);
             if (duplicateError) {
-                alert(duplicateError);
+                showWarningMessage(duplicateError);
                 return;
             }
             // 作成
