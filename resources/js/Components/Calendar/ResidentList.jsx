@@ -38,12 +38,6 @@ export default function ResidentList() {
     const residents = useApiEndpoint ? apiResidents : SAMPLE_RESIDENTS;
     const loading = useApiEndpoint ? residentsLoading : false;
 
-    // 住民データを取得
-    useEffect(() => {
-        if (useApiEndpoint) {
-            fetchResidents();
-        }
-    }, [useApiEndpoint, fetchResidents]);
 
     // コンポーネントアンマウント時のクリーンアップ
     useEffect(() => {
