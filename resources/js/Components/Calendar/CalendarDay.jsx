@@ -4,13 +4,6 @@ import ScheduleModal from './ScheduleModal';
 
 const SAMPLE_EVENTS = {};
 
-const EVENT_STYLES = {
-    general: 'bg-purple-900 bg-opacity-40 text-purple-300 border-l-purple-500',
-    meal: 'bg-green-900 bg-opacity-40 text-green-300 border-l-green-500',
-    activity: 'bg-yellow-900 bg-opacity-40 text-yellow-300 border-l-yellow-500',
-    medical: 'bg-red-900 bg-opacity-40 text-red-300 border-l-red-500',
-};
-
 export default function CalendarDay({ 
     date, 
     isCurrentMonth, 
@@ -23,8 +16,7 @@ export default function CalendarDay({
     createSchedule,
     updateSchedule,
     deleteSchedule,
-    loading = false,
-    error = null
+    loading = false
 }) {
     const [dragOver, setDragOver] = useState(false);
     const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -64,50 +56,15 @@ export default function CalendarDay({
     };
     
 
-    const handleDragOver = (e) => {
-        console.log('ドラッグオーバー発生');
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // デフォルトでcopyエフェクトを設定
-        e.dataTransfer.dropEffect = 'copy';
-        
-        if (!dragOver) {
-            console.log('ドラッグオーバー状態をtrueに設定');
-            setDragOver(true);
-        }
-    };
-
-    const handleDragEnter = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('ドラッグエンター');
-        setDragOver(true);
-    };
-
-    const handleDragLeave = (e) => {
-        console.log('ドラッグリーブ発生', e.relatedTarget);
-        // 子要素から親要素へのleaveイベントを無視
-        if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget)) {
-            console.log('ドラッグオーバー状態をfalseに設定');
-            setDragOver(false);
-        }
-    };
 
     // 次の利用可能な入浴時間を計算
     const getNextAvailableTime = () => {
-        console.log('=== getNextAvailableTime Debug ===');
-        console.log('dayEvents.bathing:', dayEvents.bathing);
-        
         // APIスケジュールのみを対象とする（schedule_type_idが存在するもの）
         const bathingSchedules = dayEvents.bathing.filter(item => 
             item.schedule_type_id !== undefined && item.start_time && item.end_time
         );
         
-        console.log('Filtered bathingSchedules:', bathingSchedules);
-        
         if (bathingSchedules.length === 0) {
-            console.log('No bathing schedules found, returning default time');
             return { start_time: '10:00', end_time: '10:30' };
         }
         
@@ -117,40 +74,30 @@ export default function CalendarDay({
             end_time_minutes: timeToMinutes(schedule.end_time)
         }));
         
-        console.log('Schedules with minutes:', schedulesWithMinutes);
-        
         const lastSchedule = schedulesWithMinutes
             .sort((a, b) => a.end_time_minutes - b.end_time_minutes)
             .pop();
         
-        console.log('Last schedule:', lastSchedule);
-        
         const nextStartMinutes = lastSchedule.end_time_minutes;
         const nextEndMinutes = nextStartMinutes + 30; // 30分後
         
-        const result = {
+        return {
             start_time: minutesToTime(nextStartMinutes),
             end_time: minutesToTime(nextEndMinutes)
         };
-        
-        console.log('Calculated next time:', result);
-        return result;
     };
     
     // 時間文字列を分に変換
     const timeToMinutes = (timeStr) => {
         if (!timeStr || typeof timeStr !== 'string') {
-            console.warn('Invalid time string:', timeStr);
             return 0;
         }
         const parts = timeStr.split(':');
         if (parts.length !== 2) {
-            console.warn('Invalid time format:', timeStr);
             return 0;
         }
         const [hours, minutes] = parts.map(Number);
         if (isNaN(hours) || isNaN(minutes)) {
-            console.warn('Invalid time values:', timeStr);
             return 0;
         }
         return hours * 60 + minutes;
@@ -159,7 +106,6 @@ export default function CalendarDay({
     // 分を時間文字列に変換
     const minutesToTime = (minutes) => {
         if (typeof minutes !== 'number' || isNaN(minutes)) {
-            console.warn('Invalid minutes value:', minutes);
             return '10:00';
         }
         const hours = Math.floor(minutes / 60);
@@ -172,31 +118,23 @@ export default function CalendarDay({
         e.stopPropagation();
         setDragOver(false);
         
-        console.log('ドロップイベント発生');
-        
         try {
             const jsonData = e.dataTransfer.getData('application/json');
-            console.log('取得したデータ:', jsonData);
             
             if (!jsonData) {
-                console.error('ドラッグデータが空です');
                 alert('ドラッグデータが見つかりませんでした');
                 return;
             }
             
             const dragData = JSON.parse(jsonData);
-            console.log('解析後のデータ:', dragData);
             
             // ドラッグデータのタイプで処理を分岐
             if (dragData.type === 'schedule_move') {
-                console.log('スケジュール移動処理を開始');
                 await handleScheduleMove(dragData);
             } else {
-                console.log('住民ドロップ処理を開始');
                 await handleResidentDrop(dragData);
             }
         } catch (error) {
-            console.error('ドロップデータの解析エラー:', error);
             alert('ドロップしたデータの読み込みに失敗しました: ' + error.message);
         }
     };
@@ -234,10 +172,8 @@ export default function CalendarDay({
         
         try {
             await createSchedule(bathingSchedule);
-            console.log(`入浴スケジュールを作成しました: ${residentData.name} (${start_time}-${end_time})`);
             showSuccessMessage(`${residentData.name}さんの入浴スケジュールを作成しました`);
         } catch (error) {
-            console.error('入浴スケジュール作成エラー:', error);
             alert(`入浴スケジュールの作成に失敗しました: ${error.message || 'エラーが発生しました'}`);
         }
     };
@@ -248,7 +184,6 @@ export default function CalendarDay({
         
         // 同じ日への移動は無視
         if (sourceDate === dateKey) {
-            console.log('同じ日への移動のためスキップ');
             return;
         }
         
@@ -272,10 +207,8 @@ export default function CalendarDay({
         
         try {
             await updateSchedule(schedule.id, updatedSchedule);
-            console.log(`スケジュールを移動しました: ${schedule.title} ${sourceDate} → ${dateKey}`);
             showSuccessMessage(`${schedule.title}のスケジュールを${dateKey}に移動しました`);
         } catch (error) {
-            console.error('スケジュール移動エラー:', error);
             alert(`スケジュールの移動に失敗しました: ${error.message || 'エラーが発生しました'}`);
         }
     };
@@ -308,7 +241,6 @@ export default function CalendarDay({
         e.dataTransfer.setData('application/json', JSON.stringify(dragData));
         e.dataTransfer.effectAllowed = 'move';
         
-        console.log('スケジュールドラッグ開始:', schedule.title, 'from', dateKey);
     };
 
     // スケジュール作成モーダルを開く
@@ -354,7 +286,6 @@ export default function CalendarDay({
             try {
                 await deleteSchedule(schedule.id);
             } catch (error) {
-                console.error('スケジュール削除エラー:', error);
                 alert('スケジュールの削除に失敗しました');
             }
         }
