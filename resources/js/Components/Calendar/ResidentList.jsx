@@ -110,7 +110,10 @@ export default function ResidentList() {
                             key={resident.id}
                             draggable
                             onDragStart={(e) => handleDragStart(e, resident)}
-                            className="flex items-center gap-3 p-3 bg-gray-700 border border-gray-600 rounded-md mb-2 cursor-move transition-all hover:bg-gray-600 hover:-translate-y-0.5 hover:shadow-lg"
+                            onDragEnd={handleDragEnd}
+                            className={`flex items-center gap-3 p-3 bg-gray-700 border border-gray-600 rounded-md mb-2 cursor-move transition-all hover:bg-gray-600 hover:-translate-y-0.5 hover:shadow-lg ${
+                                draggedResident === resident.id ? 'opacity-50 scale-95' : ''
+                            }`}
                         >
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${resident.color}`}>
                                 👤
