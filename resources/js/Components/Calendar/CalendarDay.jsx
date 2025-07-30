@@ -221,6 +221,16 @@ export default function CalendarDay({
         try {
             const residentData = JSON.parse(e.dataTransfer.getData('application/json'));
             
+            // 既にその住民の入浴スケジュールが存在するかチェック
+            const existingSchedule = dayEvents.bathing.find(item => 
+                item.resident_id === residentData.id && item.schedule_type_id !== undefined
+            );
+            
+            if (existingSchedule) {
+                alert(`${residentData.name}さんの入浴スケジュールは既に登録されています。`);
+                return;
+            }
+            
             // 次の利用可能な時間を計算
             const { start_time, end_time } = getNextAvailableTime();
             
@@ -232,18 +242,33 @@ export default function CalendarDay({
                 start_time,
                 end_time,
                 schedule_type_id: 1, // 入浴タイプ
-                resident_id: residentData.id
+                resident_id: residentData.id,
+                all_day: false
             };
             
             try {
                 await createSchedule(bathingSchedule);
                 console.log(`入浴スケジュールを作成しました: ${residentData.name} (${start_time}-${end_time})`);
+                
+                // 成功フィードバック（短時間表示）
+                const successMessage = document.createElement('div');
+                successMessage.textContent = `${residentData.name}さんの入浴スケジュールを作成しました`;
+                successMessage.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-md shadow-lg z-50';
+                document.body.appendChild(successMessage);
+                
+                setTimeout(() => {
+                    if (document.body.contains(successMessage)) {
+                        document.body.removeChild(successMessage);
+                    }
+                }, 3000);
+                
             } catch (error) {
                 console.error('入浴スケジュール作成エラー:', error);
-                alert('入浴スケジュールの作成に失敗しました');
+                alert(`入浴スケジュールの作成に失敗しました: ${error.message || 'エラーが発生しました'}`);
             }
         } catch (error) {
             console.error('ドロップデータの解析エラー:', error);
+            alert('ドロップしたデータの読み込みに失敗しました');
         }
     };
 
