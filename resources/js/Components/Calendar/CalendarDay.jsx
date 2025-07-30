@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import ScheduleModal from './ScheduleModal';
 
@@ -22,6 +22,7 @@ export default function CalendarDay({
     const [showScheduleModal, setShowScheduleModal] = useState(false);
     const [selectedSchedule, setSelectedSchedule] = useState(null);
     const [notifications, setNotifications] = useState([]);
+    const notificationTimeouts = useRef(new Map());
     const dateKey = format(date, 'yyyy-MM-dd');
     
     // スケジュールを左右に分離するロジック
@@ -214,16 +215,19 @@ export default function CalendarDay({
         }
     };
 
-    // 通知システム
+    // 通知システム（メモリリーク対策付き）
     const showNotification = (message, type = 'success') => {
         const id = Date.now() + Math.random();
         const notification = { id, message, type };
         
         setNotifications(prev => [...prev, notification]);
         
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
             setNotifications(prev => prev.filter(n => n.id !== id));
+            notificationTimeouts.current.delete(id);
         }, type === 'error' ? 5000 : 3000);
+        
+        notificationTimeouts.current.set(id, timeoutId);
     };
     
     const showSuccessMessage = (message) => {
