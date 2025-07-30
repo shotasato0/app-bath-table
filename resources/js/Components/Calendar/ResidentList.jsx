@@ -112,6 +112,13 @@ export default function ResidentList() {
 
     const handleDragEnd = () => {
         setDraggedResident(null);
+        
+        // ドラッグ終了時に念のため残っているタイマーをクリーンアップ
+        // (通常は自動的にクリアされるが、異常終了時の保険)
+        timeoutRefs.current.forEach(timeoutId => {
+            clearTimeout(timeoutId);
+        });
+        timeoutRefs.current.clear();
     };
 
     return (
