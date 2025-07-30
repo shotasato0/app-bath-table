@@ -127,18 +127,8 @@ export default function CalendarDay({
         e.preventDefault();
         e.stopPropagation();
         
-        // ドラッグデータを確認して適切なエフェクトを設定
-        try {
-            const data = e.dataTransfer.getData('application/json');
-            if (data) {
-                const dragData = JSON.parse(data);
-                e.dataTransfer.dropEffect = dragData.type === 'schedule_move' ? 'move' : 'copy';
-            } else {
-                e.dataTransfer.dropEffect = 'copy';
-            }
-        } catch {
-            e.dataTransfer.dropEffect = 'copy';
-        }
+        // デフォルトでcopyエフェクトを設定
+        e.dataTransfer.dropEffect = 'copy';
         
         setDragOver(true);
     };
