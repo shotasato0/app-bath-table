@@ -19,6 +19,7 @@ export default function CalendarDay({
     loading = false
 }) {
     const [dragOver, setDragOver] = useState(false);
+    const dragCounter = useRef(0);
     const [showScheduleModal, setShowScheduleModal] = useState(false);
     const [selectedSchedule, setSelectedSchedule] = useState(null);
     const [notifications, setNotifications] = useState([]);
