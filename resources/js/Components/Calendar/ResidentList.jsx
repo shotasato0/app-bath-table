@@ -88,6 +88,18 @@ export default function ResidentList() {
         }
     };
 
+    // 利用者一覧の再取得
+    const handleRefreshResidents = async () => {
+        if (!useApiEndpoint) return;
+        
+        try {
+            await fetchResidents();
+            showSuccessMessage('利用者一覧を更新しました');
+        } catch (error) {
+            showErrorMessage(`データの取得に失敗しました: ${error.message}`);
+        }
+    };
+
     // 利用者管理機能
     const handleAddResident = () => {
         if (!useApiEndpoint) {
