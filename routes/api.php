@@ -9,7 +9,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware(['auth:sanctum'])->group(function () {
+// 開発環境でのみ認証を無効化、本番環境では認証を有効にする
+$middleware = config('app.env') === 'local' ? [] : ['auth:sanctum'];
+
+Route::middleware($middleware)->group(function () {
     // スケジュール関連のルート
     Route::get('schedules/monthly', [ScheduleController::class, 'getMonthlySchedules']);
     Route::apiResource('schedules', ScheduleController::class);

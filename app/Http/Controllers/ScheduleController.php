@@ -42,15 +42,78 @@ class ScheduleController extends Controller
             ->orderBy('calendar_date')
             ->get();
 
+        // フロントエンドが期待する形式に変換
+        $monthlyData = $calendarDates->map(function ($calendarDate) {
+            // 日付を文字列として直接使用（タイムゾーンの影響を回避）
+            $formattedDate = $calendarDate->calendar_date instanceof \DateTime 
+                ? $calendarDate->calendar_date->format('Y-m-d')
+                : (string) $calendarDate->calendar_date;
+            
+            return [
+                'date' => $formattedDate,
+                'schedules' => $calendarDate->schedules->map(function ($schedule) use ($formattedDate) {
+                    return [
+                        'id' => $schedule->id,
+                        'title' => $schedule->title,
+                        'description' => $schedule->description,
+                        'start_time' => $schedule->start_time,
+                        'end_time' => $schedule->end_time,
+                        'schedule_type_id' => $schedule->schedule_type_id,
+                        'resident_id' => $schedule->resident_id,
+                        'date' => $formattedDate,
+                        'schedule_type' => $schedule->scheduleType
+                    ];
+                })
+            ];
+        })->filter(function ($item) {
+            // スケジュールがある日付のみ返す
+            return $item['schedules']->isNotEmpty();
+        });
+
         return response()->json([
             'status' => 'success',
-            'data' => $calendarDates
+            'data' => $monthlyData->values()
         ]);
     }
 
-    public function store(StoreScheduleRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
-        $schedule = Schedule::create($request->validated());
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'date' => ['required', 'date'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
+            'schedule_type_id' => ['required', 'exists:schedule_types,id'],
+            'resident_id' => ['nullable', 'exists:residents,id'],
+            'all_day' => ['boolean']
+        ]);
+
+        // CalendarDateを作成または取得
+        $timezone = config('app.timezone');
+        if (is_null($timezone)) {
+            throw new \RuntimeException('アプリケーションのタイムゾーンが設定で構成されていません。');
+        }
+        $dateInstance = Carbon::createFromFormat('Y-m-d', $validated['date'], $timezone);
+        $calendarDate = CalendarDate::firstOrCreate([
+            'calendar_date' => $validated['date']
+        ], [
+            'day_of_week' => $dateInstance->dayOfWeek,
+            'is_holiday' => false
+        ]);
+
+        // スケジュールデータを準備
+        $scheduleData = [
+            'date_id' => $calendarDate->id,
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'] ?? null,
+            'schedule_type_id' => $validated['schedule_type_id'],
+            'resident_id' => $validated['resident_id'] ?? null
+        ];
+
+        $schedule = Schedule::create($scheduleData);
         $schedule->load(['calendarDate', 'scheduleType', 'resident']);
 
         return response()->json([
@@ -70,9 +133,44 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function update(UpdateScheduleRequest $request, Schedule $schedule): JsonResponse
+    public function update(Request $request, Schedule $schedule): JsonResponse
     {
-        $schedule->update($request->validated());
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'date' => ['required', 'date'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
+            'schedule_type_id' => ['required', 'exists:schedule_types,id'],
+            'resident_id' => ['nullable', 'exists:residents,id'],
+            'all_day' => ['boolean']
+        ]);
+
+        // CalendarDateを作成または取得
+        $timezone = config('app.timezone');
+        if (is_null($timezone)) {
+            throw new \RuntimeException('アプリケーションのタイムゾーンが設定で構成されていません。');
+        }
+        $dateInstance = Carbon::createFromFormat('Y-m-d', $validated['date'], $timezone);
+        $calendarDate = CalendarDate::firstOrCreate([
+            'calendar_date' => $validated['date']
+        ], [
+            'day_of_week' => $dateInstance->dayOfWeek,
+            'is_holiday' => false
+        ]);
+
+        // スケジュールデータを準備
+        $scheduleData = [
+            'date_id' => $calendarDate->id,
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'] ?? null,
+            'schedule_type_id' => $validated['schedule_type_id'],
+            'resident_id' => $validated['resident_id'] ?? null
+        ];
+
+        $schedule->update($scheduleData);
         $schedule->load(['calendarDate', 'scheduleType', 'resident']);
 
         return response()->json([

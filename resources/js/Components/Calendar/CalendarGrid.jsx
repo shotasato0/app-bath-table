@@ -1,5 +1,5 @@
 import React from 'react';
-import { isSameMonth, isToday } from 'date-fns';
+import { isSameMonth, isToday, format } from 'date-fns';
 import CalendarDay from './CalendarDay';
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
@@ -8,7 +8,14 @@ export default function CalendarGrid({
     calendarDays, 
     currentDate, 
     selectedDate, 
-    onDateSelect 
+    onDateSelect,
+    monthlyCalendarData = [],
+    scheduleTypes = [],
+    createSchedule,
+    updateSchedule,
+    deleteSchedule,
+    loading = false,
+    error = null
 }) {
     return (
         <div className="flex-1 bg-gray-800 rounded-lg overflow-hidden">
@@ -30,17 +37,29 @@ export default function CalendarGrid({
             
             {/* カレンダーグリッド */}
             <div className="flex flex-wrap w-full">
-                {calendarDays.map((day, index) => (
-                    <CalendarDay
-                        key={day.toISOString()}
-                        date={day}
-                        isCurrentMonth={isSameMonth(day, currentDate)}
-                        isToday={isToday(day)}
-                        isSelected={day.toDateString() === selectedDate.toDateString()}
-                        onClick={() => onDateSelect(day)}
-                        dayIndex={index}
-                    />
-                ))}
+                {calendarDays.map((day, index) => {
+                    const dateKey = format(day, 'yyyy-MM-dd');
+                    const dayData = monthlyCalendarData.find(data => data.date === dateKey);
+                    
+                    return (
+                        <CalendarDay
+                            key={day.toISOString()}
+                            date={day}
+                            isCurrentMonth={isSameMonth(day, currentDate)}
+                            isToday={isToday(day)}
+                            isSelected={day.toDateString() === selectedDate.toDateString()}
+                            onClick={() => onDateSelect(day)}
+                            dayIndex={index}
+                            schedules={dayData?.schedules || []}
+                            scheduleTypes={scheduleTypes}
+                            createSchedule={createSchedule}
+                            updateSchedule={updateSchedule}
+                            deleteSchedule={deleteSchedule}
+                            loading={loading}
+                            error={error}
+                        />
+                    );
+                })}
             </div>
         </div>
     );
