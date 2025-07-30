@@ -40,44 +40,10 @@ export default function ResidentList() {
 
     // 住民データを取得
     useEffect(() => {
-        const fetchResidents = async () => {
-            try {
-                // 開発環境では住民APIエンドポイントが未実装のためサンプルデータを使用
-                const useApiEndpoint = import.meta.env.VITE_USE_RESIDENTS_API === 'true';
-                
-                if (useApiEndpoint) {
-                    try {
-                        const response = await api.get('/residents');
-                        const apiResidents = response.data.data || [];
-                        
-                        // APIデータに色を追加
-                        const residentsWithColors = apiResidents.map((resident, index) => ({
-                            ...resident,
-                            room: resident.room_number || `${resident.id}号室`,
-                            color: COLORS[index % COLORS.length]
-                        }));
-                        
-                        setResidents(residentsWithColors.length > 0 ? residentsWithColors : SAMPLE_RESIDENTS);
-                        console.log('住民データ: APIから取得完了');
-                    } catch (apiError) {
-                        console.warn('住民API取得エラー、サンプルデータにフォールバック:', apiError);
-                        setResidents(SAMPLE_RESIDENTS);
-                    }
-                } else {
-                    console.log('住民データ: サンプルデータを使用中（環境設定により）');
-                    setResidents(SAMPLE_RESIDENTS);
-                }
-            } catch (error) {
-                console.error('住民データ取得エラー:', error);
-                // エラー時はサンプルデータを使用
-                setResidents(SAMPLE_RESIDENTS);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchResidents();
-    }, []);
+        if (useApiEndpoint) {
+            fetchResidents();
+        }
+    }, [useApiEndpoint, fetchResidents]);
 
     // コンポーネントアンマウント時のクリーンアップ
     useEffect(() => {
