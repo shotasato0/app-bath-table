@@ -220,22 +220,35 @@ export default function CalendarDay({
 
     const handleDrop = async (e) => {
         e.preventDefault();
+        e.stopPropagation();
         setDragOver(false);
         
+        console.log('ドロップイベント発生');
+        
         try {
-            const dragData = JSON.parse(e.dataTransfer.getData('application/json'));
+            const jsonData = e.dataTransfer.getData('application/json');
+            console.log('取得したデータ:', jsonData);
+            
+            if (!jsonData) {
+                console.error('ドラッグデータが空です');
+                alert('ドラッグデータが見つかりませんでした');
+                return;
+            }
+            
+            const dragData = JSON.parse(jsonData);
+            console.log('解析後のデータ:', dragData);
             
             // ドラッグデータのタイプで処理を分岐
             if (dragData.type === 'schedule_move') {
-                // スケジュール移動処理
+                console.log('スケジュール移動処理を開始');
                 await handleScheduleMove(dragData);
             } else {
-                // 住民からの新規スケジュール作成処理
+                console.log('住民ドロップ処理を開始');
                 await handleResidentDrop(dragData);
             }
         } catch (error) {
             console.error('ドロップデータの解析エラー:', error);
-            alert('ドロップしたデータの読み込みに失敗しました');
+            alert('ドロップしたデータの読み込みに失敗しました: ' + error.message);
         }
     };
 
