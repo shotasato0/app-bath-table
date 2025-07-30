@@ -441,7 +441,11 @@ export default function CalendarDay({
                         return (
                             <div
                                 key={`${isApiSchedule ? 'schedule' : 'resident'}-${item.id}`}
-                                className="text-[9px] px-1 py-0.5 rounded-sm text-white border-l-2 cursor-pointer transition-all hover:-translate-y-px hover:brightness-110 group relative"
+                                draggable={isApiSchedule}
+                                onDragStart={isApiSchedule ? (e) => handleScheduleDragStart(e, item) : undefined}
+                                className={`text-[9px] px-1 py-0.5 rounded-sm text-white border-l-2 transition-all hover:-translate-y-px hover:brightness-110 group relative ${
+                                    isApiSchedule ? 'cursor-move' : 'cursor-pointer'
+                                }`}
                                 style={{
                                     backgroundColor: backgroundColor + '40',
                                     borderLeftColor: backgroundColor
