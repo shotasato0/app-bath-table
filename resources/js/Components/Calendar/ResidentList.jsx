@@ -116,6 +116,11 @@ export default function ResidentList() {
     };
 
     const handleSaveResident = async (formData) => {
+        if (!useApiEndpoint) {
+            showErrorMessage('サンプルデータモードでは利用者の作成・編集はできません');
+            return;
+        }
+
         try {
             if (selectedResident?.isNewResident) {
                 await createResident(formData);
