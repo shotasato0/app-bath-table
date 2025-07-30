@@ -15,6 +15,7 @@ export default function ResidentList() {
     const [searchTerm, setSearchTerm] = useState('');
     const [residents, setResidents] = useState(SAMPLE_RESIDENTS);
     const [loading, setLoading] = useState(true);
+    const [draggedResident, setDraggedResident] = useState(null);
 
     // 住民データを取得
     useEffect(() => {
