@@ -45,7 +45,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             setLoading(false);
         }
-    }, [currentYear, currentMonth, handleError]);
+    }, [handleError]);
 
     /**
      * スケジュール一覧取得
