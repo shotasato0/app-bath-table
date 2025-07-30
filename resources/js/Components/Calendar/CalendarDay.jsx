@@ -496,10 +496,10 @@ export default function CalendarDay({
                     {dayEvents.bathing.map((item) => {
                         // APIスケジュールの場合とサンプルデータの場合を判別
                         const isScheduleFromApi = isApiSchedule(item);
-                        const displayName = isApiSchedule 
+                        const displayName = isScheduleFromApi 
                             ? (item.title || `入浴スケジュール`)
                             : item.name;
-                        const scheduleType = isApiSchedule && scheduleTypes.find(type => type.id === item.schedule_type_id);
+                        const scheduleType = isScheduleFromApi && scheduleTypes.find(type => type.id === item.schedule_type_id);
                         const backgroundColor = scheduleType?.color_code || '#3B82F6';
                         
                         return (
