@@ -90,6 +90,10 @@ export default function ResidentList() {
 
     // 利用者管理機能
     const handleAddResident = () => {
+        if (!useApiEndpoint) {
+            showErrorMessage('サンプルデータモードでは利用者の追加はできません');
+            return;
+        }
         setSelectedResident({ isNewResident: true });
         setShowResidentModal(true);
     };
