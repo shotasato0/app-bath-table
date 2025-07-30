@@ -65,6 +65,7 @@ export default function ResidentList() {
     const handleDragStart = (e, resident) => {
         e.dataTransfer.setData('application/json', JSON.stringify(resident));
         e.dataTransfer.effectAllowed = 'copy';
+        setDraggedResident(resident.id);
         
         // ドラッグ中の要素のスタイルを設定
         const dragImage = e.target.cloneNode(true);
@@ -79,6 +80,10 @@ export default function ResidentList() {
                 document.body.removeChild(dragImage);
             }
         }, 0);
+    };
+
+    const handleDragEnd = () => {
+        setDraggedResident(null);
     };
 
     return (
