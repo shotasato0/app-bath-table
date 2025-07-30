@@ -102,6 +102,13 @@ export default function Calendar() {
         }
     };
 
+    const handleCreateSchedule = () => {
+        // 今日の日付で新規スケジュール作成モーダルを開く
+        setSelectedDate(new Date());
+        // CalendarGridにスケジュール作成イベントを伝える
+        // 実装は CalendarDay コンポーネントのモーダル開く処理と連携
+    };
+
     return (
         <div className="bg-gray-900">
             <CalendarHeader 
