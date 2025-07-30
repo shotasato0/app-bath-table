@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
+import { router } from '@inertiajs/react';
 import CalendarHeader from './CalendarHeader';
 import CalendarSidebar from './CalendarSidebar';
 import CalendarGrid from './CalendarGrid';
