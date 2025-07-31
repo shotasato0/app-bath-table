@@ -99,8 +99,10 @@ export const useResidents = (options = {}) => {
         try {
             const response = await residentService.deleteResident(residentId);
             
-            // 成功時は利用者一覧を再取得
-            await fetchResidents();
+            // 成功時は該当する利用者を状態から削除
+            setResidents((prevResidents) => 
+                prevResidents.filter((resident) => resident.id !== residentId)
+            );
             
             return response;
         } catch (error) {
