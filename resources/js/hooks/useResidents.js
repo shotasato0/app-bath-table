@@ -51,8 +51,8 @@ export const useResidents = (options = {}) => {
         try {
             const response = await residentService.createResident(residentData);
             
-            // 成功時は利用者一覧を再取得
-            await fetchResidents();
+            // 成功時は新しい利用者を状態に追加
+            setResidents((prevResidents) => [...prevResidents, response.data]);
             
             return response;
         } catch (error) {
