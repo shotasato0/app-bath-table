@@ -80,7 +80,7 @@ export default function ResidentModal({
         }
 
         // 性別のバリデーション
-        if (formData.gender && !['male', 'female', 'other'].includes(formData.gender)) {
+        if (formData.gender && !GENDER_VALUES.includes(formData.gender)) {
             newErrors.gender = '性別は男性、女性、その他から選択してください';
         }
 
