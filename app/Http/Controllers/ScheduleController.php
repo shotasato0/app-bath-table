@@ -58,6 +58,7 @@ class ScheduleController extends Controller
                         'description' => $schedule->description,
                         'start_time' => $schedule->start_time,
                         'end_time' => $schedule->end_time,
+                        'all_day' => $schedule->all_day,
                         'schedule_type_id' => $schedule->schedule_type_id,
                         'resident_id' => $schedule->resident_id,
                         'date' => $formattedDate,
