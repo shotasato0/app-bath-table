@@ -111,10 +111,7 @@ export default function Calendar() {
         // URLを更新
         updateURL(newDate);
         
-        // 月が変更された時にスケジュールデータを再取得
-        if (fetchMonthlySchedules) {
-            fetchMonthlySchedules(newDate.getFullYear(), newDate.getMonth() + 1);
-        }
+        // 月が変更される際はuseEffectでfetchCalendarDataが自動実行される
     };
 
     const goToToday = () => {
