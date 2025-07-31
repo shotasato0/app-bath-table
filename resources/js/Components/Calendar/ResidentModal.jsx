@@ -6,6 +6,15 @@ import InputError from '../InputError';
 import PrimaryButton from '../PrimaryButton';
 import SecondaryButton from '../SecondaryButton';
 
+// 性別の選択肢定数
+const GENDER_OPTIONS = [
+    { value: 'male', label: '男性' },
+    { value: 'female', label: '女性' },
+    { value: 'other', label: 'その他' }
+];
+
+const GENDER_VALUES = GENDER_OPTIONS.map(option => option.value);
+
 export default function ResidentModal({
     isOpen,
     onClose,
