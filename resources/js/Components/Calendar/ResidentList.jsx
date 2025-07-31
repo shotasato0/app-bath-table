@@ -287,9 +287,14 @@ export default function ResidentList() {
                                     draggedResident === resident.id ? 'opacity-50 scale-95' : ''
                                 }`}
                             >
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${resident.color || COLORS[resident.id % COLORS.length]}`}>
-                                    👤
-                                </div>
+                                {(() => {
+                                    const avatarColor = resident.color || COLORS[resident.id % COLORS.length];
+                                    return (
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${avatarColor}`}>
+                                            👤
+                                        </div>
+                                    );
+                                })()}
                                 <div className="flex-1">
                                     <h4 className="text-sm font-medium text-gray-100">{resident.name}</h4>
                                     <p className="text-xs text-gray-400">
