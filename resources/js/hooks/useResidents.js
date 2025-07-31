@@ -73,8 +73,12 @@ export const useResidents = (options = {}) => {
         try {
             const response = await residentService.updateResident(residentId, residentData);
             
-            // 成功時は利用者一覧を再取得
-            await fetchResidents();
+            // 成功時は該当する利用者を状態で更新
+            setResidents((prevResidents) => 
+                prevResidents.map((resident) => 
+                    resident.id === residentId ? { ...resident, ...response.data } : resident
+                )
+            );
             
             return response;
         } catch (error) {
