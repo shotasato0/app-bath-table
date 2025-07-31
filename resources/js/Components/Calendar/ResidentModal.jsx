@@ -168,9 +168,11 @@ export default function ResidentModal({
                             disabled={loading}
                         >
                             <option value="">選択してください</option>
-                            <option value="male">男性</option>
-                            <option value="female">女性</option>
-                            <option value="other">その他</option>
+                            {GENDER_OPTIONS.map(option => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
                         </select>
                         <InputError message={errors.gender} className="mt-2" />
                     </div>
