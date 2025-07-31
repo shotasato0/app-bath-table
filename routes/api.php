@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ScheduleTypeController;
+use App\Http\Controllers\ResidentController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -19,4 +20,7 @@ Route::middleware($middleware)->group(function () {
     
     // スケジュールタイプ関連のルート
     Route::apiResource('schedule-types', ScheduleTypeController::class);
+    
+    // 利用者関連のルート
+    Route::apiResource('residents', ResidentController::class);
 });
