@@ -71,8 +71,11 @@ class ResidentController extends Controller
 
     public function destroy(Resident $resident): JsonResponse
     {
+        // スケジュール数を取得してN+1クエリ問題を回避
+        $resident->loadCount('schedules');
+        
         // スケジュールが関連付けられている場合は削除を防ぐ
-        if ($resident->schedules()->exists()) {
+        if ($resident->schedules_count > 0) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'この利用者にはスケジュールが関連付けられているため削除できません'
