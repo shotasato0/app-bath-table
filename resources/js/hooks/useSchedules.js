@@ -227,6 +227,7 @@ export const useSchedules = (options = {}) => {
         // Actions
         fetchMonthlySchedules,
         fetchSchedules,
+        fetchSchedulesByDateRange,
         createSchedule,
         updateSchedule,
         deleteSchedule,
