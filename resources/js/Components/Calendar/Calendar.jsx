@@ -76,6 +76,18 @@ export default function Calendar() {
         end: calendarEnd
     });
 
+    // カレンダー表示範囲のスケジュールデータを取得
+    const fetchCalendarData = useCallback(async () => {
+        const startDate = format(calendarStart, 'yyyy-MM-dd');
+        const endDate = format(calendarEnd, 'yyyy-MM-dd');
+        await fetchSchedulesByDateRange(startDate, endDate);
+    }, [calendarStart, calendarEnd, fetchSchedulesByDateRange]);
+
+    // currentDateが変更された時にデータを取得
+    useEffect(() => {
+        fetchCalendarData();
+    }, [fetchCalendarData]);
+
     // URLを更新する関数
     const updateURL = (date) => {
         const year = date.getFullYear();
