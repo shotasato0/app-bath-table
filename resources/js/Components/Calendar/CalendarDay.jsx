@@ -230,7 +230,12 @@ export default function CalendarDay({
         };
         
         try {
-            await updateSchedule(schedule.id, updatedSchedule);
+            // 月跨ぎの場合、両方の月を更新するため現在の月を指定
+            const targetDate = new Date(dateKey);
+            const targetYear = targetDate.getFullYear();
+            const targetMonth = targetDate.getMonth() + 1;
+            
+            await updateSchedule(schedule.id, updatedSchedule, targetYear, targetMonth);
             showSuccessMessage(`${schedule.title}のスケジュールを${dateKey}に移動しました`);
         } catch (error) {
             showErrorMessage(`スケジュールの移動に失敗しました: ${error.message || 'エラーが発生しました'}`);
