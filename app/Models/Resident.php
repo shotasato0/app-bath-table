@@ -41,12 +41,6 @@ class Resident extends Model
     }
 
     // アクセサ
-    public function getRoomNumberAttribute()
-    {
-        // 将来的に部屋番号フィールドを追加する場合の準備
-        return $this->room ?? null;
-    }
-
     public function getAgeAttribute()
     {
         return $this->birth_date ? $this->birth_date->age : null;
