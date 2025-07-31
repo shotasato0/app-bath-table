@@ -32,13 +32,14 @@ export default function Calendar() {
         loading: schedulesLoading,
         error: schedulesError,
         fetchMonthlySchedules,
+        fetchSchedulesByDateRange,
         createSchedule,
         updateSchedule,
         deleteSchedule,
         currentYear,
         currentMonth
     } = useSchedules({ 
-        autoFetch: true, 
+        autoFetch: false, // 手動でfetchするため無効化
         initialYear: currentDate.getFullYear(),
         initialMonth: currentDate.getMonth() + 1
     });
