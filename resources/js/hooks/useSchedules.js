@@ -161,6 +161,45 @@ export const useSchedules = (options = {}) => {
     }, [handleError]);
 
     /**
+     * 期間指定スケジュール取得（カレンダー表示用）
+     */
+    const fetchSchedulesByDateRange = useCallback(async (startDate, endDate) => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+            const response = await scheduleService.getSchedulesByDateRange(startDate, endDate);
+            
+            // 日付別にグループ化してmonthlyCalendarDataの形式に変換
+            const schedulesByDate = {};
+            (response.data || []).forEach(schedule => {
+                const dateKey = schedule.date || schedule.calendar_date?.calendar_date;
+                if (dateKey) {
+                    if (!schedulesByDate[dateKey]) {
+                        schedulesByDate[dateKey] = [];
+                    }
+                    schedulesByDate[dateKey].push(schedule);
+                }
+            });
+            
+            // monthlyCalendarDataの形式に変換
+            const calendarData = Object.keys(schedulesByDate).map(date => ({
+                date,
+                schedules: schedulesByDate[date]
+            }));
+            
+            setMonthlyCalendarData(calendarData);
+            
+            return calendarData;
+        } catch (error) {
+            handleError(error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    }, [handleError]);
+
+    /**
      * 月変更
      */
     const changeMonth = useCallback((year, month) => {
