@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import api from '../../services/api';
 import ResidentModal from './ResidentModal';
 import { useResidents } from '../../hooks/useResidents';
 
@@ -330,7 +329,8 @@ export default function ResidentList() {
                                     </div>
                                 )}
                             </div>
-                        ))
+                        );
+                    })
                     )}
                 </div>
                 
