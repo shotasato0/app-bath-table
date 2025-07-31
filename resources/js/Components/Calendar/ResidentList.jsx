@@ -277,24 +277,22 @@ export default function ResidentList() {
                             </div>
                         </div>
                     ) : (
-                        filteredResidents.map((resident) => (
-                            <div
-                                key={resident.id}
-                                draggable
-                                onDragStart={(e) => handleDragStart(e, resident)}
-                                onDragEnd={handleDragEnd}
-                                className={`flex items-center gap-3 p-3 bg-gray-700 border border-gray-600 rounded-md mb-2 cursor-move transition-all hover:bg-gray-600 hover:-translate-y-0.5 hover:shadow-lg group relative ${
-                                    draggedResident === resident.id ? 'opacity-50 scale-95' : ''
-                                }`}
-                            >
-                                {(() => {
-                                    const avatarColor = resident.color || COLORS[resident.id % COLORS.length];
-                                    return (
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${avatarColor}`}>
-                                            👤
-                                        </div>
-                                    );
-                                })()}
+                        filteredResidents.map((resident) => {
+                            const avatarColor = resident.color || COLORS[resident.id % COLORS.length];
+                            
+                            return (
+                                <div
+                                    key={resident.id}
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, resident)}
+                                    onDragEnd={handleDragEnd}
+                                    className={`flex items-center gap-3 p-3 bg-gray-700 border border-gray-600 rounded-md mb-2 cursor-move transition-all hover:bg-gray-600 hover:-translate-y-0.5 hover:shadow-lg group relative ${
+                                        draggedResident === resident.id ? 'opacity-50 scale-95' : ''
+                                    }`}
+                                >
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${avatarColor}`}>
+                                        👤
+                                    </div>
                                 <div className="flex-1">
                                     <h4 className="text-sm font-medium text-gray-100">{resident.name}</h4>
                                     <p className="text-xs text-gray-400">
