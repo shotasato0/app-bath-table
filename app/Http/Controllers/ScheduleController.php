@@ -107,8 +107,9 @@ class ScheduleController extends Controller
             'date_id' => $calendarDate->id,
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'] ?? null,
+            'start_time' => $validated['all_day'] ? null : $validated['start_time'],
+            'end_time' => $validated['all_day'] ? null : ($validated['end_time'] ?? null),
+            'all_day' => $validated['all_day'] ?? false,
             'schedule_type_id' => $validated['schedule_type_id'],
             'resident_id' => $validated['resident_id'] ?? null
         ];
