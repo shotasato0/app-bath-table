@@ -15,7 +15,9 @@ const CalendarGrid = memo(function CalendarGrid({
     updateSchedule,
     deleteSchedule,
     loading = false,
-    error = null
+    error = null,
+    showNotification,
+    showConfirmDialog
 }) {
     return (
         <div className="flex-1 bg-gray-800 rounded-lg overflow-hidden">
