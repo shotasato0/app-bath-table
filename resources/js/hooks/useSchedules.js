@@ -147,7 +147,6 @@ export const useSchedules = (options = {}) => {
         optimisticUpdate();
         
         try {
-            setSmartLoading(true);
             const response = await scheduleService.createSchedule(scheduleData);
             
             // データが変更されたためキャッシュをリセット
