@@ -43,7 +43,7 @@ export default function CalendarGrid({
                     
                     return (
                         <CalendarDay
-                            key={day.toISOString()}
+                            key={format(day, 'yyyy-MM-dd')}
                             date={day}
                             isCurrentMonth={isSameMonth(day, currentDate)}
                             isToday={isToday(day)}
