@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, format } from 'date-fns';
 import { router } from '@inertiajs/react';
 import CalendarHeader from './CalendarHeader';
@@ -26,6 +26,9 @@ export default function Calendar() {
 
     const [currentDate, setCurrentDate] = useState(getInitialDate);
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const [notifications, setNotifications] = useState([]);
+    const [confirmDialog, setConfirmDialog] = useState(null);
+    const notificationTimeouts = useRef(new Map());
     
     const {
         monthlyCalendarData,
