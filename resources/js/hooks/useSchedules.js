@@ -20,6 +20,7 @@ export const useSchedules = (options = {}) => {
     const [currentYear, setCurrentYear] = useState(initialYear);
     const [currentMonth, setCurrentMonth] = useState(initialMonth);
     const [lastFetchedRange, setLastFetchedRange] = useState(null);
+    const [loadingTimeout, setLoadingTimeout] = useState(null);
 
     /**
      * エラーハンドリング
