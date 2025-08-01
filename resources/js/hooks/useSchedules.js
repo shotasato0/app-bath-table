@@ -202,13 +202,33 @@ export const useSchedules = (options = {}) => {
     }, [fetchMonthlySchedules, handleError, setSmartLoading]);
 
     /**
-     * スケジュール削除
+     * スケジュール削除（楽観的更新対応）
      */
     const deleteSchedule = useCallback(async (scheduleId, refreshCallback) => {
-        setSmartLoading(true);
         setError(null);
         
+        // 楽観的更新: 即座にスケジュールを削除
+        let deletedSchedule = null;
+        const optimisticUpdate = () => {
+            setMonthlyCalendarData(prevData => {
+                return prevData.map(dayData => {
+                    const scheduleToDelete = dayData.schedules.find(s => s.id === scheduleId);
+                    if (scheduleToDelete) {
+                        deletedSchedule = scheduleToDelete;
+                    }
+                    return {
+                        ...dayData,
+                        schedules: dayData.schedules.filter(schedule => schedule.id !== scheduleId)
+                    };
+                });
+            });
+        };
+        
+        // 楽観的更新を実行
+        optimisticUpdate();
+        
         try {
+            setSmartLoading(true);
             const response = await scheduleService.deleteSchedule(scheduleId);
             
             // データが変更されたためキャッシュをリセット
@@ -223,6 +243,16 @@ export const useSchedules = (options = {}) => {
             
             return response;
         } catch (error) {
+            // エラー時は楽観的更新を元に戻す
+            if (deletedSchedule) {
+                setMonthlyCalendarData(prevData => {
+                    return prevData.map(dayData => 
+                        dayData.date === deletedSchedule.date 
+                            ? { ...dayData, schedules: [...dayData.schedules, deletedSchedule] }
+                            : dayData
+                    );
+                });
+            }
             handleError(error);
             throw error;
         } finally {
