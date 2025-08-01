@@ -465,7 +465,7 @@ const CalendarDay = memo(function CalendarDay({
                         return (
                             <div
                                 key={event.id}
-                                className="text-[9px] px-1 py-0.5 rounded-sm border-l-2 transition-all hover:-translate-y-px hover:brightness-110 text-white group relative"
+                                className="text-[9px] px-1 py-0.5 rounded-sm border-l-2 text-white group relative schedule-item animate-fade-in"
                                 style={{
                                     backgroundColor: backgroundColor + '40', // 透明度40%
                                     borderLeftColor: backgroundColor
