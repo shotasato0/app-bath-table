@@ -33,6 +33,7 @@ export const useSchedules = (options = {}) => {
     const [currentMonth, setCurrentMonth] = useState(initialMonth);
     const [lastFetchedRange, setLastFetchedRange] = useState(null);
     const [loadingTimeout, setLoadingTimeout] = useState(null);
+    const [hasOptimisticUpdates, setHasOptimisticUpdates] = useState(false);
 
     /**
      * エラーハンドリング
