@@ -77,7 +77,7 @@ export default function Calendar() {
     });
 
     // カレンダー表示範囲のスケジュールデータを取得
-    useEffect(() => {
+    const refreshCalendarData = useCallback(() => {
         const monthStart = startOfMonth(currentDate);
         const monthEnd = endOfMonth(currentDate);
         const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
@@ -86,8 +86,12 @@ export default function Calendar() {
         const startDate = format(calendarStart, 'yyyy-MM-dd');
         const endDate = format(calendarEnd, 'yyyy-MM-dd');
         
-        fetchSchedulesByDateRange(startDate, endDate);
+        return fetchSchedulesByDateRange(startDate, endDate);
     }, [currentDate, fetchSchedulesByDateRange]);
+
+    useEffect(() => {
+        refreshCalendarData();
+    }, [refreshCalendarData]);
 
     // URLを更新する関数
     const updateURL = (date) => {
