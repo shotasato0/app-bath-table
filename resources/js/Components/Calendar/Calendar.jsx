@@ -143,10 +143,8 @@ export default function Calendar() {
     }, [updateSchedule, refreshCalendarData]);
 
     const handleDeleteSchedule = useCallback(async (scheduleId) => {
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1;
-        return await deleteSchedule(scheduleId, year, month);
-    }, [deleteSchedule, currentDate]);
+        return await deleteSchedule(scheduleId, refreshCalendarData);
+    }, [deleteSchedule, refreshCalendarData]);
 
     return (
         <div className="bg-gray-900">
