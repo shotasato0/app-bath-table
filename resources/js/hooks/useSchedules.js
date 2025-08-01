@@ -120,7 +120,7 @@ export const useSchedules = (options = {}) => {
      * スケジュール更新
      */
     const updateSchedule = useCallback(async (scheduleId, scheduleData, refreshCallback) => {
-        setLoading(true);
+        setSmartLoading(true);
         setError(null);
         
         try {
@@ -141,9 +141,9 @@ export const useSchedules = (options = {}) => {
             handleError(error);
             throw error;
         } finally {
-            setLoading(false);
+            setSmartLoading(false);
         }
-    }, [fetchMonthlySchedules, handleError]);
+    }, [fetchMonthlySchedules, handleError, setSmartLoading]);
 
     /**
      * スケジュール削除
