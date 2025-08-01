@@ -171,7 +171,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             // 楽観的更新では通常ローディング表示は不要
         }
-    }, [fetchMonthlySchedules, handleError, setSmartLoading]);
+    }, []);
 
     /**
      * スケジュール更新（楽観的更新対応）
@@ -218,7 +218,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             // 楽観的更新では通常ローディング表示は不要
         }
-    }, [fetchMonthlySchedules, handleError, setSmartLoading]);
+    }, []);
 
     /**
      * スケジュール削除（楽観的更新対応）
@@ -274,7 +274,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             // 楽観的更新では通常ローディング表示は不要
         }
-    }, [fetchMonthlySchedules, handleError, setSmartLoading]);
+    }, []);
 
     /**
      * 指定日のスケジュール取得
@@ -292,7 +292,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             setLoading(false);
         }
-    }, [handleError]);
+    }, []);
 
     /**
      * 期間指定スケジュール取得（カレンダー表示用）
@@ -355,7 +355,7 @@ export const useSchedules = (options = {}) => {
      */
     const changeMonth = useCallback((year, month) => {
         fetchMonthlySchedules(year, month);
-    }, [fetchMonthlySchedules]);
+    }, []);
 
     /**
      * 初期データ取得
