@@ -351,7 +351,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             setLoading(false);
         }
-    }, [handleError, lastFetchedRange, loading, monthlyCalendarData]);
+    }, [handleError, lastFetchedRange, loading, monthlyCalendarData, hasOptimisticUpdates]);
 
     /**
      * 月変更
