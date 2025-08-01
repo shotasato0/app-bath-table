@@ -35,9 +35,17 @@
         transition: all 0.15s ease-in-out;
     }
     
-    .schedule-item:hover {
+    /* ホバー開始時とアクティブ時のみwill-changeを適用 */
+    .schedule-item:hover,
+    .schedule-item:active,
+    .schedule-item:focus-visible {
         transform: translateY(-1px);
         will-change: transform, opacity;
+    }
+    
+    /* アニメーション終了後のwill-changeリセット */
+    .schedule-item:not(:hover):not(:active):not(:focus-visible) {
+        will-change: auto;
     }
     
     /* ドラッグオーバー効果の最適化 */
