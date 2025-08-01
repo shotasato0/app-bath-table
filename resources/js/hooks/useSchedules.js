@@ -307,16 +307,21 @@ export const useSchedules = (options = {}) => {
      * 期間指定スケジュール取得（カレンダー表示用）
      */
     const fetchSchedulesByDateRange = useCallback(async (startDate, endDate) => {
+        // refから最新の値を取得
+        const currentLoading = loadingRef.current;
+        const currentMonthlyCalendarData = monthlyCalendarDataRef.current;
+        const currentLastFetchedRange = lastFetchedRangeRef.current;
+        
         // ローディング中は重複リクエストを防ぐ
-        if (loading) {
-            return monthlyCalendarData;
+        if (currentLoading) {
+            return currentMonthlyCalendarData;
         }
         
         // 同じ期間での重複取得を防ぐ（ただし楽観的更新後は強制更新）
         const rangeKey = `${startDate}-${endDate}`;
-        if (lastFetchedRange === rangeKey && monthlyCalendarData.length > 0) {
+        if (currentLastFetchedRange === rangeKey && currentMonthlyCalendarData.length > 0) {
             // キャッシュが有効な場合のみ返す（楽観的更新でlastFetchedRangeがnullになった場合は強制更新）
-            return monthlyCalendarData;
+            return currentMonthlyCalendarData;
         }
         
         setLoading(true);
@@ -353,7 +358,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             setLoading(false);
         }
-    }, [handleError, lastFetchedRange, loading, monthlyCalendarData]);
+    }, [handleError]);
 
     /**
      * 月変更
