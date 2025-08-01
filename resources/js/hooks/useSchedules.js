@@ -151,11 +151,9 @@ export const useSchedules = (options = {}) => {
             // データが変更されたためキャッシュをリセット
             setLastFetchedRange(null);
             
-            // カスタムリフレッシュコールバックがあれば使用、なければ月別データを再取得
+            // カスタムリフレッシュコールバックがあれば使用
             if (refreshCallback) {
                 await refreshCallback();
-            } else {
-                await fetchMonthlySchedules();
             }
             
             return response;
@@ -204,11 +202,9 @@ export const useSchedules = (options = {}) => {
             // データが変更されたためキャッシュをリセット
             setLastFetchedRange(null);
             
-            // カスタムリフレッシュコールバックがあれば使用、なければ月別データを再取得
+            // カスタムリフレッシュコールバックがあれば使用
             if (refreshCallback) {
                 await refreshCallback();
-            } else {
-                await fetchMonthlySchedules();
             }
             
             return response;
@@ -259,11 +255,9 @@ export const useSchedules = (options = {}) => {
             // データが変更されたためキャッシュをリセット
             setLastFetchedRange(null);
             
-            // カスタムリフレッシュコールバックがあれば使用、なければ月別データを再取得
+            // カスタムリフレッシュコールバックがあれば使用
             if (refreshCallback) {
                 await refreshCallback();
-            } else {
-                await fetchMonthlySchedules();
             }
             
             return response;
