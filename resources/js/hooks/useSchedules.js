@@ -106,8 +106,8 @@ export const useSchedules = (options = {}) => {
         setError(null);
         
         // 楽観的更新: 仮IDでスケジュールを即座に追加
-        // 衝突を避けるためにタイムスタンプ + ランダム値 + 高精度タイマーを使用
-        const tempId = `temp_${Date.now()}_${Math.random().toString(36).substring(2, 11)}_${performance.now()}`;
+        // 衝突を回避した一意なIDを生成
+        const tempId = generateUniqueId();
         const optimisticSchedule = { ...scheduleData, id: tempId };
         
         const optimisticUpdate = () => {
