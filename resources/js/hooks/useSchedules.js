@@ -19,6 +19,7 @@ export const useSchedules = (options = {}) => {
     const [error, setError] = useState(null);
     const [currentYear, setCurrentYear] = useState(initialYear);
     const [currentMonth, setCurrentMonth] = useState(initialMonth);
+    const [lastFetchedRange, setLastFetchedRange] = useState(null);
 
     /**
      * エラーハンドリング
