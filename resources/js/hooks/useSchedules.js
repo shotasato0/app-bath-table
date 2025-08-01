@@ -91,7 +91,7 @@ export const useSchedules = (options = {}) => {
      * スケジュール作成
      */
     const createSchedule = useCallback(async (scheduleData, refreshCallback) => {
-        setLoading(true);
+        setSmartLoading(true);
         setError(null);
         
         try {
@@ -112,9 +112,9 @@ export const useSchedules = (options = {}) => {
             handleError(error);
             throw error;
         } finally {
-            setLoading(false);
+            setSmartLoading(false);
         }
-    }, [fetchMonthlySchedules, handleError]);
+    }, [fetchMonthlySchedules, handleError, setSmartLoading]);
 
     /**
      * スケジュール更新
@@ -149,7 +149,7 @@ export const useSchedules = (options = {}) => {
      * スケジュール削除
      */
     const deleteSchedule = useCallback(async (scheduleId, refreshCallback) => {
-        setLoading(true);
+        setSmartLoading(true);
         setError(null);
         
         try {
@@ -170,9 +170,9 @@ export const useSchedules = (options = {}) => {
             handleError(error);
             throw error;
         } finally {
-            setLoading(false);
+            setSmartLoading(false);
         }
-    }, [fetchMonthlySchedules, handleError]);
+    }, [fetchMonthlySchedules, handleError, setSmartLoading]);
 
     /**
      * 指定日のスケジュール取得
