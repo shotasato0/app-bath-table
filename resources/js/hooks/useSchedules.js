@@ -94,7 +94,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             setLoading(false);
         }
-    }, [handleError]);
+    }, []);
 
     /**
      * スケジュール一覧取得
@@ -111,7 +111,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             setLoading(false);
         }
-    }, [handleError]);
+    }, []);
 
     /**
      * スケジュール作成（楽観的更新対応）
@@ -169,7 +169,7 @@ export const useSchedules = (options = {}) => {
             handleError(error);
             throw error;
         } finally {
-            setSmartLoading(false);
+            // 楽観的更新では通常ローディング表示は不要
         }
     }, [fetchMonthlySchedules, handleError, setSmartLoading]);
 
@@ -197,7 +197,6 @@ export const useSchedules = (options = {}) => {
         optimisticUpdate();
         
         try {
-            setSmartLoading(true);
             const response = await scheduleService.updateSchedule(scheduleId, scheduleData);
             
             // データが変更されたためキャッシュをリセット
@@ -217,7 +216,7 @@ export const useSchedules = (options = {}) => {
             handleError(error);
             throw error;
         } finally {
-            setSmartLoading(false);
+            // 楽観的更新では通常ローディング表示は不要
         }
     }, [fetchMonthlySchedules, handleError, setSmartLoading]);
 
@@ -248,7 +247,6 @@ export const useSchedules = (options = {}) => {
         optimisticUpdate();
         
         try {
-            setSmartLoading(true);
             const response = await scheduleService.deleteSchedule(scheduleId);
             
             // データが変更されたためキャッシュをリセット
@@ -274,7 +272,7 @@ export const useSchedules = (options = {}) => {
             handleError(error);
             throw error;
         } finally {
-            setSmartLoading(false);
+            // 楽観的更新では通常ローディング表示は不要
         }
     }, [fetchMonthlySchedules, handleError, setSmartLoading]);
 
