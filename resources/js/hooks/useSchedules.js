@@ -31,6 +31,27 @@ export const useSchedules = (options = {}) => {
     }, []);
 
     /**
+     * スマートローディング制御 - 短時間の処理ではローディングを表示しない
+     */
+    const setSmartLoading = useCallback((isLoading) => {
+        if (isLoading) {
+            // 200ms後にローディングを表示
+            const timeout = setTimeout(() => {
+                setLoading(true);
+                setLoadingTimeout(null);
+            }, 200);
+            setLoadingTimeout(timeout);
+        } else {
+            // ローディング停止
+            if (loadingTimeout) {
+                clearTimeout(loadingTimeout);
+                setLoadingTimeout(null);
+            }
+            setLoading(false);
+        }
+    }, [loadingTimeout]);
+
+    /**
      * 月別スケジュールデータ取得
      */
     const fetchMonthlySchedules = useCallback(async (year = currentYear, month = currentMonth) => {
