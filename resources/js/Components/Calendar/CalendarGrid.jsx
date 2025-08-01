@@ -59,6 +59,8 @@ const CalendarGrid = memo(function CalendarGrid({
                             deleteSchedule={deleteSchedule}
                             loading={loading}
                             error={error}
+                            showNotification={showNotification}
+                            showConfirmDialog={showConfirmDialog}
                         />
                     );
                 })}
