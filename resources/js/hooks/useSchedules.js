@@ -88,13 +88,39 @@ export const useSchedules = (options = {}) => {
     }, [handleError]);
 
     /**
-     * スケジュール作成
+     * スケジュール作成（楽観的更新対応）
      */
     const createSchedule = useCallback(async (scheduleData, refreshCallback) => {
-        setSmartLoading(true);
         setError(null);
         
+        // 楽観的更新: 仮IDでスケジュールを即座に追加
+        const tempId = `temp_${Date.now()}`;
+        const optimisticSchedule = { ...scheduleData, id: tempId };
+        
+        const optimisticUpdate = () => {
+            setMonthlyCalendarData(prevData => {
+                const targetDate = scheduleData.date;
+                const existingDay = prevData.find(dayData => dayData.date === targetDate);
+                
+                if (existingDay) {
+                    // 既存の日にスケジュールを追加
+                    return prevData.map(dayData => 
+                        dayData.date === targetDate 
+                            ? { ...dayData, schedules: [...dayData.schedules, optimisticSchedule] }
+                            : dayData
+                    );
+                } else {
+                    // 新しい日のデータを作成
+                    return [...prevData, { date: targetDate, schedules: [optimisticSchedule] }];
+                }
+            });
+        };
+        
+        // 楽観的更新を実行
+        optimisticUpdate();
+        
         try {
+            setSmartLoading(true);
             const response = await scheduleService.createSchedule(scheduleData);
             
             // データが変更されたためキャッシュをリセット
@@ -109,6 +135,13 @@ export const useSchedules = (options = {}) => {
             
             return response;
         } catch (error) {
+            // エラー時は楽観的更新を元に戻す
+            setMonthlyCalendarData(prevData => {
+                return prevData.map(dayData => ({
+                    ...dayData,
+                    schedules: dayData.schedules.filter(schedule => schedule.id !== tempId)
+                }));
+            });
             handleError(error);
             throw error;
         } finally {
