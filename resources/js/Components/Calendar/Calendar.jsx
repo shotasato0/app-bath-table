@@ -78,10 +78,15 @@ export default function Calendar() {
 
     // カレンダー表示範囲のスケジュールデータを取得
     const fetchCalendarData = useCallback(async () => {
+        const monthStart = startOfMonth(currentDate);
+        const monthEnd = endOfMonth(currentDate);
+        const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+        const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+        
         const startDate = format(calendarStart, 'yyyy-MM-dd');
         const endDate = format(calendarEnd, 'yyyy-MM-dd');
         await fetchSchedulesByDateRange(startDate, endDate);
-    }, [calendarStart, calendarEnd, fetchSchedulesByDateRange]);
+    }, [currentDate, fetchSchedulesByDateRange]);
 
     // currentDateが変更された時にデータを取得
     useEffect(() => {
