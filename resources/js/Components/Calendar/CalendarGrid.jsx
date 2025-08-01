@@ -63,4 +63,6 @@ const CalendarGrid = memo(function CalendarGrid({
             </div>
         </div>
     );
-}
+});
+
+export default CalendarGrid;
