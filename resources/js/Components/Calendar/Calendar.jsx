@@ -139,7 +139,7 @@ export default function Calendar() {
         const startDate = format(calendarStart, 'yyyy-MM-dd');
         const endDate = format(calendarEnd, 'yyyy-MM-dd');
         
-        return fetchSchedulesByDateRange(startDate, endDate);
+        return fetchSchedulesByDateRange(startDate, endDate, true); // 強制更新フラグを追加
     }, [currentDate, fetchSchedulesByDateRange]);
 
     useEffect(() => {
