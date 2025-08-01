@@ -144,18 +144,16 @@ export default function Calendar() {
 
     // 初期データ取得とcurrentDate変更時のデータ取得
     useEffect(() => {
-        if (fetchSchedulesByDateRange) {
-            const monthStart = startOfMonth(currentDate);
-            const monthEnd = endOfMonth(currentDate);
-            const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-            const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
-            
-            const startDate = format(calendarStart, 'yyyy-MM-dd');
-            const endDate = format(calendarEnd, 'yyyy-MM-dd');
-            
-            fetchSchedulesByDateRange(startDate, endDate);
-        }
-    }, [currentDate, fetchSchedulesByDateRange]);
+        const monthStart = startOfMonth(currentDate);
+        const monthEnd = endOfMonth(currentDate);
+        const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+        const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+        
+        const startDate = format(calendarStart, 'yyyy-MM-dd');
+        const endDate = format(calendarEnd, 'yyyy-MM-dd');
+        
+        fetchSchedulesByDateRange(startDate, endDate);
+    }, [currentDate]);
 
     // URLを更新する関数
     const updateURL = (date) => {
