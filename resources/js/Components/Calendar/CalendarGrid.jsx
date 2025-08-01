@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { isSameMonth, isToday, format } from 'date-fns';
 import CalendarDay from './CalendarDay';
 
