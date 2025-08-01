@@ -503,7 +503,7 @@ const CalendarDay = memo(function CalendarDay({
 
                 {/* 入浴側 */}
                 <div 
-                    className={`flex-1 flex flex-col gap-0.5 border-l border-gray-600 pl-1 transition-colors ${
+                    className={`flex-1 flex flex-col gap-0.5 border-l border-gray-600 pl-1 drag-over-zone ${
                         dragOver ? 'bg-blue-900 bg-opacity-20' : ''
                     }`}
                 >
