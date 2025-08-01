@@ -33,11 +33,11 @@
     /* スケジュール項目の滑らかな表示・非表示 */
     .schedule-item {
         transition: all 0.15s ease-in-out;
-        will-change: transform, opacity;
     }
     
     .schedule-item:hover {
         transform: translateY(-1px);
+        will-change: transform, opacity;
     }
     
     /* ドラッグオーバー効果の最適化 */
