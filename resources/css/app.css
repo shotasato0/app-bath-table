@@ -43,6 +43,10 @@
     /* ドラッグオーバー効果の最適化 */
     .drag-over-zone {
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .drag-over-zone:hover,
+    .drag-over-zone.dragover {
         will-change: background-color, border-color;
     }
     
