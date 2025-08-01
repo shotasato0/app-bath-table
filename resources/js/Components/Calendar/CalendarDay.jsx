@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { format } from 'date-fns';
 import ScheduleModal from './ScheduleModal';
 
