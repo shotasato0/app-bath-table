@@ -212,8 +212,6 @@ export const useSchedules = (options = {}) => {
             // エラー時は楽観的更新を元に戻すためにデータを再取得
             if (refreshCallback) {
                 await refreshCallback();
-            } else {
-                await fetchMonthlySchedules();
             }
             handleError(error);
             throw error;
