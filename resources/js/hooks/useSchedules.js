@@ -126,7 +126,7 @@ export const useSchedules = (options = {}) => {
     /**
      * スケジュール削除
      */
-    const deleteSchedule = useCallback(async (scheduleId, refreshYear, refreshMonth) => {
+    const deleteSchedule = useCallback(async (scheduleId, refreshCallback) => {
         setLoading(true);
         setError(null);
         
@@ -136,9 +136,9 @@ export const useSchedules = (options = {}) => {
             // データが変更されたためキャッシュをリセット
             setLastFetchedRange(null);
             
-            // 成功時は月別データを再取得（明示的な年月指定があれば使用）
-            if (refreshYear && refreshMonth) {
-                await fetchMonthlySchedules(refreshYear, refreshMonth);
+            // カスタムリフレッシュコールバックがあれば使用、なければ月別データを再取得
+            if (refreshCallback) {
+                await refreshCallback();
             } else {
                 await fetchMonthlySchedules();
             }
