@@ -195,8 +195,11 @@ export default function CalendarDay({
         };
         
         try {
-            await createSchedule(bathingSchedule);
+            // 楽観的更新: 即座に成功通知を表示
             showSuccessMessage(`${residentData.name}さんの入浴スケジュールを作成しました`);
+            
+            // バックグラウンドでAPI更新（エラー時のみ通知）
+            await createSchedule(bathingSchedule);
         } catch (error) {
             showErrorMessage(`入浴スケジュールの作成に失敗しました: ${error.message || 'エラーが発生しました'}`);
         }
