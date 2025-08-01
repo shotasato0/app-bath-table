@@ -53,9 +53,15 @@
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
+    /* インタラクション時のみwill-changeを適用 */
     .drag-over-zone:hover,
     .drag-over-zone.dragover {
         will-change: background-color, border-color;
+    }
+    
+    /* インタラクション終了後のwill-changeリセット */
+    .drag-over-zone:not(:hover):not(.dragover) {
+        will-change: auto;
     }
     
     /* ローディングオーバーレイの滑らかな表示 */
