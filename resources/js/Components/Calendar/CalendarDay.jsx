@@ -202,7 +202,7 @@ export default function CalendarDay({
         }
     };
 
-    // スケジュール移動処理
+    // スケジュール移動処理（楽観的更新対応）
     const handleScheduleMove = async (dragData) => {
         const { schedule, sourceDate } = dragData;
         
@@ -230,8 +230,11 @@ export default function CalendarDay({
         };
         
         try {
-            await updateSchedule(schedule.id, updatedSchedule);
+            // 楽観的更新: 即座に成功通知を表示
             showSuccessMessage(`${schedule.title}のスケジュールを${dateKey}に移動しました`);
+            
+            // バックグラウンドでAPI更新（エラー時のみ通知）
+            await updateSchedule(schedule.id, updatedSchedule);
         } catch (error) {
             showErrorMessage(`スケジュールの移動に失敗しました: ${error.message || 'エラーが発生しました'}`);
         }
