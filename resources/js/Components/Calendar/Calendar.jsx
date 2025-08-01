@@ -175,8 +175,8 @@ export default function Calendar() {
             
             {/* ローディングオーバーレイ */}
             {(schedulesLoading || typesLoading) && (
-                <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-40 pointer-events-none">
-                    <div className="bg-blue-900 bg-opacity-90 border border-blue-600 text-blue-300 px-6 py-3 rounded-lg shadow-lg">
+                <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-40 pointer-events-none loading-overlay">
+                    <div className="bg-blue-900 bg-opacity-90 border border-blue-600 text-blue-300 px-6 py-3 rounded-lg shadow-lg animate-fade-in">
                         <div className="flex items-center">
                             <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
