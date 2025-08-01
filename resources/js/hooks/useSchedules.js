@@ -132,6 +132,7 @@ export const useSchedules = (options = {}) => {
         
         // 楽観的更新を実行
         optimisticUpdate();
+        setHasOptimisticUpdates(true);
         
         try {
             setSmartLoading(true);
@@ -139,6 +140,7 @@ export const useSchedules = (options = {}) => {
             
             // データが変更されたためキャッシュをリセット
             setLastFetchedRange(null);
+            setHasOptimisticUpdates(false);
             
             // カスタムリフレッシュコールバックがあれば使用、なければ月別データを再取得
             if (refreshCallback) {
