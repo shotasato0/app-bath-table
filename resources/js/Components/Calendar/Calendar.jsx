@@ -58,7 +58,13 @@ export default function Calendar() {
     const showConfirmDialog = useCallback((message, onConfirm) => {
         setConfirmDialog({
             message,
-            onConfirm,
+            onConfirm: async () => {
+                try {
+                    await onConfirm();
+                } finally {
+                    setConfirmDialog(null);
+                }
+            },
             onCancel: () => setConfirmDialog(null)
         });
     }, []);
