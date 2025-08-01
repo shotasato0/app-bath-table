@@ -58,6 +58,7 @@ class ScheduleController extends Controller
                         'description' => $schedule->description,
                         'start_time' => $schedule->start_time,
                         'end_time' => $schedule->end_time,
+                        'all_day' => $schedule->all_day,
                         'schedule_type_id' => $schedule->schedule_type_id,
                         'resident_id' => $schedule->resident_id,
                         'date' => $formattedDate,
@@ -82,8 +83,8 @@ class ScheduleController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
             'date' => ['required', 'date'],
-            'start_time' => ['required', 'date_format:H:i'],
-            'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
+            'start_time' => ['required_if:all_day,false', 'date_format:H:i'],
+            'end_time' => ['required_if:all_day,false', 'date_format:H:i', 'after:start_time'],
             'schedule_type_id' => ['required', 'exists:schedule_types,id'],
             'resident_id' => ['nullable', 'exists:residents,id'],
             'all_day' => ['boolean']
@@ -107,8 +108,9 @@ class ScheduleController extends Controller
             'date_id' => $calendarDate->id,
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'] ?? null,
+            'start_time' => $validated['all_day'] ? null : $validated['start_time'],
+            'end_time' => $validated['all_day'] ? null : ($validated['end_time'] ?? null),
+            'all_day' => $validated['all_day'] ?? false,
             'schedule_type_id' => $validated['schedule_type_id'],
             'resident_id' => $validated['resident_id'] ?? null
         ];
@@ -139,8 +141,8 @@ class ScheduleController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
             'date' => ['required', 'date'],
-            'start_time' => ['required', 'date_format:H:i'],
-            'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
+            'start_time' => ['required_if:all_day,false', 'date_format:H:i'],
+            'end_time' => ['required_if:all_day,false', 'date_format:H:i', 'after:start_time'],
             'schedule_type_id' => ['required', 'exists:schedule_types,id'],
             'resident_id' => ['nullable', 'exists:residents,id'],
             'all_day' => ['boolean']
@@ -164,8 +166,9 @@ class ScheduleController extends Controller
             'date_id' => $calendarDate->id,
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'] ?? null,
+            'start_time' => $validated['all_day'] ? null : $validated['start_time'],
+            'end_time' => $validated['all_day'] ? null : ($validated['end_time'] ?? null),
+            'all_day' => $validated['all_day'] ?? false,
             'schedule_type_id' => $validated['schedule_type_id'],
             'resident_id' => $validated['resident_id'] ?? null
         ];

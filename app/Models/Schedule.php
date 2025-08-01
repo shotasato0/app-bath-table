@@ -15,6 +15,7 @@ class Schedule extends Model
         'description',
         'start_time',
         'end_time',
+        'all_day',
         'schedule_type_id',
         'resident_id',
     ];
@@ -24,6 +25,7 @@ class Schedule extends Model
         return [
             'start_time' => 'datetime:H:i',
             'end_time' => 'datetime:H:i',
+            'all_day' => 'boolean',
         ];
     }
 

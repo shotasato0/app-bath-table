@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, memo } from 'react';
 import { format } from 'date-fns';
 import ScheduleModal from './ScheduleModal';
 
 const SAMPLE_EVENTS = {};
 
-export default function CalendarDay({ 
+const CalendarDay = memo(function CalendarDay({ 
     date, 
     isCurrentMonth, 
     isToday, 
@@ -16,15 +16,14 @@ export default function CalendarDay({
     createSchedule,
     updateSchedule,
     deleteSchedule,
-    loading = false
+    loading = false,
+    showNotification,
+    showConfirmDialog
 }) {
     const [dragOver, setDragOver] = useState(false);
     const dragCounter = useRef(0);
     const [showScheduleModal, setShowScheduleModal] = useState(false);
     const [selectedSchedule, setSelectedSchedule] = useState(null);
-    const [notifications, setNotifications] = useState([]);
-    const [confirmDialog, setConfirmDialog] = useState(null);
-    const notificationTimeouts = useRef(new Map());
     const dateKey = format(date, 'yyyy-MM-dd');
     
     /**
@@ -36,16 +35,6 @@ export default function CalendarDay({
         return schedule && schedule.schedule_type_id !== undefined;
     };
     
-    // コンポーネントアンマウント時のクリーンアップ
-    useEffect(() => {
-        return () => {
-            // 全ての通知タイマーをクリアしてメモリリークを防止
-            notificationTimeouts.current.forEach(timeoutId => {
-                clearTimeout(timeoutId);
-            });
-            notificationTimeouts.current.clear();
-        };
-    }, []);
     
     // スケジュールを左右に分離するロジック
     const separateSchedules = (allSchedules) => {
@@ -195,14 +184,17 @@ export default function CalendarDay({
         };
         
         try {
-            await createSchedule(bathingSchedule);
+            // 楽観的更新: 即座に成功通知を表示
             showSuccessMessage(`${residentData.name}さんの入浴スケジュールを作成しました`);
+            
+            // バックグラウンドでAPI更新（エラー時のみ通知）
+            await createSchedule(bathingSchedule);
         } catch (error) {
             showErrorMessage(`入浴スケジュールの作成に失敗しました: ${error.message || 'エラーが発生しました'}`);
         }
     };
 
-    // スケジュール移動処理
+    // スケジュール移動処理（楽観的更新対応）
     const handleScheduleMove = async (dragData) => {
         const { schedule, sourceDate } = dragData;
         
@@ -230,28 +222,17 @@ export default function CalendarDay({
         };
         
         try {
-            await updateSchedule(schedule.id, updatedSchedule);
+            // 楽観的更新: 即座に成功通知を表示
             showSuccessMessage(`${schedule.title}のスケジュールを${dateKey}に移動しました`);
+            
+            // バックグラウンドでAPI更新（エラー時のみ通知）
+            await updateSchedule(schedule.id, updatedSchedule);
         } catch (error) {
             showErrorMessage(`スケジュールの移動に失敗しました: ${error.message || 'エラーが発生しました'}`);
         }
     };
 
-    // 通知システム（メモリリーク対策付き）
-    const showNotification = (message, type = 'success') => {
-        const id = Date.now() + Math.random();
-        const notification = { id, message, type };
-        
-        setNotifications(prev => [...prev, notification]);
-        
-        const timeoutId = setTimeout(() => {
-            setNotifications(prev => prev.filter(n => n.id !== id));
-            notificationTimeouts.current.delete(id);
-        }, type === 'error' ? 5000 : 3000);
-        
-        notificationTimeouts.current.set(id, timeoutId);
-    };
-    
+    // 通知ユーティリティ関数
     const showSuccessMessage = (message) => {
         showNotification(message, 'success');
     };
@@ -262,25 +243,6 @@ export default function CalendarDay({
     
     const showWarningMessage = (message) => {
         showNotification(message, 'warning');
-    };
-    
-    // 通知の手動削除
-    const removeNotification = (id) => {
-        setNotifications(prev => prev.filter(n => n.id !== id));
-        const timeoutId = notificationTimeouts.current.get(id);
-        if (timeoutId) {
-            clearTimeout(timeoutId);
-            notificationTimeouts.current.delete(id);
-        }
-    };
-    
-    // 確認ダイアログ表示
-    const showConfirmDialog = (message, onConfirm) => {
-        setConfirmDialog({
-            message,
-            onConfirm,
-            onCancel: () => setConfirmDialog(null)
-        });
     };
 
     // スケジュールのドラッグ開始処理
@@ -342,10 +304,8 @@ export default function CalendarDay({
             async () => {
                 try {
                     await deleteSchedule(schedule.id);
-                    setConfirmDialog(null);
                 } catch (error) {
                     showErrorMessage('スケジュールの削除に失敗しました');
-                    setConfirmDialog(null);
                 }
             }
         );
@@ -415,7 +375,7 @@ export default function CalendarDay({
     return (
         <div 
             className={`
-                calendar-day flex flex-col p-1.5 min-h-[140px] border-r border-b border-gray-600 relative cursor-pointer
+                calendar-day flex flex-col p-1.5 min-h-[140px] border-r border-b border-gray-600 relative cursor-pointer layout-stable
                 ${dayIndex % 7 === 6 ? 'border-r-0' : ''}
                 ${!isCurrentMonth ? 'bg-gray-700' : 'bg-gray-800'}
                 ${isToday ? 'bg-blue-900 bg-opacity-20 border-2 border-blue-600' : ''}
@@ -459,7 +419,7 @@ export default function CalendarDay({
                         return (
                             <div
                                 key={event.id}
-                                className="text-[9px] px-1 py-0.5 rounded-sm border-l-2 transition-all hover:-translate-y-px hover:brightness-110 text-white group relative"
+                                className="text-[9px] px-1 py-0.5 rounded-sm border-l-2 text-white group relative schedule-item animate-fade-in"
                                 style={{
                                     backgroundColor: backgroundColor + '40', // 透明度40%
                                     borderLeftColor: backgroundColor
@@ -497,8 +457,8 @@ export default function CalendarDay({
 
                 {/* 入浴側 */}
                 <div 
-                    className={`flex-1 flex flex-col gap-0.5 border-l border-gray-600 pl-1 transition-colors ${
-                        dragOver ? 'bg-blue-900 bg-opacity-20' : ''
+                    className={`flex-1 flex flex-col gap-0.5 border-l border-gray-600 pl-1 drag-over-zone ${
+                        dragOver ? 'bg-blue-900 bg-opacity-20 dragover' : ''
                     }`}
                 >
                     <div className="text-blue-300 text-[8px] text-center pb-0.5 border-b border-gray-600 font-medium flex justify-between items-center">
@@ -527,7 +487,7 @@ export default function CalendarDay({
                                 key={`${isScheduleFromApi ? 'schedule' : 'resident'}-${item.id}`}
                                 draggable={isScheduleFromApi}
                                 onDragStart={isScheduleFromApi ? (e) => handleScheduleDragStart(e, item) : undefined}
-                                className={`text-[9px] px-1 py-0.5 rounded-sm text-white border-l-2 transition-all hover:-translate-y-px hover:brightness-110 group relative ${
+                                className={`text-[9px] px-1 py-0.5 rounded-sm text-white border-l-2 group relative schedule-item animate-fade-in ${
                                     isScheduleFromApi ? 'cursor-move' : 'cursor-pointer'
                                 }`}
                                 style={{
@@ -620,77 +580,8 @@ export default function CalendarDay({
                 scheduleTypes={scheduleTypes}
                 loading={loading}
             />
-            
-            {/* 確認ダイアログ */}
-            {confirmDialog && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-sm mx-4 shadow-xl">
-                        <div className="text-gray-900 mb-4">
-                            {confirmDialog.message}
-                        </div>
-                        <div className="flex gap-3 justify-end">
-                            <button
-                                onClick={confirmDialog.onCancel}
-                                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                            >
-                                キャンセル
-                            </button>
-                            <button
-                                onClick={confirmDialog.onConfirm}
-                                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-                            >
-                                削除
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-            
-            {/* Toast通知 */}
-            <div className="fixed top-4 right-4 z-50 space-y-2">
-                {notifications.map((notification) => (
-                    <div
-                        key={notification.id}
-                        className={`px-4 py-3 rounded-lg shadow-lg text-white text-sm max-w-sm transform transition-all duration-300 ease-in-out ${
-                            notification.type === 'success' 
-                                ? 'bg-green-600' 
-                                : notification.type === 'error'
-                                ? 'bg-red-600'
-                                : notification.type === 'warning'
-                                ? 'bg-yellow-600'
-                                : 'bg-blue-600'
-                        } animate-slide-in`}
-                    >
-                        <div className="flex items-center gap-2">
-                            {notification.type === 'success' && (
-                                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                            )}
-                            {notification.type === 'error' && (
-                                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                </svg>
-                            )}
-                            {notification.type === 'warning' && (
-                                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                </svg>
-                            )}
-                            <span className="break-words flex-1">{notification.message}</span>
-                            <button
-                                onClick={() => removeNotification(notification.id)}
-                                className="ml-2 text-white hover:text-gray-200 focus:outline-none focus:text-gray-200 transition-colors"
-                                aria-label="通知を閉じる"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
         </div>
     );
-}
+});
+
+export default CalendarDay;

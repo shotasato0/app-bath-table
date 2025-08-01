@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { isSameMonth, isToday, format } from 'date-fns';
 import CalendarDay from './CalendarDay';
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
-export default function CalendarGrid({ 
+const CalendarGrid = memo(function CalendarGrid({ 
     calendarDays, 
     currentDate, 
     selectedDate, 
@@ -15,7 +15,9 @@ export default function CalendarGrid({
     updateSchedule,
     deleteSchedule,
     loading = false,
-    error = null
+    error = null,
+    showNotification,
+    showConfirmDialog
 }) {
     return (
         <div className="flex-1 bg-gray-800 rounded-lg overflow-hidden">
@@ -43,7 +45,7 @@ export default function CalendarGrid({
                     
                     return (
                         <CalendarDay
-                            key={day.toISOString()}
+                            key={format(day, 'yyyy-MM-dd')}
                             date={day}
                             isCurrentMonth={isSameMonth(day, currentDate)}
                             isToday={isToday(day)}
@@ -57,10 +59,14 @@ export default function CalendarGrid({
                             deleteSchedule={deleteSchedule}
                             loading={loading}
                             error={error}
+                            showNotification={showNotification}
+                            showConfirmDialog={showConfirmDialog}
                         />
                     );
                 })}
             </div>
         </div>
     );
-}
+});
+
+export default CalendarGrid;
