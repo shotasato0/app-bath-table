@@ -2,6 +2,18 @@ import { useState, useEffect, useCallback } from 'react';
 import scheduleService from '../services/scheduleService';
 
 /**
+ * 一意な一時IDを生成する関数
+ * @returns {string} 衝突を回避した一時ID
+ */
+const generateUniqueId = () => {
+    const timestamp = Date.now();
+    const randomStr = Math.random().toString(36).substring(2, 11);
+    const performanceTime = performance.now().toString().replace('.', '');
+    const counter = Math.floor(Math.random() * 1000);
+    return `temp_${timestamp}_${randomStr}_${performanceTime}_${counter}`;
+};
+
+/**
  * スケジュール管理用カスタムフック
  * @param {Object} options - オプション設定
  * @returns {Object} スケジュール状態と操作関数
