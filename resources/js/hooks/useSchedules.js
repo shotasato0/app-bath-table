@@ -133,6 +133,9 @@ export const useSchedules = (options = {}) => {
         try {
             const response = await scheduleService.deleteSchedule(scheduleId);
             
+            // データが変更されたためキャッシュをリセット
+            setLastFetchedRange(null);
+            
             // 成功時は月別データを再取得（明示的な年月指定があれば使用）
             if (refreshYear && refreshMonth) {
                 await fetchMonthlySchedules(refreshYear, refreshMonth);
