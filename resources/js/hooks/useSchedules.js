@@ -165,6 +165,12 @@ export const useSchedules = (options = {}) => {
      * 期間指定スケジュール取得（カレンダー表示用）
      */
     const fetchSchedulesByDateRange = useCallback(async (startDate, endDate) => {
+        // 同じ期間での重複取得を防ぐ
+        const rangeKey = `${startDate}-${endDate}`;
+        if (lastFetchedRange === rangeKey && !loading) {
+            return monthlyCalendarData;
+        }
+        
         setLoading(true);
         setError(null);
         
@@ -190,6 +196,7 @@ export const useSchedules = (options = {}) => {
             }));
             
             setMonthlyCalendarData(calendarData);
+            setLastFetchedRange(rangeKey);
             
             return calendarData;
         } catch (error) {
@@ -198,7 +205,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             setLoading(false);
         }
-    }, [handleError]);
+    }, [handleError, lastFetchedRange, loading, monthlyCalendarData]);
 
     /**
      * 月変更
