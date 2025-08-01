@@ -133,18 +133,14 @@ export default function Calendar() {
         }
     };
 
-    // 現在表示中の月の年月を使ってスケジュール操作を行うラッパー関数
+    // カレンダー表示データと同期したスケジュール操作を行うラッパー関数
     const handleCreateSchedule = useCallback(async (scheduleData) => {
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1;
-        return await createSchedule(scheduleData, year, month);
-    }, [createSchedule, currentDate]);
+        return await createSchedule(scheduleData, refreshCalendarData);
+    }, [createSchedule, refreshCalendarData]);
 
     const handleUpdateSchedule = useCallback(async (scheduleId, scheduleData) => {
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1;
-        return await updateSchedule(scheduleId, scheduleData, year, month);
-    }, [updateSchedule, currentDate]);
+        return await updateSchedule(scheduleId, scheduleData, refreshCalendarData);
+    }, [updateSchedule, refreshCalendarData]);
 
     const handleDeleteSchedule = useCallback(async (scheduleId) => {
         const year = currentDate.getFullYear();
