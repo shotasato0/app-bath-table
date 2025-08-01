@@ -158,6 +158,7 @@ export const useSchedules = (options = {}) => {
                     schedules: dayData.schedules.filter(schedule => schedule.id !== tempId)
                 }));
             });
+            setHasOptimisticUpdates(false);
             handleError(error);
             throw error;
         } finally {
@@ -187,6 +188,7 @@ export const useSchedules = (options = {}) => {
         
         // 楽観的更新を実行
         optimisticUpdate();
+        setHasOptimisticUpdates(true);
         
         try {
             setSmartLoading(true);
@@ -194,6 +196,7 @@ export const useSchedules = (options = {}) => {
             
             // データが変更されたためキャッシュをリセット
             setLastFetchedRange(null);
+            setHasOptimisticUpdates(false);
             
             // カスタムリフレッシュコールバックがあれば使用、なければ月別データを再取得
             if (refreshCallback) {
@@ -205,6 +208,7 @@ export const useSchedules = (options = {}) => {
             return response;
         } catch (error) {
             // エラー時は楽観的更新を元に戻すためにデータを再取得
+            setHasOptimisticUpdates(false);
             if (refreshCallback) {
                 await refreshCallback();
             } else {
@@ -242,6 +246,7 @@ export const useSchedules = (options = {}) => {
         
         // 楽観的更新を実行
         optimisticUpdate();
+        setHasOptimisticUpdates(true);
         
         try {
             setSmartLoading(true);
@@ -249,6 +254,7 @@ export const useSchedules = (options = {}) => {
             
             // データが変更されたためキャッシュをリセット
             setLastFetchedRange(null);
+            setHasOptimisticUpdates(false);
             
             // カスタムリフレッシュコールバックがあれば使用、なければ月別データを再取得
             if (refreshCallback) {
@@ -260,6 +266,7 @@ export const useSchedules = (options = {}) => {
             return response;
         } catch (error) {
             // エラー時は楽観的更新を元に戻す
+            setHasOptimisticUpdates(false);
             if (deletedSchedule) {
                 setMonthlyCalendarData(prevData => {
                     return prevData.map(dayData => 
