@@ -4,7 +4,7 @@ import ScheduleModal from './ScheduleModal';
 
 const SAMPLE_EVENTS = {};
 
-export default function CalendarDay({ 
+const CalendarDay = memo(function CalendarDay({ 
     date, 
     isCurrentMonth, 
     isToday, 
