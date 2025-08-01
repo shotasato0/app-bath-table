@@ -117,13 +117,30 @@ export const useSchedules = (options = {}) => {
     }, [fetchMonthlySchedules, handleError, setSmartLoading]);
 
     /**
-     * スケジュール更新
+     * スケジュール更新（楽観的更新対応）
      */
     const updateSchedule = useCallback(async (scheduleId, scheduleData, refreshCallback) => {
-        setSmartLoading(true);
         setError(null);
         
+        // 楽観的更新: 即座に状態を更新
+        const optimisticUpdate = () => {
+            setMonthlyCalendarData(prevData => {
+                return prevData.map(dayData => ({
+                    ...dayData,
+                    schedules: dayData.schedules.map(schedule => 
+                        schedule.id === scheduleId 
+                            ? { ...schedule, ...scheduleData }
+                            : schedule
+                    )
+                }));
+            });
+        };
+        
+        // 楽観的更新を実行
+        optimisticUpdate();
+        
         try {
+            setSmartLoading(true);
             const response = await scheduleService.updateSchedule(scheduleId, scheduleData);
             
             // データが変更されたためキャッシュをリセット
@@ -138,6 +155,12 @@ export const useSchedules = (options = {}) => {
             
             return response;
         } catch (error) {
+            // エラー時は楽観的更新を元に戻すためにデータを再取得
+            if (refreshCallback) {
+                await refreshCallback();
+            } else {
+                await fetchMonthlySchedules();
+            }
             handleError(error);
             throw error;
         } finally {
