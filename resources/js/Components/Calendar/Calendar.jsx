@@ -258,6 +258,8 @@ export default function Calendar() {
                             deleteSchedule={handleDeleteSchedule}
                             loading={schedulesLoading || typesLoading}
                             error={schedulesError || typesError}
+                            showNotification={showNotification}
+                            showConfirmDialog={showConfirmDialog}
                         />
                     </div>
                 </div>
