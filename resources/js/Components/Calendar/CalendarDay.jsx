@@ -699,4 +699,6 @@ const CalendarDay = memo(function CalendarDay({
             </div>
         </div>
     );
-}
+});
+
+export default CalendarDay;
