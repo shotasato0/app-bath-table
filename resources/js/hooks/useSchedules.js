@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import scheduleService from '../services/scheduleService';
 
 /**
@@ -33,6 +33,18 @@ export const useSchedules = (options = {}) => {
     const [currentMonth, setCurrentMonth] = useState(initialMonth);
     const [lastFetchedRange, setLastFetchedRange] = useState(null);
     const [loadingTimeout, setLoadingTimeout] = useState(null);
+    
+    // 無限ループを防ぐためのref
+    const loadingRef = useRef(loading);
+    const monthlyCalendarDataRef = useRef(monthlyCalendarData);
+    const lastFetchedRangeRef = useRef(lastFetchedRange);
+    
+    // refを最新の値に同期
+    useEffect(() => {
+        loadingRef.current = loading;
+        monthlyCalendarDataRef.current = monthlyCalendarData;
+        lastFetchedRangeRef.current = lastFetchedRange;
+    }, [loading, monthlyCalendarData, lastFetchedRange]);
 
     /**
      * エラーハンドリング
