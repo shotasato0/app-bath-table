@@ -67,13 +67,15 @@ export const useSchedules = (options = {}) => {
             setLoadingTimeout(timeout);
         } else {
             // ローディング停止
-            if (loadingTimeout) {
-                clearTimeout(loadingTimeout);
-                setLoadingTimeout(null);
-            }
+            setLoadingTimeout(prevTimeout => {
+                if (prevTimeout) {
+                    clearTimeout(prevTimeout);
+                }
+                return null;
+            });
             setLoading(false);
         }
-    }, [loadingTimeout]);
+    }, []);
 
     /**
      * 月別スケジュールデータ取得
