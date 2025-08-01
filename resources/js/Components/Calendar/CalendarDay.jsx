@@ -533,7 +533,7 @@ const CalendarDay = memo(function CalendarDay({
                                 key={`${isScheduleFromApi ? 'schedule' : 'resident'}-${item.id}`}
                                 draggable={isScheduleFromApi}
                                 onDragStart={isScheduleFromApi ? (e) => handleScheduleDragStart(e, item) : undefined}
-                                className={`text-[9px] px-1 py-0.5 rounded-sm text-white border-l-2 transition-all hover:-translate-y-px hover:brightness-110 group relative ${
+                                className={`text-[9px] px-1 py-0.5 rounded-sm text-white border-l-2 group relative schedule-item animate-fade-in ${
                                     isScheduleFromApi ? 'cursor-move' : 'cursor-pointer'
                                 }`}
                                 style={{
