@@ -30,6 +30,50 @@ export default function Calendar() {
     const [confirmDialog, setConfirmDialog] = useState(null);
     const notificationTimeouts = useRef(new Map());
     
+    // 通知システム（メモリリーク対策付き）
+    const showNotification = useCallback((message, type = 'success') => {
+        const id = Date.now() + Math.random();
+        const notification = { id, message, type };
+        
+        setNotifications(prev => [...prev, notification]);
+        
+        const timeoutId = setTimeout(() => {
+            setNotifications(prev => prev.filter(n => n.id !== id));
+            notificationTimeouts.current.delete(id);
+        }, type === 'error' ? 5000 : 3000);
+        
+        notificationTimeouts.current.set(id, timeoutId);
+    }, []);
+    
+    const removeNotification = useCallback((id) => {
+        setNotifications(prev => prev.filter(n => n.id !== id));
+        const timeoutId = notificationTimeouts.current.get(id);
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+            notificationTimeouts.current.delete(id);
+        }
+    }, []);
+    
+    // 確認ダイアログ表示
+    const showConfirmDialog = useCallback((message, onConfirm) => {
+        setConfirmDialog({
+            message,
+            onConfirm,
+            onCancel: () => setConfirmDialog(null)
+        });
+    }, []);
+    
+    // コンポーネントアンマウント時のクリーンアップ
+    useEffect(() => {
+        return () => {
+            // 全ての通知タイマーをクリアしてメモリリークを防止
+            notificationTimeouts.current.forEach(timeoutId => {
+                clearTimeout(timeoutId);
+            });
+            notificationTimeouts.current.clear();
+        };
+    }, []);
+    
     const {
         monthlyCalendarData,
         loading: schedulesLoading,
