@@ -310,10 +310,10 @@ export const useSchedules = (options = {}) => {
             return monthlyCalendarData;
         }
         
-        // 同じ期間での重複取得を防ぐ（ただし楽観的更新後は強制更新）
+        // 同じ期間での重複取得を防ぐ（ただし楽観的更新中は強制更新）
         const rangeKey = `${startDate}-${endDate}`;
-        if (lastFetchedRange === rangeKey && monthlyCalendarData.length > 0) {
-            // キャッシュが有効な場合のみ返す（楽観的更新でlastFetchedRangeがnullになった場合は強制更新）
+        if (lastFetchedRange === rangeKey && monthlyCalendarData.length > 0 && !hasOptimisticUpdates) {
+            // キャッシュが有効かつ楽観的更新中でない場合のみ返す
             return monthlyCalendarData;
         }
         
