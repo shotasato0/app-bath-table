@@ -130,7 +130,7 @@ export default function Calendar() {
     });
 
     // カレンダー表示範囲のスケジュールデータを取得
-    const refreshCalendarData = useCallback(() => {
+    const refreshCalendarData = useCallback(async () => {
         const monthStart = startOfMonth(currentDate);
         const monthEnd = endOfMonth(currentDate);
         const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
@@ -139,12 +139,23 @@ export default function Calendar() {
         const startDate = format(calendarStart, 'yyyy-MM-dd');
         const endDate = format(calendarEnd, 'yyyy-MM-dd');
         
-        return fetchSchedulesByDateRange(startDate, endDate, true); // 強制更新フラグを追加
-    }, [currentDate, fetchSchedulesByDateRange]);
+        return await fetchSchedulesByDateRange(startDate, endDate, true); // 強制更新フラグを追加
+    }, [currentDate]);
 
+    // 初期データ取得とcurrentDate変更時のデータ取得
     useEffect(() => {
-        refreshCalendarData();
-    }, [refreshCalendarData]);
+        if (fetchSchedulesByDateRange) {
+            const monthStart = startOfMonth(currentDate);
+            const monthEnd = endOfMonth(currentDate);
+            const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+            const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+            
+            const startDate = format(calendarStart, 'yyyy-MM-dd');
+            const endDate = format(calendarEnd, 'yyyy-MM-dd');
+            
+            fetchSchedulesByDateRange(startDate, endDate);
+        }
+    }, [currentDate, fetchSchedulesByDateRange]);
 
     // URLを更新する関数
     const updateURL = (date) => {
