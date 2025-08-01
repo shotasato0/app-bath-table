@@ -140,7 +140,7 @@ export default function Calendar() {
         const endDate = format(calendarEnd, 'yyyy-MM-dd');
         
         return await fetchSchedulesByDateRange(startDate, endDate, true); // 強制更新フラグを追加
-    }, [currentDate]);
+    }, []);
 
     // 初期データ取得とcurrentDate変更時のデータ取得
     useEffect(() => {
