@@ -4,7 +4,7 @@ import CalendarDay from './CalendarDay';
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
-export default function CalendarGrid({ 
+const CalendarGrid = memo(function CalendarGrid({ 
     calendarDays, 
     currentDate, 
     selectedDate, 
