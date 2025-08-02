@@ -401,8 +401,8 @@ const CalendarDay = memo(function CalendarDay({
                 </div>
             </div>
 
-            {/* 日の内容 */}
-            <div className="flex flex-1 gap-1">
+            {/* 日の内容 - 上下分割レイアウト */}
+            <div className="flex flex-col flex-1 calendar-content">
                 {/* 予定側 */}
                 <div className="flex-1 flex flex-col gap-0.5">
                     <div className="text-purple-300 text-[8px] text-center pb-0.5 border-b border-gray-600 font-medium flex justify-between items-center">
