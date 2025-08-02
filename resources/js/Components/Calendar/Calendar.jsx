@@ -258,7 +258,7 @@ export default function Calendar() {
             )}
             
             <div className="container max-w-full mx-auto p-2">
-                <div className="flex gap-3">
+                <div className="flex gap-3 h-[calc(100vh-100px)]">
                     <div className="hidden md:block">
                         <CalendarSidebar 
                             currentDate={currentDate}

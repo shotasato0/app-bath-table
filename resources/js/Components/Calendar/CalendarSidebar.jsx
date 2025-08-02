@@ -9,14 +9,16 @@ export default function CalendarSidebar({
     onMonthChange 
 }) {
     return (
-        <div className="w-60 flex-shrink-0">
+        <div className="w-60 flex-shrink-0 flex flex-col h-full">
             <MiniCalendar 
                 currentDate={currentDate}
                 selectedDate={selectedDate}
                 onDateSelect={onDateSelect}
                 onMonthChange={onMonthChange}
             />
-            <ResidentList />
+            <div className="flex-1 mt-4">
+                <ResidentList />
+            </div>
         </div>
     );
 }
