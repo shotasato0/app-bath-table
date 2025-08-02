@@ -417,7 +417,9 @@ const CalendarDay = memo(function CalendarDay({
                             </svg>
                         </button>
                     </div>
-                    {dayEvents.schedules.map((event) => {
+                    <div className="flex-1 pt-0.5 space-y-0.5">
+                        {/* 表示制限された予定 */}
+                        {dayEvents.schedules.slice(0, MAX_DISPLAY_SCHEDULES).map((event) => {
                         const scheduleType = scheduleTypes.find(type => type.id === event.schedule_type_id);
                         const backgroundColor = scheduleType?.color_code || '#9B59B6';
                         const displayText = event.title || event.text || 'スケジュール';
