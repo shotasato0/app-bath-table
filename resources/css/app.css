@@ -33,17 +33,35 @@
     /* スケジュール項目の滑らかな表示・非表示 */
     .schedule-item {
         transition: all 0.15s ease-in-out;
+    }
+    
+    /* ホバー開始時とアクティブ時のみwill-changeを適用 */
+    .schedule-item:hover,
+    .schedule-item:active,
+    .schedule-item:focus-visible {
+        transform: translateY(-1px);
         will-change: transform, opacity;
     }
     
-    .schedule-item:hover {
-        transform: translateY(-1px);
+    /* アニメーション終了後のwill-changeリセット */
+    .schedule-item:not(:hover):not(:active):not(:focus-visible) {
+        will-change: auto;
     }
     
     /* ドラッグオーバー効果の最適化 */
     .drag-over-zone {
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* インタラクション時のみwill-changeを適用 */
+    .drag-over-zone:hover,
+    .drag-over-zone.dragover {
         will-change: background-color, border-color;
+    }
+    
+    /* インタラクション終了後のwill-changeリセット */
+    .drag-over-zone:not(:hover):not(.dragover) {
+        will-change: auto;
     }
     
     /* ローディングオーバーレイの滑らかな表示 */
