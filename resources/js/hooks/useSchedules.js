@@ -75,7 +75,7 @@ export const useSchedules = (options = {}) => {
             });
             setLoading(false);
         }
-    }, []);
+    }, [loadingTimeout]);
 
     /**
      * 月別スケジュールデータ取得
