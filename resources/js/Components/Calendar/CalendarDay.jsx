@@ -1,6 +1,7 @@
 import React, { useState, useRef, memo } from 'react';
 import { format } from 'date-fns';
 import ScheduleModal from './ScheduleModal';
+import AllSchedulesModal from './AllSchedulesModal';
 
 const SAMPLE_EVENTS = {};
 
@@ -24,7 +25,12 @@ const CalendarDay = memo(function CalendarDay({
     const dragCounter = useRef(0);
     const [showScheduleModal, setShowScheduleModal] = useState(false);
     const [selectedSchedule, setSelectedSchedule] = useState(null);
+    const [showAllSchedulesModal, setShowAllSchedulesModal] = useState(false);
     const dateKey = format(date, 'yyyy-MM-dd');
+    
+    // 表示数制限の設定
+    const MAX_DISPLAY_SCHEDULES = 2; // 一般予定の最大表示数
+    const MAX_DISPLAY_BATHING = 3;   // 入浴予定の最大表示数
     
     /**
      * ユーティリティ関数: APIスケジュールかサンプルデータかを判定
