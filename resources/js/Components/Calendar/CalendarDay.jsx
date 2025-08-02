@@ -30,7 +30,7 @@ const CalendarDay = memo(function CalendarDay({
     
     // 表示数制限の設定
     const MAX_DISPLAY_SCHEDULES = 2; // 一般予定の最大表示数
-    const MAX_DISPLAY_BATHING = 3;   // 入浴予定の最大表示数
+    const MAX_DISPLAY_BATHING = 4;   // 入浴予定の最大表示数
 
     /**
      * ユーティリティ関数: APIスケジュールかサンプルデータかを判定
