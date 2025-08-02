@@ -205,8 +205,8 @@ export default function ResidentList() {
 
     return (
         <>
-            <div className="bg-gray-800 border border-gray-600 rounded-lg h-full flex flex-col">
-                <div className="p-4 border-b border-gray-600">
+            <div className="bg-gray-800 border border-gray-600 rounded-lg flex flex-col">
+                <div className="p-4 border-b border-gray-600 flex-shrink-0">
                     <div className="flex items-center justify-between mb-3">
                         <h3 className="text-sm font-medium text-gray-100">利用者一覧</h3>
                         <div className="flex items-center gap-2">
@@ -247,7 +247,7 @@ export default function ResidentList() {
                     />
                 </div>
                 
-                <div className="p-4 flex-1 overflow-y-auto" style={{ maxHeight: 'calc(10 * 80px)' }}>
+                <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(10 * 80px)' }}>
                     {loading ? (
                         <div className="flex items-center justify-center py-8">
                             <div className="text-gray-400 text-sm">住民データを読み込み中...</div>
