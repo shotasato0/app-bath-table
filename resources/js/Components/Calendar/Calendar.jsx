@@ -259,7 +259,7 @@ export default function Calendar() {
             
             <div className="container max-w-full mx-auto p-2">
                 <div className="flex gap-3 h-[calc(100vh-100px)]">
-                    <div className="hidden md:block">
+                    <div className="hidden md:block w-60 flex-shrink-0 overflow-y-auto bg-gray-900">
                         <CalendarSidebar 
                             currentDate={currentDate}
                             selectedDate={selectedDate}
@@ -267,7 +267,7 @@ export default function Calendar() {
                             onMonthChange={setCurrentDate}
                         />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 overflow-auto">
                         <CalendarGrid 
                             calendarDays={calendarDays}
                             currentDate={currentDate}
