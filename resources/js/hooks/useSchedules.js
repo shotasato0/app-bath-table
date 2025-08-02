@@ -111,7 +111,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [handleError]);
 
     /**
      * スケジュール作成（楽観的更新対応）
@@ -292,7 +292,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [handleError]);
 
     /**
      * 期間指定スケジュール取得（カレンダー表示用）
@@ -348,7 +348,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [handleError]);
 
     /**
      * 月変更
