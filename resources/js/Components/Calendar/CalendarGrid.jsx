@@ -38,7 +38,7 @@ const CalendarGrid = memo(function CalendarGrid({
             </div>
             
             {/* カレンダーグリッド */}
-            <div className="flex flex-wrap w-full flex-1 min-h-0">
+            <div className="flex flex-wrap w-full flex-1 min-h-0 overflow-auto">
                 {calendarDays.map((day, index) => {
                     const dateKey = format(day, 'yyyy-MM-dd');
                     const dayData = monthlyCalendarData.find(data => data.date === dateKey);
