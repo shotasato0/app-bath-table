@@ -94,7 +94,7 @@ export const useSchedules = (options = {}) => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [handleError]);
 
     /**
      * スケジュール一覧取得
