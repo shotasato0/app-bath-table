@@ -311,6 +311,7 @@ const CalendarDay = memo(function CalendarDay({
         <div 
             className={`
                 calendar-day flex flex-col p-3 min-h-[220px] border-r border-b border-gray-600 relative cursor-pointer layout-stable
+                w-[calc(100%/7)] flex-shrink-0
                 ${dayIndex % 7 === 6 ? 'border-r-0' : ''}
                 ${!isCurrentMonth ? 'bg-gray-700' : 'bg-gray-800'}
                 ${isToday ? 'bg-blue-900 bg-opacity-20 border-2 border-blue-600' : ''}
