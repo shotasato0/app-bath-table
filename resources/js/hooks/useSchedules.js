@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import scheduleService from '../services/scheduleService';
 
 /**
@@ -33,7 +33,18 @@ export const useSchedules = (options = {}) => {
     const [currentMonth, setCurrentMonth] = useState(initialMonth);
     const [lastFetchedRange, setLastFetchedRange] = useState(null);
     const [loadingTimeout, setLoadingTimeout] = useState(null);
-    const [hasOptimisticUpdates, setHasOptimisticUpdates] = useState(false);
+    
+    // 無限ループを防ぐためのref
+    const loadingRef = useRef(loading);
+    const monthlyCalendarDataRef = useRef(monthlyCalendarData);
+    const lastFetchedRangeRef = useRef(lastFetchedRange);
+    
+    // refを最新の値に同期
+    useEffect(() => {
+        loadingRef.current = loading;
+        monthlyCalendarDataRef.current = monthlyCalendarData;
+        lastFetchedRangeRef.current = lastFetchedRange;
+    }, [loading, monthlyCalendarData, lastFetchedRange]);
 
     /**
      * エラーハンドリング
@@ -56,10 +67,12 @@ export const useSchedules = (options = {}) => {
             setLoadingTimeout(timeout);
         } else {
             // ローディング停止
-            if (loadingTimeout) {
-                clearTimeout(loadingTimeout);
-                setLoadingTimeout(null);
-            }
+            setLoadingTimeout(prevTimeout => {
+                if (prevTimeout) {
+                    clearTimeout(prevTimeout);
+                }
+                return null;
+            });
             setLoading(false);
         }
     }, [loadingTimeout]);
@@ -132,21 +145,16 @@ export const useSchedules = (options = {}) => {
         
         // 楽観的更新を実行
         optimisticUpdate();
-        setHasOptimisticUpdates(true);
         
         try {
-            setSmartLoading(true);
             const response = await scheduleService.createSchedule(scheduleData);
             
             // データが変更されたためキャッシュをリセット
             setLastFetchedRange(null);
-            setHasOptimisticUpdates(false);
             
-            // カスタムリフレッシュコールバックがあれば使用、なければ月別データを再取得
+            // カスタムリフレッシュコールバックがあれば使用
             if (refreshCallback) {
                 await refreshCallback();
-            } else {
-                await fetchMonthlySchedules();
             }
             
             return response;
@@ -158,13 +166,12 @@ export const useSchedules = (options = {}) => {
                     schedules: dayData.schedules.filter(schedule => schedule.id !== tempId)
                 }));
             });
-            setHasOptimisticUpdates(false);
             handleError(error);
             throw error;
         } finally {
-            setSmartLoading(false);
+            // 楽観的更新では通常ローディング表示は不要
         }
-    }, [fetchMonthlySchedules, handleError, setSmartLoading]);
+    }, []);
 
     /**
      * スケジュール更新（楽観的更新対応）
@@ -188,38 +195,30 @@ export const useSchedules = (options = {}) => {
         
         // 楽観的更新を実行
         optimisticUpdate();
-        setHasOptimisticUpdates(true);
         
         try {
-            setSmartLoading(true);
             const response = await scheduleService.updateSchedule(scheduleId, scheduleData);
             
             // データが変更されたためキャッシュをリセット
             setLastFetchedRange(null);
-            setHasOptimisticUpdates(false);
             
-            // カスタムリフレッシュコールバックがあれば使用、なければ月別データを再取得
+            // カスタムリフレッシュコールバックがあれば使用
             if (refreshCallback) {
                 await refreshCallback();
-            } else {
-                await fetchMonthlySchedules();
             }
             
             return response;
         } catch (error) {
             // エラー時は楽観的更新を元に戻すためにデータを再取得
-            setHasOptimisticUpdates(false);
             if (refreshCallback) {
                 await refreshCallback();
-            } else {
-                await fetchMonthlySchedules();
             }
             handleError(error);
             throw error;
         } finally {
-            setSmartLoading(false);
+            // 楽観的更新では通常ローディング表示は不要
         }
-    }, [fetchMonthlySchedules, handleError, setSmartLoading]);
+    }, []);
 
     /**
      * スケジュール削除（楽観的更新対応）
@@ -246,27 +245,21 @@ export const useSchedules = (options = {}) => {
         
         // 楽観的更新を実行
         optimisticUpdate();
-        setHasOptimisticUpdates(true);
         
         try {
-            setSmartLoading(true);
             const response = await scheduleService.deleteSchedule(scheduleId);
             
             // データが変更されたためキャッシュをリセット
             setLastFetchedRange(null);
-            setHasOptimisticUpdates(false);
             
-            // カスタムリフレッシュコールバックがあれば使用、なければ月別データを再取得
+            // カスタムリフレッシュコールバックがあれば使用
             if (refreshCallback) {
                 await refreshCallback();
-            } else {
-                await fetchMonthlySchedules();
             }
             
             return response;
         } catch (error) {
             // エラー時は楽観的更新を元に戻す
-            setHasOptimisticUpdates(false);
             if (deletedSchedule) {
                 setMonthlyCalendarData(prevData => {
                     return prevData.map(dayData => 
@@ -279,9 +272,9 @@ export const useSchedules = (options = {}) => {
             handleError(error);
             throw error;
         } finally {
-            setSmartLoading(false);
+            // 楽観的更新では通常ローディング表示は不要
         }
-    }, [fetchMonthlySchedules, handleError, setSmartLoading]);
+    }, []);
 
     /**
      * 指定日のスケジュール取得
@@ -304,17 +297,21 @@ export const useSchedules = (options = {}) => {
     /**
      * 期間指定スケジュール取得（カレンダー表示用）
      */
-    const fetchSchedulesByDateRange = useCallback(async (startDate, endDate) => {
+    const fetchSchedulesByDateRange = useCallback(async (startDate, endDate, forceRefresh = false) => {
+        // refから最新の値を取得
+        const currentLoading = loadingRef.current;
+        const currentMonthlyCalendarData = monthlyCalendarDataRef.current;
+        const currentLastFetchedRange = lastFetchedRangeRef.current;
+        
         // ローディング中は重複リクエストを防ぐ
-        if (loading) {
-            return monthlyCalendarData;
+        if (currentLoading) {
+            return currentMonthlyCalendarData;
         }
         
-        // 同じ期間での重複取得を防ぐ（ただし楽観的更新中は強制更新）
+        // 同じ期間での重複取得を防ぐ（強制更新が指定されていない場合のみ）
         const rangeKey = `${startDate}-${endDate}`;
-        if (lastFetchedRange === rangeKey && monthlyCalendarData.length > 0 && !hasOptimisticUpdates) {
-            // キャッシュが有効かつ楽観的更新中でない場合のみ返す
-            return monthlyCalendarData;
+        if (!forceRefresh && currentLastFetchedRange === rangeKey && currentMonthlyCalendarData.length > 0) {
+            return currentMonthlyCalendarData;
         }
         
         setLoading(true);
@@ -351,14 +348,14 @@ export const useSchedules = (options = {}) => {
         } finally {
             setLoading(false);
         }
-    }, [handleError, lastFetchedRange, loading, monthlyCalendarData, hasOptimisticUpdates]);
+    }, [handleError]);
 
     /**
      * 月変更
      */
     const changeMonth = useCallback((year, month) => {
         fetchMonthlySchedules(year, month);
-    }, [fetchMonthlySchedules]);
+    }, []);
 
     /**
      * 初期データ取得

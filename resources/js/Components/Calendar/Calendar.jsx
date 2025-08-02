@@ -29,6 +29,12 @@ export default function Calendar() {
     const [notifications, setNotifications] = useState([]);
     const [confirmDialog, setConfirmDialog] = useState(null);
     const notificationTimeouts = useRef(new Map());
+    const currentDateRef = useRef(currentDate);
+    
+    // refを最新の値に同期
+    useEffect(() => {
+        currentDateRef.current = currentDate;
+    }, [currentDate]);
     
     // 通知システム（メモリリーク対策付き）
     const showNotification = useCallback((message, type = 'success') => {
@@ -130,7 +136,21 @@ export default function Calendar() {
     });
 
     // カレンダー表示範囲のスケジュールデータを取得
-    const refreshCalendarData = useCallback(() => {
+    const refreshCalendarData = useCallback(async () => {
+        const currentDateValue = currentDateRef.current;
+        const monthStart = startOfMonth(currentDateValue);
+        const monthEnd = endOfMonth(currentDateValue);
+        const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+        const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+        
+        const startDate = format(calendarStart, 'yyyy-MM-dd');
+        const endDate = format(calendarEnd, 'yyyy-MM-dd');
+        
+        return await fetchSchedulesByDateRange(startDate, endDate, true); // 強制更新フラグを追加
+    }, []);
+
+    // 初期データ取得とcurrentDate変更時のデータ取得
+    useEffect(() => {
         const monthStart = startOfMonth(currentDate);
         const monthEnd = endOfMonth(currentDate);
         const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
@@ -139,12 +159,8 @@ export default function Calendar() {
         const startDate = format(calendarStart, 'yyyy-MM-dd');
         const endDate = format(calendarEnd, 'yyyy-MM-dd');
         
-        return fetchSchedulesByDateRange(startDate, endDate);
-    }, [currentDate, fetchSchedulesByDateRange]);
-
-    useEffect(() => {
-        refreshCalendarData();
-    }, [refreshCalendarData]);
+        fetchSchedulesByDateRange(startDate, endDate);
+    }, [currentDate]);
 
     // URLを更新する関数
     const updateURL = (date) => {
