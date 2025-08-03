@@ -20,9 +20,9 @@ const CalendarGrid = memo(function CalendarGrid({
     showConfirmDialog
 }) {
     return (
-        <div className="flex-1 bg-gray-800 rounded-lg overflow-hidden">
+        <div className="bg-gray-800 rounded-lg overflow-hidden h-full flex flex-col">
             {/* 曜日ヘッダー */}
-            <div className="flex w-full border-b border-gray-600">
+            <div className="flex w-full border-b border-gray-600 flex-shrink-0">
                 {WEEKDAYS.map((weekday, index) => (
                     <div 
                         key={weekday}
@@ -38,7 +38,7 @@ const CalendarGrid = memo(function CalendarGrid({
             </div>
             
             {/* カレンダーグリッド */}
-            <div className="flex flex-wrap w-full">
+            <div className="flex flex-wrap w-full flex-1 min-h-0 overflow-auto">
                 {calendarDays.map((day, index) => {
                     const dateKey = format(day, 'yyyy-MM-dd');
                     const dayData = monthlyCalendarData.find(data => data.date === dateKey);

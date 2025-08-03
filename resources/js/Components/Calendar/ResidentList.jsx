@@ -205,8 +205,8 @@ export default function ResidentList() {
 
     return (
         <>
-            <div className="bg-gray-800 border border-gray-600 rounded-lg">
-                <div className="p-4 border-b border-gray-600">
+            <div className="bg-gray-800 border border-gray-600 rounded-lg flex flex-col">
+                <div className="p-4 border-b border-gray-600 flex-shrink-0">
                     <div className="flex items-center justify-between mb-3">
                         <h3 className="text-sm font-medium text-gray-100">利用者一覧</h3>
                         <div className="flex items-center gap-2">
@@ -247,7 +247,7 @@ export default function ResidentList() {
                     />
                 </div>
                 
-                <div className="p-4 max-h-96 overflow-y-auto">
+                <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(10 * 80px)' }}>
                     {loading ? (
                         <div className="flex items-center justify-center py-8">
                             <div className="text-gray-400 text-sm">住民データを読み込み中...</div>
@@ -276,61 +276,78 @@ export default function ResidentList() {
                             </div>
                         </div>
                     ) : (
-                        filteredResidents.map((resident) => {
-                            const avatarColor = resident.color || COLORS[resident.id % COLORS.length];
-                            
-                            return (
-                                <div
-                                    key={resident.id}
-                                    draggable
-                                    onDragStart={(e) => handleDragStart(e, resident)}
-                                    onDragEnd={handleDragEnd}
-                                    className={`flex items-center gap-3 p-3 bg-gray-700 border border-gray-600 rounded-md mb-2 cursor-move transition-all hover:bg-gray-600 hover:-translate-y-0.5 hover:shadow-lg group relative ${
-                                        draggedResident === resident.id ? 'opacity-50 scale-95' : ''
-                                    }`}
-                                >
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${avatarColor}`}>
-                                        👤
+                        <div className="space-y-2">
+                            {filteredResidents.map((resident) => {
+                                const avatarColor = resident.color || COLORS[resident.id % COLORS.length];
+                                
+                                return (
+                                    <div
+                                        key={resident.id}
+                                        draggable
+                                        onDragStart={(e) => handleDragStart(e, resident)}
+                                        onDragEnd={handleDragEnd}
+                                        className={`flex items-center gap-3 p-3 bg-gray-700 border border-gray-600 rounded-md cursor-move transition-all hover:bg-gray-600 hover:-translate-y-0.5 hover:shadow-lg group relative ${
+                                            draggedResident === resident.id ? 'opacity-50 scale-95' : ''
+                                        }`}
+                                        style={{ minHeight: '72px' }}
+                                    >
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${avatarColor}`}>
+                                            👤
+                                        </div>
+                                        <div className="flex-1">
+                                            <h4 className="text-sm font-medium text-gray-100">{resident.name}</h4>
+                                            <p className="text-xs text-gray-400">
+                                                {resident.room || (resident.gender && `${resident.gender === 'male' ? '男性' : resident.gender === 'female' ? '女性' : 'その他'}`)}
+                                            </p>
+                                        </div>
+
+                                        {/* 管理ボタン（APIモードの場合のみ表示） */}
+                                        {useApiEndpoint && (
+                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleEditResident(resident);
+                                                    }}
+                                                    className="p-1 text-blue-400 hover:text-blue-300 transition-colors"
+                                                    title="編集"
+                                                >
+                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5h2a2 2 0 012 2v2m-7 7l9-9a2.828 2.828 0 114 4l-9 9H5v-4z" />
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteResident(resident);
+                                                    }}
+                                                    className="p-1 text-red-400 hover:text-red-300 transition-colors"
+                                                    title="削除"
+                                                >
+                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-7 0h10" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-                                <div className="flex-1">
-                                    <h4 className="text-sm font-medium text-gray-100">{resident.name}</h4>
+                                );
+                            })}
+                            
+                            {/* 利用者数表示 */}
+                            {filteredResidents.length > 0 && (
+                                <div className="text-center py-2 border-t border-gray-600 mt-2">
                                     <p className="text-xs text-gray-400">
-                                        {resident.room || (resident.gender && `${resident.gender === 'male' ? '男性' : resident.gender === 'female' ? '女性' : 'その他'}`)}
+                                        {searchTerm ? `検索結果: ${filteredResidents.length}件` : `利用者: ${filteredResidents.length}件`}
+                                        {filteredResidents.length > 10 && (
+                                            <span className="block mt-1 text-yellow-400">
+                                                スクロールして全て表示
+                                            </span>
+                                        )}
                                     </p>
                                 </div>
-
-                                {/* 管理ボタン（APIモードの場合のみ表示） */}
-                                {useApiEndpoint && (
-                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleEditResident(resident);
-                                            }}
-                                            className="p-1 text-blue-400 hover:text-blue-300 transition-colors"
-                                            title="編集"
-                                        >
-                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteResident(resident);
-                                            }}
-                                            className="p-1 text-red-400 hover:text-red-300 transition-colors"
-                                            title="削除"
-                                        >
-                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })
+                            )}
+                        </div>
                     )}
                 </div>
                 
