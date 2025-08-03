@@ -1960,8 +1960,1131 @@ Phase 3では、これらの基盤の上にスケジュールのサンプルデ�
 - **リアルなテストデータの作成手法**
 - **開発効率を向上させるシーダー設計**
 
+### 🛠️ 実装手順 3-1: スケジュールファクトリー作成
+
+#### 1. ScheduleFactory作成
+
+```bash
+./vendor/bin/sail artisan make:factory ScheduleFactory
+```
+
+```php
+// database/factories/ScheduleFactory.php
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\ScheduleType;
+use App\Models\Resident;
+use App\Models\User;
+use Carbon\Carbon;
+
+class ScheduleFactory extends Factory
+{
+    public function definition(): array
+    {
+        $date = $this->faker->dateTimeBetween('now', '+30 days');
+        $startTime = $this->faker->time('H:i', '18:00');
+        $endTime = Carbon::parse($startTime)->addHours(1)->format('H:i');
+
+        return [
+            'title' => $this->faker->randomElement([
+                '入浴サービス',
+                '午前入浴',
+                '午後入浴',
+                '夕方入浴',
+            ]),
+            'description' => $this->faker->optional(0.3)->sentence(),
+            'date' => $date->format('Y-m-d'),
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+            'all_day' => false,
+            'schedule_type_id' => ScheduleType::factory(),
+            'resident_id' => Resident::factory(),
+            'created_by' => User::factory(),
+        ];
+    }
+
+    /**
+     * 入浴スケジュール専用
+     */
+    public function bathingSchedule(): static
+    {
+        return $this->state(function (array $attributes) {
+            $bathType = ScheduleType::where('name', '入浴')->first();
+            
+            return [
+                'title' => $this->faker->randomElement([
+                    '一般浴槽',
+                    '特浴（リフト浴）',
+                    'シャワー浴',
+                    '清拭',
+                ]),
+                'schedule_type_id' => $bathType ? $bathType->id : ScheduleType::factory(),
+                'start_time' => $this->faker->randomElement(['09:00', '10:00', '14:00', '15:00']),
+                'end_time' => $this->faker->randomElement(['10:00', '11:00', '15:00', '16:00']),
+            ];
+        });
+    }
+
+    /**
+     * 特定の日付範囲
+     */
+    public function forDateRange(string $startDate, string $endDate): static
+    {
+        return $this->state(function (array $attributes) use ($startDate, $endDate) {
+            return [
+                'date' => $this->faker->dateTimeBetween($startDate, $endDate)->format('Y-m-d'),
+            ];
+        });
+    }
+
+    /**
+     * 週間スケジュール生成用
+     */
+    public function weeklyPattern(): static
+    {
+        return $this->state(function (array $attributes) {
+            $dayOfWeek = Carbon::parse($attributes['date'])->dayOfWeek;
+            
+            // 月・水・金は入浴日
+            if (in_array($dayOfWeek, [Carbon::MONDAY, Carbon::WEDNESDAY, Carbon::FRIDAY])) {
+                return [
+                    'title' => '定期入浴',
+                    'start_time' => '14:00',
+                    'end_time' => '15:00',
+                ];
+            }
+            
+            return $attributes;
+        });
+    }
+}
+```
+
+#### 2. ResidentFactory作成
+
+```bash
+./vendor/bin/sail artisan make:factory ResidentFactory
+```
+
+```php
+// database/factories/ResidentFactory.php
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Department;
+use Carbon\Carbon;
+
+class ResidentFactory extends Factory
+{
+    public function definition(): array
+    {
+        $names = [
+            '田中 太郎', '佐藤 花子', '山田 次郎', '鈴木 一郎', '高橋 美子',
+            '伊藤 三郎', '渡辺 久子', '中村 良子', '小林 正雄', '加藤 和子',
+            '吉田 春雄', '山本 秋子', '佐々木 冬美', '松本 夏男', '井上 光子',
+        ];
+
+        $medicalInfos = [
+            '糖尿病、高血圧症の既往歴あり。血糖値管理が必要。',
+            '認知症初期段階。見守りが必要。',
+            '脳梗塞の既往歴。右半身に軽度の麻痺あり。',
+            '特記事項なし。自立度高い。',
+            'アルツハイマー型認知症。徘徊リスクあり。',
+            '関節リウマチ。歩行時に介助が必要。',
+            '骨粗鬆症。転倒リスクあり。',
+            '心房細動。抗凝固薬服用中。',
+            '慢性腎臓病。水分制限あり。',
+            '誤嚥性肺炎の既往。食事時要注意。',
+        ];
+
+        return [
+            'name' => $this->faker->randomElement($names),
+            'room_number' => $this->faker->unique()->numerify('##0'),
+            'gender' => $this->faker->randomElement(['male', 'female']),
+            'birth_date' => $this->faker->dateTimeBetween('-100 years', '-65 years'),
+            'medical_info' => $this->faker->randomElement($medicalInfos),
+            'department_id' => Department::factory(),
+            'is_active' => true,
+        ];
+    }
+
+    /**
+     * 入居中の住民
+     */
+    public function active(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'is_active' => true,
+            ];
+        });
+    }
+
+    /**
+     * 男性住民
+     */
+    public function male(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'gender' => 'male',
+            ];
+        });
+    }
+
+    /**
+     * 女性住民
+     */
+    public function female(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'gender' => 'female',
+            ];
+        });
+    }
+}
+```
+
 ---
 
-このようにして、実際の開発履歴に基づいた段階的な学習ガイドを作成することができます。各フェーズで実際に開発者が体験した問題と解決方法を含めることで、未経験者でも実践的なスキルを身につけられる構成になっています。
+### 🛠️ 実装手順 3-2: 実用的なスケジュールシーダー
 
-完全なガイドの作成には相当な時間がかかりますが、このような構造で進めることで、理論だけでなく実際の開発経験に基づいた価値の高い教育資料を作成できます。
+```bash
+./vendor/bin/sail artisan make:seeder ScheduleSeeder
+```
+
+```php
+// database/seeders/ScheduleSeeder.php
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\Schedule;
+use App\Models\ScheduleType;
+use App\Models\Resident;
+use App\Models\User;
+use Carbon\Carbon;
+
+class ScheduleSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // 必要なデータを取得
+        $bathType = ScheduleType::where('name', '入浴')->first();
+        $residents = Resident::active()->get();
+        $staff = User::where('role', 'staff')->first();
+
+        if (!$bathType || $residents->isEmpty() || !$staff) {
+            $this->command->warn('必要なデータが不足しています。DepartmentSeeder, UserSeeder, ResidentSeeder, ScheduleTypeSeederを先に実行してください。');
+            return;
+        }
+
+        $this->command->info('スケジュールサンプルデータを生成中...');
+
+        // 今日から30日間のスケジュール生成
+        $startDate = Carbon::today();
+        $endDate = Carbon::today()->addDays(30);
+
+        $scheduleCount = 0;
+
+        for ($date = $startDate->copy(); $date <= $endDate; $date->addDay()) {
+            // 月・水・金は入浴日として設定
+            if (in_array($date->dayOfWeek, [Carbon::MONDAY, Carbon::WEDNESDAY, Carbon::FRIDAY])) {
+                
+                // 各住民の入浴スケジュールを作成（全員ではなくランダムに選択）
+                $selectedResidents = $residents->random(min(8, $residents->count()));
+                
+                foreach ($selectedResidents as $index => $resident) {
+                    // 時間をずらして入浴スケジュール作成
+                    $startTime = Carbon::parse('09:00')->addMinutes($index * 30);
+                    $endTime = $startTime->copy()->addMinutes(30);
+
+                    Schedule::create([
+                        'title' => $this->getBathTitle($resident),
+                        'description' => $this->getBathDescription($resident),
+                        'date' => $date->format('Y-m-d'),
+                        'start_time' => $startTime->format('H:i'),
+                        'end_time' => $endTime->format('H:i'),
+                        'all_day' => false,
+                        'schedule_type_id' => $bathType->id,
+                        'resident_id' => $resident->id,
+                        'created_by' => $staff->id,
+                    ]);
+
+                    $scheduleCount++;
+                }
+            }
+
+            // 土曜日には一部の住民のみ入浴
+            if ($date->dayOfWeek === Carbon::SATURDAY) {
+                $selectedResidents = $residents->random(min(3, $residents->count()));
+                
+                foreach ($selectedResidents as $index => $resident) {
+                    $startTime = Carbon::parse('10:00')->addMinutes($index * 45);
+                    $endTime = $startTime->copy()->addMinutes(30);
+
+                    Schedule::create([
+                        'title' => '週末入浴',
+                        'description' => '週末の追加入浴サービス',
+                        'date' => $date->format('Y-m-d'),
+                        'start_time' => $startTime->format('H:i'),
+                        'end_time' => $endTime->format('H:i'),
+                        'all_day' => false,
+                        'schedule_type_id' => $bathType->id,
+                        'resident_id' => $resident->id,
+                        'created_by' => $staff->id,
+                    ]);
+
+                    $scheduleCount++;
+                }
+            }
+        }
+
+        // 追加：その他のスケジュール種別のサンプルデータ
+        $this->createOtherSchedules($residents, $staff, $startDate, $endDate);
+
+        $this->command->info("合計 {$scheduleCount} 件の入浴スケジュールを生成しました。");
+    }
+
+    /**
+     * 住民に応じた入浴タイトルを生成
+     */
+    private function getBathTitle(Resident $resident): string
+    {
+        $titles = [
+            '一般浴槽',
+            '特浴（リフト浴）',
+            'シャワー浴',
+        ];
+
+        // 医療情報に基づいて適切な入浴方法を選択
+        if (str_contains($resident->medical_info, '麻痺') || str_contains($resident->medical_info, '関節')) {
+            return '特浴（リフト浴）';
+        }
+
+        if (str_contains($resident->medical_info, '自立度高い')) {
+            return '一般浴槽';
+        }
+
+        return collect($titles)->random();
+    }
+
+    /**
+     * 住民に応じた入浴説明を生成
+     */
+    private function getBathDescription(Resident $resident): string
+    {
+        $descriptions = [
+            '通常の入浴介助を実施',
+            '血圧測定後に入浴開始',
+            '見守りレベルでの入浴支援',
+            'リフト使用での安全入浴',
+            '時間をかけてゆっくりと入浴',
+        ];
+
+        if (str_contains($resident->medical_info, '高血圧')) {
+            return '血圧測定後に入浴開始。長湯に注意。';
+        }
+
+        if (str_contains($resident->medical_info, '麻痺')) {
+            return 'リフト使用での安全入浴。転倒リスクに注意。';
+        }
+
+        if (str_contains($resident->medical_info, '認知症')) {
+            return '見守りレベルでの入浴支援。声かけを多めに。';
+        }
+
+        return collect($descriptions)->random();
+    }
+
+    /**
+     * その他のスケジュール生成
+     */
+    private function createOtherSchedules(
+        $residents, 
+        User $staff, 
+        Carbon $startDate, 
+        Carbon $endDate
+    ): void {
+        $rehaType = ScheduleType::where('name', 'リハビリ')->first();
+        $recreationType = ScheduleType::where('name', 'レクリエーション')->first();
+
+        if (!$rehaType || !$recreationType) {
+            return;
+        }
+
+        // 週2回のリハビリスケジュール（火・木）
+        for ($date = $startDate->copy(); $date <= $endDate; $date->addDay()) {
+            if (in_array($date->dayOfWeek, [Carbon::TUESDAY, Carbon::THURSDAY])) {
+                $selectedResidents = $residents->random(min(5, $residents->count()));
+                
+                foreach ($selectedResidents as $index => $resident) {
+                    $startTime = Carbon::parse('10:00')->addMinutes($index * 20);
+                    $endTime = $startTime->copy()->addMinutes(20);
+
+                    Schedule::create([
+                        'title' => 'リハビリテーション',
+                        'description' => '理学療法・作業療法の実施',
+                        'date' => $date->format('Y-m-d'),
+                        'start_time' => $startTime->format('H:i'),
+                        'end_time' => $endTime->format('H:i'),
+                        'all_day' => false,
+                        'schedule_type_id' => $rehaType->id,
+                        'resident_id' => $resident->id,
+                        'created_by' => $staff->id,
+                    ]);
+                }
+            }
+        }
+
+        // 週1回のレクリエーション（日曜午後）
+        for ($date = $startDate->copy(); $date <= $endDate; $date->addDay()) {
+            if ($date->dayOfWeek === Carbon::SUNDAY) {
+                Schedule::create([
+                    'title' => '集団レクリエーション',
+                    'description' => '歌唱・体操・ゲーム等の集団活動',
+                    'date' => $date->format('Y-m-d'),
+                    'start_time' => '14:00',
+                    'end_time' => '15:30',
+                    'all_day' => false,
+                    'schedule_type_id' => $recreationType->id,
+                    'resident_id' => null, // 全体対象のため住民IDはnull
+                    'created_by' => $staff->id,
+                ]);
+            }
+        }
+    }
+}
+```
+
+---
+
+### 🛠️ 実装手順 3-3: DatabaseSeederの更新
+
+```php
+// database/seeders/DatabaseSeeder.php
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $this->call([
+            DepartmentSeeder::class,
+            UserSeeder::class,
+            ResidentSeeder::class,
+            ScheduleTypeSeeder::class,
+            ScheduleSeeder::class, // 追加
+        ]);
+    }
+}
+```
+
+---
+
+### 🛠️ 実装手順 3-4: 実行とテスト
+
+```bash
+# データベースリセットと再構築
+./vendor/bin/sail artisan migrate:fresh --seed
+
+# または個別にスケジュールシーダーのみ実行
+./vendor/bin/sail artisan db:seed --class=ScheduleSeeder
+
+# データ確認
+./vendor/bin/sail artisan tinker
+```
+
+```php
+// Tinkerでのデータ確認
+>> Schedule::with(['scheduleType', 'resident', 'creator'])->count()
+>> Schedule::with(['scheduleType', 'resident'])->where('date', today())->get()
+>> Schedule::byType(1)->count() // 入浴スケジュールの数
+>> $today = Schedule::byDate(today())->get()
+>> $today->each(function($s) { echo $s->title . ' - ' . $s->resident->name . "\n"; })
+```
+
+---
+
+### 🛠️ 動作確認用コマンド作成
+
+カレンダーデータを簡単に確認できるコマンドを作成します。
+
+```bash
+./vendor/bin/sail artisan make:command ShowScheduleCommand
+```
+
+```php
+// app/Console/Commands/ShowScheduleCommand.php
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use App\Models\Schedule;
+use Carbon\Carbon;
+
+class ShowScheduleCommand extends Command
+{
+    protected $signature = 'schedule:show {date?}';
+    protected $description = 'Show schedules for a specific date';
+
+    public function handle()
+    {
+        $date = $this->argument('date') ?? today()->format('Y-m-d');
+        
+        try {
+            $targetDate = Carbon::parse($date);
+        } catch (\Exception $e) {
+            $this->error('Invalid date format. Please use YYYY-MM-DD format.');
+            return 1;
+        }
+
+        $schedules = Schedule::with(['scheduleType', 'resident', 'creator'])
+            ->byDate($targetDate->format('Y-m-d'))
+            ->orderBy('start_time')
+            ->get();
+
+        if ($schedules->isEmpty()) {
+            $this->info("No schedules found for {$targetDate->format('Y-m-d')}");
+            return 0;
+        }
+
+        $this->info("Schedules for {$targetDate->format('Y-m-d')} ({$targetDate->format('l')}):");
+        $this->line('');
+
+        $headers = ['Time', 'Title', 'Type', 'Resident', 'Created By'];
+        $rows = [];
+
+        foreach ($schedules as $schedule) {
+            $rows[] = [
+                $schedule->formatted_time,
+                $schedule->title,
+                $schedule->scheduleType->name,
+                $schedule->resident ? $schedule->resident->name : '全体',
+                $schedule->creator->name,
+            ];
+        }
+
+        $this->table($headers, $rows);
+        $this->info("Total: {$schedules->count()} schedules");
+
+        return 0;
+    }
+}
+```
+
+### コマンド使用例
+
+```bash
+# 今日のスケジュールを表示
+./vendor/bin/sail artisan schedule:show
+
+# 特定の日付のスケジュールを表示
+./vendor/bin/sail artisan schedule:show 2024-01-15
+
+# 明日のスケジュールを表示
+./vendor/bin/sail artisan schedule:show $(date -d tomorrow +%Y-%m-%d)
+```
+
+---
+
+### Phase 3 完了チェックリスト
+
+- [ ] ScheduleFactory が正常に作成された
+- [ ] ResidentFactory が正常に作成された
+- [ ] ScheduleSeeder で実用的なデータが生成される
+- [ ] 入浴スケジュールが月・水・金に適切に配置される
+- [ ] 住民の医療情報に応じた入浴方法が選択される
+- [ ] その他のスケジュール（リハビリ・レクリエーション）も生成される
+- [ ] schedule:show コマンドでデータ確認ができる
+
+### 学習の振り返り
+
+Phase 3では以下を学習しました：
+- **Factory パターンの実践的活用**
+- **ビジネスロジックを含むシーダー設計**
+- **実際の運用を想定したテストデータ作成**
+- **Artisan コマンドによる開発支援ツール作成**
+
+---
+
+## Phase 4: ダッシュボードUI実装（PR #4相当）
+
+### この段階の目標
+- **Reactを使ったダッシュボード画面の構築**
+- **Inertia.jsでのデータ受け渡しを学ぶ**
+- **Tailwind CSSによるレスポンシブデザイン実装**
+- **コンポーネント設計の基礎を身につける**
+
+### 実装する機能
+1. 認証後のダッシュボード画面
+2. 今日のスケジュール表示
+3. 住民一覧カード表示
+4. 基本的なナビゲーション
+
+### 学習ポイント
+- **React コンポーネントの設計パターン**
+- **Inertia.js でのデータフェッチング**
+- **Tailwind CSS Grid/Flexbox レイアウト**
+- **条件分岐によるUIの出し分け**
+
+---
+
+### 🛠️ 実装手順 4-1: ダッシュボードコントローラー作成
+
+```bash
+./vendor/bin/sail artisan make:controller DashboardController
+```
+
+```php
+// app/Http/Controllers/DashboardController.php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use App\Models\Schedule;
+use App\Models\Resident;
+use App\Models\User;
+use Carbon\Carbon;
+
+class DashboardController extends Controller
+{
+    public function index(Request $request)
+    {
+        $user = $request->user();
+        $today = Carbon::today();
+
+        // 今日のスケジュール取得
+        $todaySchedules = Schedule::with(['scheduleType', 'resident', 'creator'])
+            ->byDate($today->format('Y-m-d'))
+            ->orderBy('start_time')
+            ->get();
+
+        // アクティブな住民取得
+        $residents = Resident::with('department')
+            ->active()
+            ->orderByRoom()
+            ->get();
+
+        // 統計データ
+        $stats = [
+            'total_residents' => $residents->count(),
+            'today_schedules' => $todaySchedules->count(),
+            'bath_schedules_today' => $todaySchedules->where('scheduleType.name', '入浴')->count(),
+            'total_staff' => User::where('role', '!=', 'viewer')->count(),
+        ];
+
+        // 週間スケジュール概要（今日含む7日間）
+        $weekSchedules = Schedule::with(['scheduleType', 'resident'])
+            ->byDateRange($today->format('Y-m-d'), $today->addDays(6)->format('Y-m-d'))
+            ->get()
+            ->groupBy('date');
+
+        return Inertia::render('Dashboard', [
+            'user' => $user->load('department'),
+            'todaySchedules' => $todaySchedules,
+            'residents' => $residents,
+            'stats' => $stats,
+            'weekSchedules' => $weekSchedules,
+            'currentDate' => $today->format('Y-m-d'),
+            'currentDateFormatted' => $today->format('Y年n月j日（D）'),
+        ]);
+    }
+}
+```
+
+---
+
+### 🛠️ 実装手順 4-2: ルート設定
+
+```php
+// routes/web.php に追加
+<?php
+
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+use App\Http\Controllers\DashboardController;
+
+Route::get('/', function () {
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // 他の認証必須ルート
+});
+
+require __DIR__.'/auth.php';
+```
+
+---
+
+### 🛠️ 実装手順 4-3: ダッシュボードコンポーネント作成
+
+```jsx
+// resources/js/Pages/Dashboard.jsx
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head } from '@inertiajs/react';
+import TodaySchedules from '@/Components/Dashboard/TodaySchedules';
+import ResidentsList from '@/Components/Dashboard/ResidentsList';
+import StatCards from '@/Components/Dashboard/StatCards';
+import WeeklyOverview from '@/Components/Dashboard/WeeklyOverview';
+
+export default function Dashboard({ 
+    user, 
+    todaySchedules, 
+    residents, 
+    stats, 
+    weekSchedules, 
+    currentDate, 
+    currentDateFormatted 
+}) {
+    return (
+        <AuthenticatedLayout
+            user={user}
+            header={
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                            ダッシュボード
+                        </h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                            {currentDateFormatted}
+                        </p>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-sm text-gray-600">
+                            ログイン中: {user.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                            {user.department?.department_name}
+                        </p>
+                    </div>
+                </div>
+            }
+        >
+            <Head title="ダッシュボード" />
+
+            <div className="py-6">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+                    
+                    {/* 統計カード */}
+                    <StatCards stats={stats} />
+                    
+                    {/* メインコンテンツエリア */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        {/* 今日のスケジュール */}
+                        <div className="lg:col-span-2">
+                            <TodaySchedules 
+                                schedules={todaySchedules} 
+                                currentDate={currentDateFormatted}
+                            />
+                        </div>
+                        
+                        {/* 住民一覧 */}
+                        <div className="lg:col-span-1">
+                            <ResidentsList residents={residents} />
+                        </div>
+                    </div>
+                    
+                    {/* 週間概要 */}
+                    <WeeklyOverview 
+                        weekSchedules={weekSchedules} 
+                        currentDate={currentDate}
+                    />
+                </div>
+            </div>
+        </AuthenticatedLayout>
+    );
+}
+```
+
+---
+
+### 🛠️ 実装手順 4-4: ダッシュボードコンポーネント作成
+
+#### 1. 統計カードコンポーネント
+
+```jsx
+// resources/js/Components/Dashboard/StatCards.jsx
+export default function StatCards({ stats }) {
+    const cards = [
+        {
+            title: '入居住民数',
+            value: stats.total_residents,
+            icon: '👥',
+            color: 'bg-blue-500',
+            bgColor: 'bg-blue-50',
+            textColor: 'text-blue-700'
+        },
+        {
+            title: '本日のスケジュール',
+            value: stats.today_schedules,
+            icon: '📅',
+            color: 'bg-green-500',
+            bgColor: 'bg-green-50',
+            textColor: 'text-green-700'
+        },
+        {
+            title: '本日の入浴予定',
+            value: stats.bath_schedules_today,
+            icon: '🛁',
+            color: 'bg-purple-500',
+            bgColor: 'bg-purple-50',
+            textColor: 'text-purple-700'
+        },
+        {
+            title: '職員数',
+            value: stats.total_staff,
+            icon: '👨‍⚕️',
+            color: 'bg-orange-500',
+            bgColor: 'bg-orange-50',
+            textColor: 'text-orange-700'
+        }
+    ];
+
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {cards.map((card, index) => (
+                <div key={index} className={`${card.bgColor} rounded-lg p-6 border border-gray-200`}>
+                    <div className="flex items-center">
+                        <div className={`${card.color} rounded-lg p-3 text-white text-2xl mr-4`}>
+                            {card.icon}
+                        </div>
+                        <div className="flex-1">
+                            <p className={`text-sm font-medium ${card.textColor} opacity-75`}>
+                                {card.title}
+                            </p>
+                            <p className={`text-3xl font-bold ${card.textColor}`}>
+                                {card.value}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+}
+```
+
+#### 2. 今日のスケジュールコンポーネント
+
+```jsx
+// resources/js/Components/Dashboard/TodaySchedules.jsx
+export default function TodaySchedules({ schedules, currentDate }) {
+    const getTypeColor = (typeName) => {
+        const colors = {
+            '入浴': 'bg-blue-100 text-blue-800 border-blue-200',
+            'リハビリ': 'bg-green-100 text-green-800 border-green-200',
+            'レクリエーション': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+            '医療行為': 'bg-red-100 text-red-800 border-red-200',
+            '面会': 'bg-purple-100 text-purple-800 border-purple-200',
+        };
+        return colors[typeName] || 'bg-gray-100 text-gray-800 border-gray-200';
+    };
+
+    return (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900">
+                    今日のスケジュール
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">
+                    {currentDate} • {schedules.length}件
+                </p>
+            </div>
+            
+            <div className="p-6">
+                {schedules.length === 0 ? (
+                    <div className="text-center py-8">
+                        <div className="text-4xl mb-4">📅</div>
+                        <p className="text-gray-500">今日のスケジュールはありません</p>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        {schedules.map((schedule) => (
+                            <div 
+                                key={schedule.id} 
+                                className="flex items-start space-x-4 p-4 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors"
+                            >
+                                <div className="flex-shrink-0 text-sm font-medium text-gray-600 min-w-[80px]">
+                                    {schedule.start_time} - {schedule.end_time}
+                                </div>
+                                
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center space-x-2 mb-2">
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getTypeColor(schedule.schedule_type.name)}`}>
+                                            {schedule.schedule_type.name}
+                                        </span>
+                                        <h4 className="font-medium text-gray-900 truncate">
+                                            {schedule.title}
+                                        </h4>
+                                    </div>
+                                    
+                                    <div className="flex items-center text-sm text-gray-600">
+                                        <span className="mr-2">👤</span>
+                                        <span>
+                                            {schedule.resident ? schedule.resident.name : '全体対象'}
+                                        </span>
+                                        {schedule.resident?.room_number && (
+                                            <span className="ml-2 text-xs bg-gray-100 px-2 py-0.5 rounded">
+                                                {schedule.resident.room_number}号室
+                                            </span>
+                                        )}
+                                    </div>
+                                    
+                                    {schedule.description && (
+                                        <p className="text-sm text-gray-500 mt-1 truncate">
+                                            {schedule.description}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+```
+
+#### 3. 住民一覧コンポーネント
+
+```jsx
+// resources/js/Components/Dashboard/ResidentsList.jsx
+export default function ResidentsList({ residents }) {
+    const getGenderIcon = (gender) => {
+        return gender === 'male' ? '👨' : gender === 'female' ? '👩' : '👤';
+    };
+
+    const getAge = (birthDate) => {
+        if (!birthDate) return '';
+        const birth = new Date(birthDate);
+        const today = new Date();
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+            age--;
+        }
+        return age;
+    };
+
+    return (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900">
+                    入居住民一覧
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">
+                    {residents.length}名の住民
+                </p>
+            </div>
+            
+            <div className="p-6">
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {residents.map((resident) => (
+                        <div 
+                            key={resident.id} 
+                            className="flex items-center space-x-3 p-3 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors"
+                        >
+                            <div className="flex-shrink-0 text-2xl">
+                                {getGenderIcon(resident.gender)}
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center space-x-2">
+                                    <h4 className="font-medium text-gray-900 truncate">
+                                        {resident.name}
+                                    </h4>
+                                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                                        {resident.room_number}号室
+                                    </span>
+                                </div>
+                                
+                                <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
+                                    {resident.birth_date && (
+                                        <span>{getAge(resident.birth_date)}歳</span>
+                                    )}
+                                    <span>•</span>
+                                    <span>{resident.department?.department_name}</span>
+                                </div>
+                                
+                                {resident.medical_info && (
+                                    <p className="text-xs text-gray-500 mt-1 truncate">
+                                        {resident.medical_info}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+```
+
+#### 4. 週間概要コンポーネント
+
+```jsx
+// resources/js/Components/Dashboard/WeeklyOverview.jsx
+export default function WeeklyOverview({ weekSchedules, currentDate }) {
+    const getDayOfWeek = (dateString) => {
+        const days = ['日', '月', '火', '水', '木', '金', '土'];
+        const date = new Date(dateString);
+        return days[date.getDay()];
+    };
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return `${date.getMonth() + 1}/${date.getDate()}`;
+    };
+
+    const isToday = (dateString) => {
+        return dateString === currentDate;
+    };
+
+    // 7日間の日付を生成
+    const generateWeekDates = () => {
+        const dates = [];
+        const start = new Date(currentDate);
+        
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(start);
+            date.setDate(start.getDate() + i);
+            dates.push(date.toISOString().split('T')[0]);
+        }
+        
+        return dates;
+    };
+
+    const weekDates = generateWeekDates();
+
+    return (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900">
+                    今週のスケジュール概要
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">
+                    7日間のスケジュール件数
+                </p>
+            </div>
+            
+            <div className="p-6">
+                <div className="grid grid-cols-7 gap-4">
+                    {weekDates.map((date) => {
+                        const daySchedules = weekSchedules[date] || [];
+                        const bathCount = daySchedules.filter(s => s.schedule_type.name === '入浴').length;
+                        const totalCount = daySchedules.length;
+                        
+                        return (
+                            <div 
+                                key={date} 
+                                className={`text-center p-4 rounded-lg border transition-colors ${
+                                    isToday(date) 
+                                        ? 'border-blue-300 bg-blue-50' 
+                                        : 'border-gray-200 hover:border-gray-300'
+                                }`}
+                            >
+                                <div className={`text-sm font-medium mb-2 ${
+                                    isToday(date) ? 'text-blue-700' : 'text-gray-700'
+                                }`}>
+                                    {getDayOfWeek(date)}
+                                </div>
+                                <div className={`text-lg font-bold mb-1 ${
+                                    isToday(date) ? 'text-blue-900' : 'text-gray-900'
+                                }`}>
+                                    {formatDate(date)}
+                                </div>
+                                
+                                <div className="space-y-1">
+                                    <div className="text-xs text-gray-600">
+                                        全{totalCount}件
+                                    </div>
+                                    {bathCount > 0 && (
+                                        <div className="text-xs text-blue-600">
+                                            🛁 {bathCount}件
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                {isToday(date) && (
+                                    <div className="mt-2">
+                                        <span className="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+}
+```
+
+---
+
+### 🛠️ 実装手順 4-5: 動作確認
+
+```bash
+# 開発サーバー起動
+./vendor/bin/sail up -d
+npm run dev
+
+# ブラウザで確認
+# http://localhost/login でログイン
+# http://localhost/dashboard でダッシュボード表示
+```
+
+### 確認項目
+- [ ] ログイン後にダッシュボードが表示される
+- [ ] 統計カードに正しい数値が表示される
+- [ ] 今日のスケジュールが時系列で表示される
+- [ ] 住民一覧がカード形式で表示される
+- [ ] 週間概要で7日間のスケジュール件数が確認できる
+- [ ] レスポンシブデザインが機能する
+
+---
+
+### Phase 4 完了チェックリスト
+
+- [ ] DashboardController が正常に動作する
+- [ ] Inertia.js でデータが正しく渡される
+- [ ] React コンポーネントが適切に分割されている
+- [ ] Tailwind CSS でレスポンシブレイアウトが実装されている
+- [ ] 各コンポーネントが再利用可能な設計になっている
+
+### 学習の振り返り
+
+Phase 4では以下を学習しました：
+- **Inertia.js を使ったデータ受け渡し**
+- **React コンポーネントの分割と再利用設計**
+- **Tailwind CSS による効率的なスタイリング**
+- **条件分岐を使った動的UI表示**
+- **Laravel Eloquent のリレーション活用**
+
+Phase 5では、このダッシュボードを基にカレンダー機能の実装に進みます。
