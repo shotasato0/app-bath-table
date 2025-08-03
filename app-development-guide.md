@@ -245,139 +245,245 @@ touch resources/js/Components/Calendar/AllSchedulesModal.jsx
 
 **ファイル**: `resources/js/Components/Calendar/AllSchedulesModal.jsx`
 
-**以下の内容をコピペ**:
-
-### 3. モーダル機能の実装（中優先度）
-
-#### 3.1 全スケジュール表示モーダル
-**ファイル**: `resources/js/Components/Calendar/AllSchedulesModal.jsx`
-
-React Portalを使用したモーダル実装：
-
 ```javascript
+import React from 'react';
 import { createPortal } from 'react-dom';
+import { format } from 'date-fns';
 
-export default function AllSchedulesModal({ isOpen, onClose, ... }) {
-  if (!isOpen) return null;
-  
-  const modalContent = (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[9999]">
-      {/* モーダル内容 */}
-    </div>
-  );
-  
-  return createPortal(modalContent, document.body);
+export default function AllSchedulesModal({ 
+    isOpen, 
+    onClose, 
+    date, 
+    schedules, 
+    bathingSchedules, 
+    scheduleTypes,
+    onEditSchedule,
+    onDeleteSchedule,
+    showConfirmDialog
+}) {
+    if (!isOpen) return null;
+
+    const modalContent = (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[9999]" onClick={onClose}>
+            <div 
+                className="bg-gray-800 rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-600"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-semibold text-gray-100">
+                        {format(date, 'M月d日')} の全スケジュール
+                    </h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-200">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                {schedules.length === 0 && bathingSchedules.length === 0 && (
+                    <div className="text-center py-8">
+                        <svg className="mx-auto w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                        <div className="text-gray-400">この日にはスケジュールがありません</div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+
+    return createPortal(modalContent, document.body);
 }
 ```
 
-### 4. UIコンポーネントの改善（中優先度）
+---
 
-#### 4.1 住民リストの制限表示
-**ファイル**: `resources/js/Components/Calendar/ResidentList.jsx`
+## 🔧 STEP 4: カレンダーグリッド修正（30分）
 
+### 4.1 CalendarGrid.jsxの修正
+
+**ファイル**: `resources/js/Components/Calendar/CalendarGrid.jsx`
+
+以下の部分を探して置き換え：
+
+**変更前** (レイアウト部分):
 ```javascript
-<div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(10 * 80px)' }}>
-  {/* 最大10人表示、それ以上はスクロール */}
+<div className="bg-gray-800 rounded-lg overflow-hidden">
+```
+
+**変更後**:
+```javascript
+<div className="bg-gray-800 rounded-lg overflow-hidden h-full flex flex-col">
+    {/* 曜日ヘッダー - 固定 */}
+    <div className="flex w-full border-b border-gray-600 flex-shrink-0">
+        {WEEKDAYS.map((weekday, index) => (
+            <div key={weekday} className="flex-1 p-4 text-center font-medium text-sm">
+                {weekday}
+            </div>
+        ))}
+    </div>
+    
+    {/* カレンダーグリッド - スクロール可能 */}
+    <div className="flex flex-wrap w-full flex-1 min-h-0 overflow-auto">
+        {/* ここにCalendarDayコンポーネント */}
+    </div>
 </div>
 ```
 
-#### 4.2 アクセシビリティ対応（SVGアイコン化）
-絵文字をSVGアイコンに置換してスクリーンリーダー対応：
+### 4.2 動作確認
 
-```javascript
-// 絵文字：📋 → SVGアイコン
-<svg className="w-4 h-4 text-purple-300" aria-hidden="true" focusable="false">
-  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-        d="M9 4h6a2 2 0 012 2v2a2 2 0 01-2 2H9a2 2 0 01-2-2V6a2 2 0 012-2z..." />
-</svg>
+```bash
+# ページを再読み込み
+# カレンダーが正しく7日間×週数で表示されることを確認
 ```
 
-### 5. バグ修正とパフォーマンス最適化（低優先度）
+---
 
-#### 5.1 ドラッグ&ドロップの最適化
-- `will-change`プロパティの適用タイミング制限
-- ドラッグオーバー状態の適切な管理
-- メモリリーク対策
+## 🏠 STEP 5: サイドバー修正（30分）
 
-#### 5.2 楽観的更新の実装
-- スケジュール操作時の即座なUI反映
-- エラー時のロールバック処理
-- キャッシュ制御の最適化
+### 5.1 Calendar.jsxのレイアウト修正
 
-## 避けるべき実装・不要な作業
+**ファイル**: `resources/js/Components/Calendar/Calendar.jsx`
 
-### 1. 過度な最適化
-- 初期段階でのパフォーマンス最適化
-- 複雑なキャッシュ戦略
-- 不要なuseMemoやuseCallback
+以下の部分を探して修正：
 
-### 2. 機能の先走り実装
-- zoom toggle機能（現在未使用）
-- 複雑な権限管理
-- 高度な検索・フィルタリング
-
-### 3. UI/UXの過度な調整
-- 細かなアニメーション
-- 複雑なレスポンシブデザイン
-- カスタムテーマ機能
-
-## 重要な技術的ポイント
-
-### 1. React Hooks の依存配列管理
+**変更前**:
 ```javascript
-// 正しい依存配列の指定
-const fetchData = useCallback(async () => {
-  // 処理
-}, [handleError, otherDependency]); // すべての依存値を含める
+<div className="container mx-auto p-2">
+    <div className="flex gap-3">
 ```
 
-### 2. Flexbox レイアウト戦略
+**変更後**:
 ```javascript
-// 高さ制御とスクロールの組み合わせ
-className="h-full flex flex-col"     // 親：フル高さのflex
-className="flex-shrink-0"            // ヘッダー：縮小禁止
-className="flex-1 overflow-auto"     // コンテンツ：拡張＋スクロール
+<div className="container max-w-full mx-auto p-2">
+    <div className="flex gap-3 h-[calc(100vh-100px)]">
+        <div className="hidden md:block w-60 flex-shrink-0 overflow-y-auto bg-gray-900">
+            {/* サイドバー */}
+        </div>
+        <div className="flex-1 overflow-auto">
+            {/* カレンダー */}
+        </div>
+    </div>
+</div>
 ```
 
-### 3. React Portal の活用
+---
+
+## 🎨 STEP 6: 住民リスト改善（15分）
+
+### 6.1 ResidentList.jsxの修正
+
+**ファイル**: `resources/js/Components/Calendar/ResidentList.jsx`
+
+以下の部分を探して修正：
+
+**変更前**:
 ```javascript
-// モーダルの適切な実装
-return createPortal(modalContent, document.body);
+<div className="p-4">
 ```
 
-## テスト・デバッグのポイント
+**変更後**:
+```javascript
+<div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(10 * 80px)' }}>
+```
 
-### 1. 必須確認項目
-- [ ] useSchedules.jsの依存配列修正
-- [ ] カレンダーグリッドの7日間表示
-- [ ] スクロール機能の動作
-- [ ] モーダルの表示・非表示
-- [ ] ドラッグ&ドロップ機能
+---
 
-### 2. レスポンシブ確認
-- [ ] モバイル表示（768px未満）
-- [ ] タブレット表示（768px-1024px）
-- [ ] デスクトップ表示（1024px以上）
+## ✅ STEP 7: 最終確認とテスト（30分）
 
-### 3. アクセシビリティ確認
-- [ ] スクリーンリーダーでの読み上げ
-- [ ] キーボードナビゲーション
-- [ ] コントラスト比の確認
+### 7.1 動作確認チェックリスト
 
-## 開発時間の目安
+```bash
+# 開発サーバーが起動していることを確認
+npm run dev
+```
 
-| 項目 | 時間 | 優先度 |
-|------|------|--------|
-| useSchedules修正 | 30分 | 最高 |
-| カレンダーレイアウト変更 | 2-3時間 | 高 |
-| モーダル実装 | 1-2時間 | 中 |
-| SVGアイコン化 | 1時間 | 中 |
-| バグ修正・最適化 | 2-4時間 | 低 |
+**必須チェック項目**:
 
-**総開発時間**: 約6-10時間
+- [ ] **カレンダー表示**: 7日×週数で正しく表示される
+- [ ] **スクロール機能**: サイドバーとカレンダーが独立してスクロールする
+- [ ] **住民リスト**: 最大10人表示、それ以上はスクロール
+- [ ] **上下分割**: 各日に「予定」「入浴」セクションが表示される
+- [ ] **SVGアイコン**: クリップボードと入浴アイコンが表示される
+- [ ] **レスポンシブ**: モバイルでサイドバーが隠れる
 
-## まとめ
+### 7.2 エラー確認
 
-このガイドに従って開発を進めることで、効率的かつ安定したシステムを構築できます。特にuseSchedules.jsの修正は最優先で行い、その後段階的にUI改善を進めることを推奨します。
+```bash
+# コンソールエラーがないか確認
+# ブラウザのDevToolsを開いてConsoleタブを確認
 
-過度な最適化や機能追加は避け、まず安定動作する基盤を構築してから必要に応じて機能拡張を検討してください。
+# ビルドエラーがないか確認
+npm run build
+```
+
+### 7.3 コミット
+
+```bash
+# 変更をステージング
+git add .
+
+# コミット
+git commit -m "feat: 入浴スケジュール管理システムの基本機能実装
+
+- useSchedules.jsのクロージャ問題を修正
+- カレンダーレイアウトを上下分割に変更
+- モーダル機能を追加
+- レスポンシブレイアウトを実装
+- アクセシビリティを改善（SVGアイコン化）"
+
+# メインブランチにマージ（必要に応じて）
+git checkout main
+git merge feature/bathing-schedule-system
+```
+
+---
+
+## 🚨 トラブルシューティング
+
+### よくあるエラーと解決方法
+
+#### 1. カレンダーが正しく表示されない
+```bash
+# node_modulesを再インストール
+rm -rf node_modules package-lock.json
+npm install
+npm run dev
+```
+
+#### 2. モーダルが表示されない
+- React Portalの`createPortal`が正しくインポートされているか確認
+- z-indexが`z-[9999]`になっているか確認
+
+#### 3. スクロールが効かない
+- 親要素に`height`が設定されているか確認
+- `overflow-auto`が正しく設定されているか確認
+
+#### 4. レスポンシブが効かない
+- Tailwind CSSが正しく読み込まれているか確認
+- `md:block`などのブレークポイントが正しく設定されているか確認
+
+---
+
+## 🎯 完成！
+
+おめでとうございます！これで入浴スケジュール管理システムの基本機能が完成しました。
+
+**実装された機能**:
+- ✅ 安定したカレンダー表示
+- ✅ 上下分割レイアウト
+- ✅ 独立スクロール機能
+- ✅ モーダル表示
+- ✅ レスポンシブデザイン
+- ✅ アクセシビリティ対応
+
+**今後の拡張可能な機能**:
+- ドラッグ&ドロップ機能
+- スケジュール作成・編集機能
+- 住民管理機能
+- データの永続化
+
+このシステムを基盤として、必要に応じて機能を追加していけます！
