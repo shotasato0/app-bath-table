@@ -38,7 +38,7 @@
 ```
 
 ### 技術スタック
-- **バックエンド**: Laravel 11 (PHP)
+- **バックエンド**: Laravel 12 (PHP)
 - **フロントエンド**: React + Inertia.js
 - **スタイリング**: Tailwind CSS
 - **データベース**: MySQL/PostgreSQL
@@ -64,7 +64,7 @@
 
 #### 1. 基本環境
 ```bash
-# PHP 8.1以上
+# PHP 8.2以上
 php --version
 
 # Composer（PHPパッケージマネージャー）
@@ -99,7 +99,7 @@ cd care-facility-calendar
 
 # Laravel Breezeインストール（認証機能）
 composer require laravel/breeze --dev
-php artisan breeze:install react
+./vendor/bin/sail artisan breeze:install react
 npm install && npm run build
 
 # データベース設定
@@ -108,29 +108,29 @@ php artisan key:generate
 
 # .envファイル編集（データベース設定）
 DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
+DB_HOST=mysql
 DB_PORT=3306
 DB_DATABASE=care_facility_calendar
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
+DB_USERNAME=sail
+DB_PASSWORD=password
 ```
 
 #### STEP 2: 開発環境起動確認（15分）
 
 ```bash
+# Sailを起動
+./vendor/bin/sail up -d
+
 # データベースマイグレーション
-php artisan migrate
+./vendor/bin/sail artisan migrate
 
-# 開発サーバー起動
-php artisan serve
-
-# 別ターミナルでフロントエンド開発サーバー
+# フロントエンド開発サーバー
 npm run dev
 ```
 
 **確認項目**:
-- [ ] http://localhost:8000 でWelcome画面が表示される
-- [ ] http://localhost:8000/register で登録画面が表示される
+- [ ] http://localhost でWelcome画面が表示される
+- [ ] http://localhost/register で登録画面が表示される
 - [ ] 新規ユーザー登録とログインができる
 
 ---
@@ -169,7 +169,7 @@ npm run dev
 
 **1. マイグレーション作成**
 ```bash
-php artisan make:migration create_departments_table
+./vendor/bin/sail artisan make:migration create_departments_table
 ```
 
 **2. マイグレーションファイル編集**
@@ -204,7 +204,7 @@ return new class extends Migration
 
 **3. モデル作成**
 ```bash
-php artisan make:model Department
+./vendor/bin/sail artisan make:model Department
 ```
 
 ```php
@@ -240,7 +240,7 @@ class Department extends Model
 
 **4. コントローラー作成**
 ```bash
-php artisan make:controller DepartmentController --resource
+./vendor/bin/sail artisan make:controller DepartmentController --resource
 ```
 
 ```php
@@ -295,7 +295,7 @@ class DepartmentController extends Controller
 
 **5. シーダー作成**
 ```bash
-php artisan make:seeder DepartmentSeeder
+./vendor/bin/sail artisan make:seeder DepartmentSeeder
 ```
 
 ```php
@@ -329,13 +329,13 @@ class DepartmentSeeder extends Seeder
 **6. 実行とテスト**
 ```bash
 # マイグレーション実行
-php artisan migrate
+./vendor/bin/sail artisan migrate
 
 # シーダー実行
-php artisan db:seed --class=DepartmentSeeder
+./vendor/bin/sail artisan db:seed --class=DepartmentSeeder
 
 # 動作確認
-php artisan tinker
+./vendor/bin/sail artisan tinker
 # >> Department::all()
 # >> Department::find(1)->users
 ```
@@ -365,7 +365,7 @@ php artisan tinker
 
 **1. ユーザーテーブル拡張マイグレーション**
 ```bash
-php artisan make:migration modify_users_table_for_staff
+./vendor/bin/sail artisan make:migration modify_users_table_for_staff
 ```
 
 ```php
@@ -469,7 +469,7 @@ class User extends Authenticatable
 
 **3. ユーザーシーダー作成**
 ```bash
-php artisan make:seeder UserSeeder
+./vendor/bin/sail artisan make:seeder UserSeeder
 ```
 
 ```php
@@ -535,7 +535,7 @@ class UserSeeder extends Seeder
 
 **1. マイグレーション作成**
 ```bash
-php artisan make:migration create_residents_table
+./vendor/bin/sail artisan make:migration create_residents_table
 ```
 
 ```php
@@ -711,7 +711,7 @@ class ResidentSeeder extends Seeder
 #### 1. スケジュール種別テーブル
 
 ```bash
-php artisan make:migration create_schedule_types_table
+./vendor/bin/sail artisan make:migration create_schedule_types_table
 ```
 
 ```php
@@ -834,7 +834,7 @@ class ScheduleTypeSeeder extends Seeder
 #### 2. カレンダー日付テーブル
 
 ```bash
-php artisan make:migration create_calendar_dates_table
+./vendor/bin/sail artisan make:migration create_calendar_dates_table
 ```
 
 ```php
@@ -875,7 +875,7 @@ return new class extends Migration
 #### 3. メインスケジュールテーブル
 
 ```bash
-php artisan make:migration create_schedules_table
+./vendor/bin/sail artisan make:migration create_schedules_table
 ```
 
 ```php
@@ -1003,7 +1003,7 @@ class Schedule extends Model
 ### 🛠️ 実装手順 1-5: 権限管理機能
 
 ```bash
-php artisan make:migration create_permissions_table
+./vendor/bin/sail artisan make:migration create_permissions_table
 ```
 
 ```php
@@ -1045,21 +1045,21 @@ return new class extends Migration
 
 ```bash
 # 全マイグレーション実行
-php artisan migrate
+./vendor/bin/sail artisan migrate
 
 # 全シーダー実行
-php artisan db:seed
+./vendor/bin/sail artisan db:seed
 
 # 或いは個別に実行
-php artisan db:seed --class=DepartmentSeeder
-php artisan db:seed --class=UserSeeder
-php artisan db:seed --class=ResidentSeeder
-php artisan db:seed --class=ScheduleTypeSeeder
+./vendor/bin/sail artisan db:seed --class=DepartmentSeeder
+./vendor/bin/sail artisan db:seed --class=UserSeeder
+./vendor/bin/sail artisan db:seed --class=ResidentSeeder
+./vendor/bin/sail artisan db:seed --class=ScheduleTypeSeeder
 ```
 
 ### 動作確認
 ```bash
-php artisan tinker
+./vendor/bin/sail artisan tinker
 
 # データ確認
 >> Department::with('users', 'residents')->get()
@@ -1894,8 +1894,8 @@ class RegisteredUserController extends Controller
 ### 動作確認
 
 ```bash
-# 開発サーバー起動
-php artisan serve
+# Sailを起動
+./vendor/bin/sail up -d
 npm run dev
 
 # 確認項目
