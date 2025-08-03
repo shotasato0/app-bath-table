@@ -70,7 +70,7 @@ php --version
 # Composer（PHPパッケージマネージャー）
 composer --version
 
-# Node.js 18以上
+# Node.js 20以上
 node --version
 npm --version
 
