@@ -1,77 +1,251 @@
-# 入浴スケジュール管理システム開発ガイド
+# 入浴スケジュール管理システム 実装手順書
 
-このドキュメントは、入浴スケジュール管理システムの開発で実際に実装した機能と最適な開発手順をまとめたものです。
+## 🎯 このガイドの使い方
 
-## システム概要
+この手順書は**コピペで実装できる**ように設計されています。
+上から順番に実行すれば、約6-10時間で完成したシステムが手に入ります。
 
-React + Laravel Inertia.jsベースの介護施設向け入浴スケジュール管理システム。カレンダーUIでの直感的なスケジュール管理と住民管理機能を提供。
+## 📋 事前準備
 
-## 開発の優先順位と最適手順
+```bash
+# プロジェクトディレクトリに移動
+cd /path/to/your/project
 
-### 1. 基盤修正（必須・最優先）
+# 現在のブランチを確認
+git branch
 
-#### 1.1 useSchedules.jsのクロージャ問題修正
+# 新しいブランチを作成（推奨）
+git checkout -b feature/bathing-schedule-system
+```
+
+---
+
+## 🚨 STEP 1: 致命的バグ修正（必須・15分）
+
+### 1.1 useSchedules.jsファイルを開く
+
+```bash
+# エディタでファイルを開く
+code resources/js/hooks/useSchedules.js
+# または
+vim resources/js/hooks/useSchedules.js
+```
+
+### 1.2 fetchMonthlySchedules関数の修正
+
 **ファイル**: `resources/js/hooks/useSchedules.js`
 
-以下4つの関数の依存配列にhandleErrorを追加：
-- `fetchMonthlySchedules`
-- `fetchSchedules` 
-- `getSchedulesByDate`
-- `fetchSchedulesByDateRange`
-
+以下の行を探す：
 ```javascript
-// 修正例
 const fetchMonthlySchedules = useCallback(async (year, month) => {
-  // ... 処理
-}, [handleError]); // handleErrorを依存配列に追加
 ```
 
-**理由**: クロージャによる古い状態参照を防ぎ、メモリリークとバグを防止
+その関数の最後の `}, [` 部分を以下に変更：
 
-### 2. カレンダーレイアウト改善（高優先度）
+**変更前**:
+```javascript
+}, []);
+```
 
-#### 2.1 上下分割レイアウトの実装
+**変更後**:
+```javascript
+}, [handleError]);
+```
+
+### 1.3 fetchSchedules関数の修正
+
+以下の行を探す：
+```javascript
+const fetchSchedules = useCallback(async () => {
+```
+
+その関数の最後の依存配列を修正：
+
+**変更前**:
+```javascript
+}, []);
+```
+
+**変更後**:
+```javascript
+}, [handleError]);
+```
+
+### 1.4 getSchedulesByDate関数の修正
+
+以下の行を探す：
+```javascript
+const getSchedulesByDate = useCallback((date) => {
+```
+
+その関数の最後の依存配列を修正：
+
+**変更前**:
+```javascript
+}, [schedules]);
+```
+
+**変更後**:
+```javascript
+}, [schedules, handleError]);
+```
+
+### 1.5 fetchSchedulesByDateRange関数の修正
+
+以下の行を探す：
+```javascript
+const fetchSchedulesByDateRange = useCallback(async (startDate, endDate, forceRefresh = false) => {
+```
+
+その関数の最後の依存配列を修正：
+
+**変更前**:
+```javascript
+}, []);
+```
+
+**変更後**:
+```javascript
+}, [handleError]);
+```
+
+### 1.6 保存して確認
+
+```bash
+# ファイルを保存後、構文エラーがないか確認
+npm run dev
+```
+
+---
+
+## 📊 STEP 2: カレンダーレイアウト変更（1-2時間）
+
+### 2.1 CalendarDay.jsxの完全書き換え
+
 **ファイル**: `resources/js/Components/Calendar/CalendarDay.jsx`
 
-- 従来の左右分割から上下分割に変更
-- 上部：一般予定（最大2件表示）
-- 下部：入浴予定（最大4件表示）
-- 表示制限超過時は「他X件」ボタンで全件表示モーダル
-
 ```javascript
-// 表示数制限の設定
-const MAX_DISPLAY_SCHEDULES = 2; // 一般予定
-const MAX_DISPLAY_BATHING = 4;   // 入浴予定
+import React, { useState, useRef, memo } from 'react';
+import { format } from 'date-fns';
+import ScheduleModal from './ScheduleModal';
+import AllSchedulesModal from './AllSchedulesModal';
+
+const SAMPLE_EVENTS = {};
+
+const CalendarDay = memo(function CalendarDay({ 
+    date, 
+    isCurrentMonth, 
+    isToday, 
+    isSelected, 
+    onClick, 
+    dayIndex,
+    schedules = [],
+    scheduleTypes = [],
+    createSchedule,
+    updateSchedule,
+    deleteSchedule,
+    loading = false,
+    showNotification,
+    showConfirmDialog
+}) {
+    const [dragOver, setDragOver] = useState(false);
+    const dragCounter = useRef(0);
+    const [showScheduleModal, setShowScheduleModal] = useState(false);
+    const [selectedSchedule, setSelectedSchedule] = useState(null);
+    const [showAllSchedulesModal, setShowAllSchedulesModal] = useState(false);
+    const dateKey = format(date, 'yyyy-MM-dd');
+    
+    // 表示数制限の設定
+    const MAX_DISPLAY_SCHEDULES = 2; // 一般予定の最大表示数
+    const MAX_DISPLAY_BATHING = 4;   // 入浴予定の最大表示数
+
+    // ここに他の関数をコピペ（長いので次のセクションで追加）
+
+    return (
+        <div 
+            className={`
+                calendar-day flex flex-col p-3 min-h-[220px] border-r border-b border-gray-600 relative cursor-pointer layout-stable
+                w-[calc(100%/7)] flex-shrink-0
+                ${dayIndex % 7 === 6 ? 'border-r-0' : ''}
+                ${!isCurrentMonth ? 'bg-gray-700' : 'bg-gray-800'}
+                ${isToday ? 'bg-blue-900 bg-opacity-20 border-2 border-blue-600' : ''}
+                ${isSelected ? 'ring-2 ring-blue-500' : ''}
+            `}
+            onClick={onClick}
+        >
+            {/* 日付ヘッダー */}
+            <div className="flex justify-between items-center mb-3 min-h-[24px]">
+                <div className={`text-lg font-semibold ${
+                    !isCurrentMonth ? 'text-gray-500' : 
+                    isToday ? 'text-blue-400' : 
+                    'text-gray-100'
+                }`}>
+                    {format(date, 'd')}
+                </div>
+            </div>
+
+            {/* 上下分割レイアウト */}
+            <div className="flex flex-col flex-1">
+                {/* 上部：予定セクション */}
+                <div className="flex-1 flex flex-col">
+                    <div className="text-purple-300 text-xs text-center pb-1 border-b border-gray-600 font-semibold flex justify-between items-center">
+                        <span className="flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 4h6a2 2 0 012 2v2a2 2 0 01-2 2H9a2 2 0 01-2-2V6a2 2 0 012-2z" />
+                            </svg>
+                            予定
+                        </span>
+                    </div>
+                </div>
+
+                {/* 下部：入浴セクション */}
+                <div className="flex-1 flex flex-col border-t border-gray-600 pt-1 mt-1">
+                    <div className="text-blue-300 text-xs text-center pb-1 border-b border-gray-600 font-semibold flex justify-between items-center">
+                        <span className="flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 3a5 5 0 015 5 5 5 0 015-5 5 5 0 00-5 5 5 5 0 00-5-5z" />
+                            </svg>
+                            入浴
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+});
+
+export default CalendarDay;
 ```
 
-#### 2.2 レスポンシブレイアウトの最適化
-**ファイル**: `resources/js/Components/Calendar/CalendarGrid.jsx`
+### 2.2 動作確認
 
-```javascript
-// Flexレイアウトの実装
-<div className="bg-gray-800 rounded-lg overflow-hidden h-full flex flex-col">
-  <div className="flex w-full border-b border-gray-600 flex-shrink-0">
-    {/* 固定曜日ヘッダー */}
-  </div>
-  <div className="flex flex-wrap w-full flex-1 min-h-0 overflow-auto">
-    {/* スクロール可能なカレンダーグリッド */}
-  </div>
-</div>
+```bash
+# 開発サーバーを起動
+npm run dev
+
+# ブラウザでアクセス
+# http://localhost:3000/calendar
 ```
 
-#### 2.3 独立スクロール機能の実装
-**ファイル**: `resources/js/Components/Calendar/Calendar.jsx`
+**確認項目**:
+- [ ] カレンダーが7日間表示される
+- [ ] 各日に「予定」「入浴」セクションが表示される
+- [ ] SVGアイコンが正しく表示される
 
-```javascript
-<div className="flex gap-3 h-[calc(100vh-100px)]">
-  <div className="hidden md:block w-60 flex-shrink-0 overflow-y-auto bg-gray-900">
-    {/* サイドバー独立スクロール */}
-  </div>
-  <div className="flex-1 overflow-auto">
-    {/* カレンダー独立スクロール */}
-  </div>
-</div>
+---
+
+## 🎭 STEP 3: モーダル機能追加（1-2時間）
+
+### 3.1 AllSchedulesModal.jsxファイル作成
+
+```bash
+# 新しいファイルを作成
+touch resources/js/Components/Calendar/AllSchedulesModal.jsx
 ```
+
+**ファイル**: `resources/js/Components/Calendar/AllSchedulesModal.jsx`
+
+**以下の内容をコピペ**:
 
 ### 3. モーダル機能の実装（中優先度）
 
