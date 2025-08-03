@@ -83,7 +83,6 @@ npm run dev
 
 - [🗃️ データベース設計](docs/development/database.md)
 - [🌱 シーダーとテストデータ](docs/development/seeding.md)
-- [🧪 テスト実行方法](docs/development/testing.md)
 
 ### 🛠️ 運用・トラブルシューティング
 
