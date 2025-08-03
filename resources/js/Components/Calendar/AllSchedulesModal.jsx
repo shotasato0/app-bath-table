@@ -71,7 +71,21 @@ export default function AllSchedulesModal({
                 {schedules.length > 0 && (
                     <div className="mb-6">
                         <h3 className="text-lg font-medium text-purple-300 mb-3 flex items-center">
-                            <span className="mr-2">📋</span>
+                            <svg
+                                className="mr-2 w-5 h-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
+                            >
+                                <title>クリップボード</title>
+                                <rect x="9" y="2" width="6" height="4" rx="1" />
+                                <path d="M4 7v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7" />
+                                <path d="M9 2h6" />
+                            </svg>
                             予定 ({schedules.length}件)
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -145,7 +159,19 @@ export default function AllSchedulesModal({
                 {bathingSchedules.length > 0 && (
                     <div>
                         <h3 className="text-lg font-medium text-blue-300 mb-3 flex items-center">
-                            <span className="mr-2">🛁</span>
+                            <svg
+                                className="mr-2 w-5 h-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
+                            >
+                                <title>入浴</title>
+                                <path d="M8 3a5 5 0 015 5 5 5 0 015-5 5 5 0 00-5 5 5 5 0 00-5-5zM3 21v-6a3 3 0 113 3H3z" />
+                            </svg>
                             入浴 ({bathingSchedules.length}件)
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -221,7 +247,22 @@ export default function AllSchedulesModal({
                 {/* スケジュールがない場合 */}
                 {schedules.length === 0 && bathingSchedules.length === 0 && (
                     <div className="text-center py-8">
-                        <div className="text-gray-400 text-lg mb-2">📅</div>
+                        <svg
+                            className="mx-auto w-8 h-8 text-gray-400 mb-2"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                        >
+                            <title>カレンダー</title>
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
                         <div className="text-gray-400">この日にはスケジュールがありません</div>
                     </div>
                 )}
