@@ -344,7 +344,20 @@ const CalendarDay = memo(function CalendarDay({
                 {/* 上部：予定セクション */}
                 <div className="flex-1 flex flex-col calendar-section">
                     <div className="text-purple-300 text-xs text-center pb-1 border-b border-gray-600 font-semibold flex justify-between items-center calendar-section-header">
-                        <span>📋 予定</span>
+                        <span className="flex items-center gap-1">
+                            <svg
+                                className="w-4 h-4 text-purple-300"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 4h6a2 2 0 012 2v2a2 2 0 01-2 2H9a2 2 0 01-2-2V6a2 2 0 012-2zm0 0V2a2 2 0 012-2h2a2 2 0 012 2v2m-6 0h6m-6 0a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V6a2 2 0 00-2-2H9z" />
+                            </svg>
+                            予定
+                        </span>
                         <button
                             onClick={handleCreateSchedule}
                             className="text-purple-400 hover:text-purple-300 transition-colors"
@@ -422,7 +435,20 @@ const CalendarDay = memo(function CalendarDay({
                     }`}
                 >
                     <div className="text-blue-300 text-xs text-center pb-1 border-b border-gray-600 font-semibold flex justify-between items-center calendar-section-header">
-                        <span>🛁 入浴</span>
+                        <span className="flex items-center gap-1">
+                            <svg
+                                className="w-4 h-4 text-blue-300"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 3a5 5 0 015 5 5 5 0 015-5 5 5 0 00-5 5 5 5 0 00-5-5zM3 21v-6a3 3 0 113 3H3z" />
+                            </svg>
+                            入浴
+                        </span>
                         <button
                             onClick={handleCreateBathingSchedule}
                             className="text-blue-400 hover:text-blue-300 transition-colors"
