@@ -363,12 +363,18 @@ class ScheduleTypeSeeder extends Seeder
 
 class ScheduleSeeder extends Seeder
 {
+    // スケジュールタイプ名の定数定義
+    const SCHEDULE_TYPE_BATH = '入浴';
+    const SCHEDULE_TYPE_REHAB = 'リハビリ';
+    const SCHEDULE_TYPE_RECREATION = 'レクリエーション';
+    const SCHEDULE_TYPE_MEDICAL = '医療行為';
+
     public function run(): void
     {
         // 必要なデータを取得
-        $bathType = ScheduleType::where('name', '入浴')->first();
-        $rehaType = ScheduleType::where('name', 'リハビリ')->first();
-        $recreationType = ScheduleType::where('name', 'レクリエーション')->first();
+        $bathType = ScheduleType::where('name', self::SCHEDULE_TYPE_BATH)->first();
+        $rehaType = ScheduleType::where('name', self::SCHEDULE_TYPE_REHAB)->first();
+        $recreationType = ScheduleType::where('name', self::SCHEDULE_TYPE_RECREATION)->first();
         
         $residents = Resident::active()->get();
         $staff = User::where('role', 'staff')->first();
