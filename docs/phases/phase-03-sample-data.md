@@ -145,7 +145,7 @@ class ScheduleSeeder extends Seeder
 
         for ($date = $startDate->copy(); $date <= $endDate; $date->addDay()) {
             // 月・水・金は入浴日（実際の介護施設のパターン）
-            if (in_array($date->dayOfWeek, [Carbon::MONDAY, Carbon::WEDNESDAY, Carbon::FRIDAY])) {
+            if (in_array($date->dayOfWeek, [Carbon::MONDAY, Carbon::WEDNESDAY, Carbon::FRIDAY]) && $bathType) {
                 $scheduleCount += $this->createBathSchedules($date, $bathType, $residents, $staff);
             }
 
