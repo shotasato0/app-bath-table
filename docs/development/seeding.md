@@ -369,6 +369,26 @@ class ScheduleSeeder extends Seeder
     const SCHEDULE_TYPE_RECREATION = 'レクリエーション';
     const SCHEDULE_TYPE_MEDICAL = '医療行為';
 
+    // 入浴タイプの定数定義
+    const BATH_TYPE_SPECIAL = '特浴（リフト浴）';
+    const BATH_TYPE_GENERAL = '一般浴槽';
+    const BATH_TYPE_SHOWER = 'シャワー浴';
+
+    // その他のスケジュールタイトル定数
+    const TITLE_REHABILITATION = 'リハビリテーション';
+    
+    // レクリエーション活動の定数
+    const RECREATION_ACTIVITIES = [
+        '集団レクリエーション',
+        '歌唱会',
+        '体操教室',
+        '手工芸教室',
+        'ゲーム大会',
+        '映画鑑賞会',
+        '読書会',
+        '園芸活動',
+    ];
+
     public function run(): void
     {
         // 必要なデータを取得
