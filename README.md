@@ -1,61 +1,147 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 介護施設カレンダーアプリ
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 📋 プロジェクト概要
 
-## About Laravel
+**介護施設向け入浴スケジュール管理システム**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Laravel 12 + React + Inertia.js で構築された、介護施設での住民の入浴スケジュールを効率的に管理するWebアプリケーションです。
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 🎯 主な機能
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- 📅 **カレンダー型UI**でのスケジュール管理
+- 👥 **住民管理機能**とドラッグ&ドロップによる直感的操作
+- 🔐 **職員認証システム**と権限管理
+- 📱 **レスポンシブデザイン**でモバイル対応
+- 🛁 **入浴スケジュール**の最適化と重複防止
 
-## Learning Laravel
+### 🏗️ 技術スタック
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **バックエンド**: Laravel 12 (PHP 8.2+)
+- **フロントエンド**: React 18 + Inertia.js
+- **スタイリング**: Tailwind CSS
+- **データベース**: MySQL/PostgreSQL
+- **認証**: Laravel Breeze
+- **開発環境**: Laravel Sail (Docker)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🚀 クイックスタート
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 前提条件
 
-## Laravel Sponsors
+- Docker & Docker Compose
+- Node.js 20+
+- Composer
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### セットアップ
 
-### Premium Partners
+```bash
+# リポジトリクローン
+git clone <repository-url>
+cd app-bath-table
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# 環境設定
+cp .env.example .env
 
-## Contributing
+# Sailによる環境構築
+./vendor/bin/sail up -d
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 依存関係インストール
+./vendor/bin/sail composer install
+npm install
 
-## Code of Conduct
+# データベース準備
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate --seed
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# 開発サーバー起動
+npm run dev
+```
 
-## Security Vulnerabilities
+### アクセス
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **アプリケーション**: http://localhost
+- **phpMyAdmin**: http://localhost:8080
 
-## License
+### デフォルトユーザー
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- **管理者**: admin / password
+- **一般職員**: nurse01 / password
+
+## 📚 ドキュメント
+
+### 🔧 セットアップ・環境構築
+
+- [📋 必要な環境・ソフトウェア](docs/setup/prerequisites.md)
+- [🐳 Laravel Sail による環境構築](docs/setup/environment.md)
+
+### ⚙️ 機能仕様・実装ガイド
+
+- [🔐 認証システム](docs/features/auth.md)
+- [📊 ダッシュボード機能](docs/features/dashboard.md)
+- [📅 カレンダー機能](docs/features/calendar.md)
+
+### 👩‍💻 開発ガイド
+
+- [🗃️ データベース設計](docs/development/database.md)
+- [🌱 シーダーとテストデータ](docs/development/seeding.md)
+
+### 🛠️ 運用・トラブルシューティング
+
+- [📝 Artisanコマンド一覧](docs/operations/commands.md)
+- [🔧 よくあるトラブルと対処法](docs/operations/troubleshooting.md)
+
+## 📈 開発の進め方
+
+このプロジェクトは **段階的な実装アプローチ** を採用しています：
+
+1. **Phase 1**: データベース基盤構築
+2. **Phase 2**: 認証システムカスタマイズ  
+3. **Phase 3**: サンプルデータ作成
+4. **Phase 4**: ダッシュボードUI実装
+5. **Phase 5**: カレンダーUI基盤実装
+6. **Phase 6**: スケジュール編集機能（予定）
+
+各段階の詳細な実装手順は [開発ガイド](docs/development/) を参照してください。
+
+## 🔍 主要なコマンド
+
+```bash
+# 開発環境起動
+./vendor/bin/sail up -d
+
+# データベースリセット
+./vendor/bin/sail artisan migrate:fresh --seed
+
+# テスト実行
+./vendor/bin/sail test
+
+# スケジュール確認
+./vendor/bin/sail artisan schedule:show
+
+# コードスタイル修正
+./vendor/bin/sail composer pint
+```
+
+## 🤝 コントリビューション
+
+1. フィーチャーブランチを作成
+2. 変更を実装
+3. テストを確認
+4. プルリクエストを作成
+
+詳細は [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+
+## 📄 ライセンス
+
+このプロジェクトは [MIT License](LICENSE) の下で公開されています。
+
+## 🆘 サポート
+
+質問や問題がある場合は、以下をご確認ください：
+
+1. [トラブルシューティングガイド](docs/operations/troubleshooting.md)
+2. [Issue](https://github.com/username/app-bath-table/issues) の作成
+3. [Discussion](https://github.com/username/app-bath-table/discussions) での議論
+
+---
+
+**🏥 介護業界のDXを推進し、職員の皆さんがより利用者ケアに集中できる環境づくりを目指しています。**
