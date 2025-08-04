@@ -608,7 +608,7 @@ class ShowSchedules extends Command
 >> Schedule::count()
 => 150
 
->> Schedule::whereHas('scheduleType', fn($q) => $q->where('name', '入浴'))->count()
+>> Schedule::whereHas('scheduleType', fn($q) => $q->where('name', ScheduleSeeder::SCHEDULE_TYPE_BATH))->count()
 => 60
 
 >> Resident::count()
