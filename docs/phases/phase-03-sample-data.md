@@ -120,6 +120,26 @@ class ScheduleSeeder extends Seeder
     const SCHEDULE_TYPE_RECREATION = 'レクリエーション';
     const SCHEDULE_TYPE_MEDICAL = '医療行為';
 
+    // 入浴タイプの定数定義
+    const BATH_TYPE_SPECIAL = '特浴（リフト浴）';
+    const BATH_TYPE_GENERAL = '一般浴槽';
+    const BATH_TYPE_SHOWER = 'シャワー浴';
+
+    // その他のスケジュールタイトル定数
+    const TITLE_REHABILITATION = 'リハビリテーション';
+    
+    // レクリエーション活動の定数
+    const RECREATION_ACTIVITIES = [
+        '集団レクリエーション',
+        '歌唱会',
+        '体操教室',
+        '手工芸教室',
+        'ゲーム大会',
+        '映画鑑賞会',
+        '読書会',
+        '園芸活動',
+    ];
+
     public function run(): void
     {
         // 必要なデータを取得
@@ -223,7 +243,7 @@ class ScheduleSeeder extends Seeder
             $endTime = $startTime->copy()->addMinutes(20);
 
             Schedule::create([
-                'title' => 'リハビリテーション',
+                'title' => self::TITLE_REHABILITATION,
                 'description' => $this->getRehabDescription($resident),
                 'date' => $date->format('Y-m-d'),
                 'start_time' => $startTime->format('H:i'),
@@ -245,16 +265,7 @@ class ScheduleSeeder extends Seeder
      */
     private function createRecreationSchedules(Carbon $date, ScheduleType $recreationType, User $staff): int
     {
-        $activities = [
-            '集団レクリエーション',
-            '歌唱会',
-            '体操教室',
-            '手工芸教室',
-            'ゲーム大会',
-            '映画鑑賞会',
-            '読書会',
-            '園芸活動',
-        ];
+        $activities = self::RECREATION_ACTIVITIES;
 
         Schedule::create([
             'title' => collect($activities)->random(),
@@ -310,14 +321,18 @@ class ScheduleSeeder extends Seeder
     private function getBathTitle(Resident $resident): string
     {
         if (str_contains($resident->medical_info, '麻痺') || str_contains($resident->medical_info, '関節')) {
-            return '特浴（リフト浴）';
+            return self::BATH_TYPE_SPECIAL;
         }
 
         if (str_contains($resident->medical_info, '自立度高い')) {
-            return '一般浴槽';
+            return self::BATH_TYPE_GENERAL;
         }
 
-        return collect(['一般浴槽', '特浴（リフト浴）', 'シャワー浴'])->random();
+        return collect([
+            self::BATH_TYPE_GENERAL, 
+            self::BATH_TYPE_SPECIAL, 
+            self::BATH_TYPE_SHOWER
+        ])->random();
     }
 
     /**
