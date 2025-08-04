@@ -38,6 +38,15 @@
 ```php
 // app/Http/Controllers/ResidentController.php
 
+use App\Http\Controllers\Controller;
+use App\Models\Resident;
+use App\Models\Department;
+use App\Models\Schedule;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
+use Carbon\Carbon;
+
 class ResidentController extends Controller
 {
     public function index(Request $request)
@@ -138,6 +147,7 @@ class ResidentController extends Controller
                 'nullable',
                 'string',
                 'max:20',
+                // 更新時: 自身のIDは除外してユニークチェック
                 Rule::unique('residents')->ignore($resident->id),
             ],
             'gender' => 'nullable|in:male,female,other',
