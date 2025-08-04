@@ -133,6 +133,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import Checkbox from '@/Components/Checkbox';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Login({ status, canResetPassword }) {
@@ -246,6 +247,14 @@ export default function Login({ status, canResetPassword }) {
 
 ```jsx
 // resources/js/Pages/Auth/Register.jsx
+
+import { useEffect } from 'react';
+import GuestLayout from '@/Layouts/GuestLayout';
+import InputError from '@/Components/InputError';
+import InputLabel from '@/Components/InputLabel';
+import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Register({ departments }) {
     const { data, setData, post, processing, errors, reset } = useForm({
