@@ -80,6 +80,10 @@ export default function CalendarIndex({ events, residents }) {
 // ✅ 修正後のコード
 // resources/js/Pages/Calendar/Index.jsx
 
+// useState: ローディング・エラー状態管理
+// useEffect: 副作用処理（データ取得・クリーンアップ）
+// useCallback: 関数メモ化（無限ループ防止）
+// useRef: タイムアウトID管理（DOM参照ではなく値の保持用）
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 export default function CalendarIndex({ events, residents }) {
