@@ -132,6 +132,17 @@ class CalendarController extends Controller
             'recreation_schedules' => $schedules->where('scheduleType.name', 'レクリエーション')->count(),
         ];
     }
+
+    // 🔮 将来的な拡張メソッド（Phase 5で実装予定）
+    // public function week(Request $request)
+    // {
+    //     // 週表示用のロジック
+    // }
+    
+    // public function show(Request $request, $date)
+    // {
+    //     // 特定日の詳細表示ロジック
+    // }
 }
 ```
 
@@ -145,8 +156,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // カレンダー関連ルート
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
-    Route::get('/calendar/week', [CalendarController::class, 'week'])->name('calendar.week');
-    Route::get('/calendar/{date}', [CalendarController::class, 'show'])->name('calendar.show');
+    
+    // 注意: この段階では基本的なindex表示のみ実装
+    // week/show メソッドは将来的な拡張として予約
+    // Route::get('/calendar/week', [CalendarController::class, 'week'])->name('calendar.week');
+    // Route::get('/calendar/{date}', [CalendarController::class, 'show'])->name('calendar.show');
 });
 ```
 
