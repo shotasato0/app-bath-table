@@ -691,8 +691,8 @@ Phase 3 が完了したら、以下を確認してください：
 ./vendor/bin/sail artisan tinker
 >> $resident = Resident::where('medical_info', 'like', '%麻痺%')->first();
 >> $schedules = Schedule::where('resident_id', $resident->id)->with('scheduleType')->get();
->> $schedules->where('scheduleType.name', '入浴')->first()->title
-=> "特浴（リフト浴）"
+>> $schedules->where('scheduleType.name', ScheduleSeeder::SCHEDULE_TYPE_BATH)->first()->title
+=> ScheduleSeeder::BATH_TYPE_SPECIAL
 ```
 
 ## 🎯 次の段階への準備
