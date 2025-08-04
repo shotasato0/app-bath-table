@@ -286,6 +286,8 @@ public function up(): void
 - **部署権限**: User.department_idとの組み合わせ
 - **詳細権限**: 必要に応じて後から追加
 
+**注意**: この段階ではPermissionテーブルは作成しません。Phase 2-6の実装ではUser.roleによる基本的な権限管理で十分です。
+
 ### Step 3: Eloquentモデルのリレーション定義
 
 #### 3.1 Department モデル
